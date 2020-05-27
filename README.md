@@ -6,7 +6,7 @@ The application consists of:
 - [ui.R](https://github.com/hc-tbi-dabs/TBI-Project-Dashboard/blob/master/ui.R) : defines user interface of the application
 - [server.R](https://github.com/hc-tbi-dabs/TBI-Project-Dashboard/blob/master/server.R) : defines server components of the application
 - [global.R](https://github.com/hc-tbi-dabs/TBI-Project-Dashboard/blob/master/global.R) : loads libraries and data needed for the application
-- [functions.R]-[functions.R](https://github.com/hc-tbi-dabs/TBI-Project-Dashboard/blob/master/functions.R) : extra functions, dependencies needed
+- [functions.R](https://github.com/hc-tbi-dabs/TBI-Project-Dashboard/blob/master/functions.R) : extra functions, dependencies needed
 
 
 Author: HPFB
