@@ -3,11 +3,8 @@ TBI-Project-Dashboard displays information on schedule, milestones, budget, stag
 The application is composed of:
 
 ui.R : defines user interface of the application
-
 server.R : defines server components of the application
-
 global.R : loads libraries and data needed for the application
-
 functions.R: extra functions, dependencies needed
 
 Author: HPFB
