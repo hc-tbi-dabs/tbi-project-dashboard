@@ -1,6 +1,6 @@
 # TBI-Project-Dashboard
 
-TBI-Project-Dashboard displays information on schedule, milestones, budget, stage and project health for all IP and SF projects at Technology and Business Inovation (TBI). The dashboard was built using R Shiny.
+TBI-Project-Dashboard displays information on schedule, milestones, budget, stage and project health for all IP and SF projects at Technology and Business Inovation branch (TBI). The dashboard was built using R Shiny.
 
 The application consists of:
 - [ui.R](https://github.com/hc-tbi-dabs/TBI-Project-Dashboard/blob/master/ui.R) : defines user interface of the application
