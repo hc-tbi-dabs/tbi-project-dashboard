@@ -410,6 +410,7 @@ shinyServer(function(input, output,session) {
   
   output$overall2<-renderPlotly({
     status$IP2<-paste0(status$IP)
+    status$IP2<-map(status$IP2,is.sf_proj)
     df<-status%>%
       filter(`Overall Project Health`!='Blue')%>%
       filter(IP %in% ip_selected()$ips)%>%
