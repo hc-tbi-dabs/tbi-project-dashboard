@@ -167,27 +167,27 @@ timeplot<-function(df){  # removed argument internal
   return(timeline_plot)
 }
 
-
+# Remove IP prefix for SF projects --------------
+is.sf_proj<-function(proj_name){
+  if(startsWith(proj_name,"Cipher") | startsWith(proj_name,"Cyclops") | startsWith(proj_name,"Hummingbird") | startsWith(proj_name,"Kelpie") | startsWith(proj_name,"IP000")){
+    return(proj_name)
+  } else {
+    return(paste0("IP",proj_name))
+  }
+}
 
 # ========= Status ----
 
 status_plot<-function(df){
   cols<-c('On-Track'='#00B050','Caution'='#FFC000','Delayed'='#C00000')
   label=''
-  is.sf_proj<-function(proj_name){
-    if(startsWith(proj_name,"Cipher") | startsWith(proj_name,"Cyclops") | startsWith(proj_name,"Hummingbird") | startsWith(proj_name,"Kelpie") | startsWith(proj_name,"IP000")){
-      return(proj_name)
-    } else {
-      return(paste0("IP",proj_name))
-    }
-  }
-  plot_label<-map(ip,is.sf_proj)
+ 
   df%>%
     arrange(status)%>%
     ggplot(aes(x=as.character(IP),y=`Approved Budget`,size=`Approved Budget`,color=status,text=dollar(`Approved Budget`)))+
     scale_color_manual(values=cols)+
     geom_point(alpha=0.5)+
-    geom_text(aes(label=plot_label),size=3,nudge_y=200000,nudge_x=0.4)+
+    geom_text(aes(label=IP2),size=3,nudge_y=200000,nudge_x=0.4)+
     scale_size_continuous(breaks=c(500,100000,500000,5000000,20000000),range=c(1,30))+
     scale_y_continuous(limits=c(0,17000000),breaks=seq(1500000,20000000,2000000),labels = dollar_y)+
     theme_minimal()+
