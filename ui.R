@@ -120,6 +120,11 @@ ui<-secure_app(
                 valueBoxOutput("stage_4")
                 # valueBoxOutput("planning")
               ),
+              div(style="text-align:center;
+                        color:#4086b8;
+                        font-size:10;
+                        font-weight:bold;
+                  ",textOutput("caption")),
               uiOutput('ui_output3'),
               uiOutput('ui_output2'),
               uiOutput('ui_output1')
