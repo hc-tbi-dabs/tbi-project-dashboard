@@ -26,8 +26,8 @@ library(devtools)
 library(shinyjs)
 
 credentials <- data.frame(
-  user = c("hello_world"),
-  password = c("1234"),
+  user = c("user1"),
+  password = c("pass1"),
   # comment = c("alsace", "auvergne", "bretagne"), %>% 
   stringsAsFactors = FALSE
 )
@@ -78,14 +78,14 @@ schedule$Approved_finish_date<-as.Date(as.character(schedule$Approved_finish_dat
 proj_issue$`Target Date for Resolution`<-as.Date(as.character(proj_issue$`Target Date for Resolution`))
 
 # pasting schedule IP to major milestone blurb ----
-schedule$Major.Milestone<-paste0(schedule$Project,":",schedule$Major.Milestone)
+schedule$Major.Milestone<-paste0(schedule$IP,":",schedule$Major.Milestone)
 schedule$Major.Milestone.Standard<-paste0(schedule$Project,":",schedule$Major.Milestone.Standard)
 
 # list of ip and directorate ----
 ip<-c(description$IP[!is.na(description$IP)])
 directorate<-c('All') # Martin wants it to only say all
 
-# status cleaning ---- 
+# status cleaning ----  
 status$`Overall Project Health`[is.na(status$`Overall Project Health`)]<-'Blue'
 status$status[is.na(status$status)]<-'Not yet started'
 
@@ -116,3 +116,4 @@ stage_2 <- status%>%filter(grepl('2',stage,ignore.case=T))
 stage_3 <- status%>%filter(grepl('3',stage,ignore.case=T))
 stage_4 <- status%>%filter(grepl('4',stage,ignore.case=T))
 planning <- status%>%filter(grepl('planning',stage,ignore.case=T))
+

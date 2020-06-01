@@ -16,12 +16,12 @@ budget_plot<-function(ds){
           marker=list(color='rgb(252,205,201)'),
           hoverinfo='text',
           text=~paste('Capital: $',prettyNum(Capital,big.mark=',')))%>%
-    add_trace(y=~Non_Capital,name='Project Authority - Non-Capital',marker=list(color='rgb(248,118,109'),
+    add_trace(y=~Non_Capital,name='Project Authority - Non-Capital',marker=list(color='rgb(248,118,109)'),
               hoverinfo='text',
               text=~ label)%>%
     layout(barmode='stack',yaxis=list(title='Budget'))%>%
     add_trace(data=ds%>%filter(`Authority vs. Expenditures`=='Project Expenditures'),x=~year+0.2,y=~Non_Capital,type='bar',name='Project Expenditure',
-              marker=list(color='rgb(0,191,196'),
+              marker=list(color='rgb(0,191,196)'),
               hoverinfo='text',
               text=~label)%>%
     layout(xaxis=list(title='Fiscal Year',
@@ -95,7 +95,7 @@ timeplot<-function(df){  # removed argument internal
   
   df$Schedule.Health.Standard <- factor(df$Schedule.Health.Standard, levels=status_levels, ordered=TRUE)
   
-  positions <- c(0.4, -0.4, 0.5, -0.5,0.9,-0.9,1.25, -1.25)
+  positions <- c(0.4, -0.4, 0.5, -0.5,0.9,-0.9,1.2,-1.25)
   directions <- c(1, -1)
   
   line_pos <- data.frame(
@@ -110,9 +110,22 @@ timeplot<-function(df){  # removed argument internal
   df$month_count <- ave(df$Actual_date==df$Actual_date, df$Actual_date, FUN=cumsum)
   df$text_position <- (df$month_count * text_offset * df$direction) + df$position
   
-  month_buffer <- 4
+  month_buffer <- 6 # was 4 but 6 makes the projects that don't have tasks in 2018-2019 look more centered
   
-  month_date_range <- seq(min(df$Actual_date,na.rm=TRUE) - months(month_buffer), max(df$Actual_date,na.rm=TRUE) + months(month_buffer), by='month')
+  # Jodi's sanity check
+  
+  from <- min(df$Actual_date,na.rm=TRUE) - months(month_buffer)
+  to <- max(df$Actual_date,na.rm=TRUE) + months(month_buffer)
+  
+  if (is.na(from)) {
+    from <- min(df$Actual_date,na.rm=TRUE)
+  }
+  
+  if (is.na(to)) {
+    to <- max(df$Actual_date,na.rm=TRUE)
+  }
+  
+  month_date_range <- seq(from, to, by='month')
   month_df <- data.frame(month_date_range)
   month_df$month_format <- paste0(year(month_df$month_date_range),' ',quarters(month_df$month_date_range))
   month_df$month_format<-ifelse(month_df$month_format==lag(month_df$month_format,default=''),'',month_df$month_format)
@@ -149,7 +162,6 @@ timeplot<-function(df){  # removed argument internal
       legend.text=element_text(size=8,color='#494949')
     )
     
-    
   # }
   
   # Don't show axes, appropriately position legend
@@ -167,7 +179,10 @@ timeplot<-function(df){  # removed argument internal
   return(timeline_plot)
 }
 
-# Remove IP prefix for SF projects --------------
+
+
+# ========= Seth's Function that Removes "IP" from SF projects ----
+
 is.sf_proj<-function(proj_name){
   if(startsWith(proj_name,"Cipher") | startsWith(proj_name,"Cyclops") | startsWith(proj_name,"Hummingbird") | startsWith(proj_name,"Kelpie") | startsWith(proj_name,"IP000")){
     return(proj_name)
@@ -180,18 +195,25 @@ is.sf_proj<-function(proj_name){
 
 status_plot<-function(df){
   cols<-c('On-Track'='#00B050','Caution'='#FFC000','Delayed'='#C00000')
+  
+  # df<-df%>%mutate(txt_position=case_when(status =='Elevated Risk'~3,
+  #                                        status=='Caution'~2,
+  #                                        status=='On Track'~1))
+  # df<-df%>%arrange(status,desc(`Approved Budget`))
+  # df$index<-ifelse(as.numeric(rownames(df))%%2==0,1,-1)
+  # df$txt_position<-df$txt_position+0.3*df$index
   label=''
- 
+  
   df%>%
     arrange(status)%>%
     ggplot(aes(x=as.character(IP),y=`Approved Budget`,size=`Approved Budget`,color=status,text=dollar(`Approved Budget`)))+
     scale_color_manual(values=cols)+
     geom_point(alpha=0.5)+
-    geom_text(aes(label=IP2),size=3,nudge_y=200000,nudge_x=0.4)+
+    geom_text(aes(label=IP2),size=3,nudge_y=800000,nudge_x=0.4)+
     scale_size_continuous(breaks=c(500,100000,500000,5000000,20000000),range=c(1,30))+
     scale_y_continuous(limits=c(0,17000000),breaks=seq(1500000,20000000,2000000),labels = dollar_y)+
     theme_minimal()+
-    labs(x='Project')+
+    labs(x='IP Project')+
     annotate("text",x=length(unique(df$IP)),y=17*10^6,label=label,size=3)+
     theme(axis.text.x =element_blank(),legend.position='none')
 }

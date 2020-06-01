@@ -187,7 +187,7 @@ shinyServer(function(input, output,session) {
     
     DT::datatable
     
-    datatable(ds, options = list(searching = FALSE,pageLength = 5,lengthMenu = c(5, 15, 20), scrollX = T))
+    datatable(ds, options = list(searching = FALSE,pageLength = 5,lengthMenu = c(5, 10, 15, 20), scrollX = T))
   })
   
   
@@ -212,7 +212,7 @@ shinyServer(function(input, output,session) {
     
     # Jodi added this scrollbar to the table that is too long
     # https://stackoverflow.com/questions/46709404/adjusting-the-width-of-the-datatable-using-dt-in-r
-    datatable(ds, options = list(searching = FALSE,pageLength = 10,lengthMenu = c(10, 15, 20), scrollX = T))
+    datatable(ds, options = list(searching = FALSE,pageLength = 5,lengthMenu = c(5, 10, 15, 20), scrollX = T))
   })
   
   # ========= End of Project Portfolio Budget
@@ -271,6 +271,8 @@ shinyServer(function(input, output,session) {
 
 
     df<-no_completed_schedule_overview()%>%filter(!is.na(Approved_finish_date))
+    # df<-schedule_overview()%>%filter(!is.na(Approved_finish_date))
+    # using schedule ommitted completed tasks because too crowded
 
     shiny::validate((
       need(any(!is.na(df$Approved_finish_date)),'There is no information on project schedule')
@@ -571,4 +573,9 @@ shinyServer(function(input, output,session) {
   
   
   # ========= End of ValueBoxes
+  # ========= Caption ----
+  output$caption <- renderText({
+    text="*** completed tasks are hidden in main plot ***"
+  })
+  
 })
