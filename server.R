@@ -40,18 +40,19 @@ shinyServer(function(input, output,session) {
     showModal(modalDialog(
       title='Contact Us',
       HTML(paste(
-        "If you have any questions regarding data source or data quality, please contact:",br(),
-        "Sarah-Emily Carle",br(),
-        "Management, Program Support",br(),
-        "Business Informatics Division",br(),
-        "RMOD, HFPB",br(),
-        "sarah-emily.carle@canada.ca",br(),br(),
+        # "If you have any questions regarding data source or data quality, please contact:",br(),
+        # "Sarah-Emily Carle",br(),
+        # "Management, Program Support",br(),
+        # "Business Informatics Division",br(),
+        # "RMOD, HFPB",br(),
+        # "sarah-emily.carle@canada.ca",br(),br(),
         "If you have technical questions regarding the application, please contact:",br(),
-        "Nanqing (Nancy) Zhu",br(),
-        "Data Scientist",br(),
-        "Business Informatics Division",br(),
-        "RMOD, HFPB",br(),
-        "nanqing.zhu@canada.ca"
+        br(),
+        "Jodi Qiao",br(),
+        "Jr Data Scientist",br(),
+        "Data Analytics and Business Solutions",br(),
+        "TBI, POD",br(),
+        "di.qiao@canada.ca; dqiao100@uottawa.ca"
       )),
       easyClose=T
     ))
