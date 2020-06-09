@@ -70,11 +70,11 @@ shinyServer(function(input, output,session) {
     
     # Project by IP name header
     name<-all_proj%>%filter(IP== input$selectip)%>%pull(`Project`)
-    project_name<-paste0('IP',input$selectip,' ',name)
-    if(startsWith(project_name,"IPCipher") | startsWith(project_name,"IPCyclops") | startsWith(project_name,"IPHummingbird") | startsWith(project_name,"IPKelpie")){
+    project_name<-paste0(input$selectip,': ',name)
+    if(startsWith(project_name,"Cipher") | startsWith(project_name,"Cyclops") | startsWith(project_name,"Hummingbird") | startsWith(project_name,"Kelpie")){
       project_name<-name
-    } else if(startsWith(project_name,"IPIP000")){
-      project_name<-paste("IP000",name)
+    #} else if(startsWith(project_name,"IPIP000")){
+      #project_name<-paste("IP000",name)
     }
     h2(project_name,
        style = "font-family: 'Arial';margin-left:20px;
@@ -413,7 +413,7 @@ shinyServer(function(input, output,session) {
   
   output$overall2<-renderPlotly({
     status$IP2<-paste0(status$IP)
-    status$IP2<-map(status$IP2,is.sf_proj)
+    #status$IP2<-map(status$IP2,is.sf_proj)
     df<-status%>%
       filter(`Overall Project Health`!='Blue')%>%
       filter(IP %in% ip_selected()$ips)%>%
