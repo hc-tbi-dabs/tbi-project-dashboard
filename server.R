@@ -65,15 +65,13 @@ shinyServer(function(input, output,session) {
   output$ip_tbl<-renderTable(
     all_proj[,1:2]%>%mutate(IP=as.character(IP))
   )
-  
   output$project_name<-renderUI({
-    
     # Project by IP name header
     name<-all_proj%>%filter(IP== input$selectip)%>%pull(`Project`)
     project_name<-paste0(input$selectip,': ',name)
     if(startsWith(project_name,"Cipher") | startsWith(project_name,"Cyclops") | startsWith(project_name,"Hummingbird") | startsWith(project_name,"Kelpie")){
       project_name<-name
-    #} else if(startsWith(project_name,"IPIP000")){
+      #} else if(startsWith(project_name,"IPIP000")){
       #project_name<-paste("IP000",name)
     }
     h2(project_name,
@@ -117,8 +115,9 @@ shinyServer(function(input, output,session) {
   output$budget_all<-renderPlot({
     ds<-budget%>%filter(IP==input$selectip)%>%
       summarise(`Approved Budget`=sum(`Approved Budget`,na.rm=T),
+                `Forecasted Total Expenditures`=sum(`Forecasted Total Expenditures`,na.rm=T),
                 `Expenditure to Date`=sum(`Expenditure to Date`,na.rm=T),
-                `Remaining Budget Projected`=sum(`Variance / Remaining budget`,na.rm=T))%>%
+                `Project Forecasted Expenditures 2020-21`=sum(`Variance / Remaining budget`,na.rm=T))%>%
       gather(cat)
     
     budget_plot2(ds)
@@ -130,8 +129,9 @@ shinyServer(function(input, output,session) {
       filter(IP %in% ip_selected()$ips)%>%
       left_join(all_proj%>%select(IP=IP))%>%
       summarise(`Approved Budget`=sum(`Approved Budget`,na.rm=T),
+                `Forecasted Total Expenditures`=sum(`Forecasted Total Expenditures`,na.rm=T),
                 `Expenditure to Date`=sum(`Expenditure to Date`,na.rm=T),
-                `Remaining Budget Projected`=sum(`Variance / Remaining budget`,na.rm=T))%>%
+                `Project Forecasted Expenditures 2020-21`=sum(`Variance / Remaining budget`,na.rm=T))%>%
       gather(cat,value)
     
     budget_plot2(ds)
@@ -181,11 +181,12 @@ shinyServer(function(input, output,session) {
   
   output$budget_tbl<-DT::renderDataTable({
     
+    
     ds<-budget_yr%>%filter(IP==input$selectip)%>%
       spread(`Authority vs. Expenditures`,Value)%>%
-      select(-year)%>% # not sure why but big Y is needed here
+      select(-year)%>%
       mutate_at(c('Capital','Non_Capital','Project Authority', 'Project Expenditures'),dollar)
-    
+
     DT::datatable
     
     datatable(ds, options = list(searching = FALSE,pageLength = 5,lengthMenu = c(5, 10, 15, 20), scrollX = T))
@@ -208,6 +209,8 @@ shinyServer(function(input, output,session) {
     # summarise(value=sum(value,na.rm=T))%>%
     # mutate(value=dollar(value))%>%
     # spread(var,value)
+    
+
     
     DT::datatable
     
@@ -271,9 +274,10 @@ shinyServer(function(input, output,session) {
   output$schedule_plt2<-renderPlot({
 
 
-    df<-no_completed_schedule_overview()%>%filter(!is.na(Approved_finish_date))
-    # df<-schedule_overview()%>%filter(!is.na(Approved_finish_date))
+    #df<-no_completed_schedule_overview()%>%filter(!is.na(Approved_finish_date))
+    df<-schedule_overview()%>%filter(!is.na(Approved_finish_date))%>%filter(if(Schedule.Health.Standard == "completed"){Actual_date >= as.IDate(paste0(as.character(year(now())), "-01-01"))})
     # using schedule ommitted completed tasks because too crowded
+    # only show tasks completed this year
 
     shiny::validate((
       need(any(!is.na(df$Approved_finish_date)),'There is no information on project schedule')
@@ -310,7 +314,7 @@ shinyServer(function(input, output,session) {
     DT::datatable(df,options = list(dom = 'tip'), rownames = FALSE)
   })
 
-  # # ========= End of Schedule
+  # ========= End of Schedule
   # ========= Project Risk ----
     
     output$proj_risk_tb<-DT::renderDataTable({
@@ -483,7 +487,7 @@ shinyServer(function(input, output,session) {
       summarise(IP=paste(IP,collapse='\n'),count=n())
     df$status<-factor(df$status,levels=c('On-Track','Caution','Delayed','Not yet started'))
     
-    p=stage_plot(df)
+    p<-stage_plot(df)
     
     ggplotly(p,tooltip='none')%>%
       layout(margin = list(b = 40, l=30))
@@ -575,8 +579,63 @@ shinyServer(function(input, output,session) {
   
   # ========= End of ValueBoxes
   # ========= Caption ----
+  
   output$caption <- renderText({
-    text="*** completed tasks are hidden in main plot ***"
+    text="*** tasks completed before 2020 are hidden in main plot ***"
   })
   
+  # ========= End of Caption
+  # ========= Downloaders ----
+  
+  output$downloadData<-downloadHandler(
+    
+    filename<-function(){
+      paste('TBI Dashboard','xlsx',sep='.')
+    },
+    
+    content<-function(file){
+      file.copy('dattbi.xlsx',file)
+      
+    }
+  )
+  
+  output$downloadreport_overview<-downloadHandler(
+    filename='report.pdf',
+    
+    content = function(file) {
+      src <- normalizePath('report_overall.Rmd')
+      
+      # temporarily switch to the temp dir, in case you do not have write
+      # permission to the current working directory
+      owd <- setwd(tempdir())
+      on.exit(setwd(owd))
+      file.copy(src, 'report_overall.Rmd', overwrite = TRUE)
+      
+      library(rmarkdown)
+      out <- render('report_overall.Rmd', pdf_document())
+      file.rename(out, file)
+    }
+  )
+  
+  output$downloadreport_individual<-downloadHandler(
+    
+    filename='report.pdf',
+    
+    content = function(file) {
+      src <- normalizePath('report_individual.Rmd')
+      
+      # temporarily switch to the temp dir, in case you do not have write
+      # permission to the current working directory
+      owd <- setwd(tempdir())
+      on.exit(setwd(owd))
+      file.copy(src, 'report_individual.Rmd', overwrite = TRUE)
+      
+      library(rmarkdown)
+      out <- render('report_individual.Rmd', pdf_document())
+      file.rename(out, file)
+    }
+    
+  )
+  
+  # ========= End of Downloaders
 })
