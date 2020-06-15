@@ -24,10 +24,14 @@ library(ggrepel)
 library(devtools)
 # library(shinyauthr)
 library(shinyjs)
+library(lubridate)
+library(processx)
+library(rsconnect)
+library(webshot)
 
 credentials <- data.frame(
-  user = c("user1"),
-  password = c("pass1"),
+  user = c("dabs"),
+  password = c("TBI"),
   # comment = c("alsace", "auvergne", "bretagne"), %>% 
   stringsAsFactors = FALSE
 )

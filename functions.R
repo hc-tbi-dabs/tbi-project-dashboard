@@ -77,7 +77,8 @@ budget_plot2<-function(ds){
     theme(axis.title.x=element_blank(),
           axis.text.x =element_text(size=11,family='sans',color='#494949'),
           legend.text=element_text(size=12,family='sans',color='#494949'),
-          legend.justification = 'top')
+          legend.justification = 'top')+
+    coord_flip()
   
 }
 
