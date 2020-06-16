@@ -30,8 +30,8 @@ library(rsconnect)
 library(webshot)
 
 credentials <- data.frame(
-  user = c("dabs"),
-  password = c("TBI"),
+  user = c("user1"),
+  password = c("pass1"),
   # comment = c("alsace", "auvergne", "bretagne"), %>% 
   stringsAsFactors = FALSE
 )
