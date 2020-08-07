@@ -25,6 +25,7 @@ library(devtools)
 # library(shinyauthr)
 library(shinyjs)
 library(lubridate)
+library(orca)
 library(processx)
 library(rsconnect)
 library(webshot)
@@ -104,16 +105,20 @@ budget_yr$Capital<-ifelse(is.na(budget_yr$Capital),0,budget_yr$Capital)
 budget_yr$Non_Capital<-budget_yr$Value-budget_yr$Capital
 budget_yr$year<-as.numeric(substr(budget_yr$Year,1,4))
 
+# sorted budget ----
+# for reporting purposes
+sorted_budget<-budget[order(-budget$`Approved Budget`),]
+
 # schedule data wrangling ----
 
 no_completed_schedule <- schedule[!grepl("completed", schedule$Schedule.Health.Standard),]
 
-# count completed, covid delayed
+# count completed, covid delayed ----
 
 schedule_completed <- schedule%>%filter(grepl('completed',Schedule.Health.Standard,ignore.case=T))
 covid_delayed <- schedule%>%filter(grepl('covid',Schedule.Health,ignore.case=T))
 
-# project stages counts
+# project stages counts ----
 
 stage_1 <- status%>%filter(grepl('1',stage,ignore.case=T))
 stage_2 <- status%>%filter(grepl('2',stage,ignore.case=T))
