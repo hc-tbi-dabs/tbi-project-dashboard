@@ -108,6 +108,31 @@ shinyServer(function(input, output,session) {
   
   # ========= End of Select IP Side Menu 
   
+  # ========= Project Selected ----
+  
+  project_selected<-reactive({
+    
+    ip<-input$selectip
+    names<-all_proj$`Project`[all_proj$IP==input$selectip]
+    
+    return(list(ip=ip,names=names))
+  })
+  
+  # ========= End of Project Selected
+  
+  # ========= Report Title ----
+  
+  report_title<-reactive({
+    ip<-input$selectip
+    project_title<-project_selected()$names[project_selected()$ip==ip]
+    if(ip!=project_title){
+      report_title<-paste(ip, project_title)
+    } else {
+      report_title<-ip
+    }
+    return(report_title)
+  })
+  
   # ========= Removed Functionality Plots
   
   # ========= Project Portfolio Budget ----
@@ -600,16 +625,20 @@ shinyServer(function(input, output,session) {
   )
   
   output$downloadreport_overview<-downloadHandler(
-    filename='report.pdf',
+    filename=function() {
+      paste0('Overview of TBI Investment Projects','-', Sys.Date(),'.pdf')
+    },
     
     content = function(file) {
       src <- normalizePath('report_overall.Rmd')
+      src2 <- normalizePath('overall.png')
       
       # temporarily switch to the temp dir, in case you do not have write
       # permission to the current working directory
       owd <- setwd(tempdir())
       on.exit(setwd(owd))
       file.copy(src, 'report_overall.Rmd', overwrite = TRUE)
+      file.copy(src2, 'overall.png')
       
       library(rmarkdown)
       out <- render('report_overall.Rmd', pdf_document())
@@ -619,16 +648,21 @@ shinyServer(function(input, output,session) {
   
   output$downloadreport_individual<-downloadHandler(
     
-    filename='report.pdf',
+    filename=function(){
+      paste0(ip_selected()$ip,'-',project_selected()$names,'-',Sys.Date(),'.pdf')
+    },
     
     content = function(file) {
       src <- normalizePath('report_individual.Rmd')
+      img_name <- paste0(ip_selected()$ip,'.png')
+      src2 <- normalizePath(img_name)
       
       # temporarily switch to the temp dir, in case you do not have write
       # permission to the current working directory
       owd <- setwd(tempdir())
       on.exit(setwd(owd))
       file.copy(src, 'report_individual.Rmd', overwrite = TRUE)
+      file.copy(src2, img_name)
       
       library(rmarkdown)
       out <- render('report_individual.Rmd', pdf_document())
