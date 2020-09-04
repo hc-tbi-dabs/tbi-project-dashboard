@@ -31,8 +31,8 @@ library(rsconnect)
 library(webshot)
 
 credentials <- data.frame(
-  user = c("user1"),
-  password = c("pass1"),
+  user = c("dabs"),
+  password = c("TBI"),
   # comment = c("alsace", "auvergne", "bretagne"), %>% 
   stringsAsFactors = FALSE
 )
@@ -125,4 +125,3 @@ stage_2 <- status%>%filter(grepl('2',stage,ignore.case=T))
 stage_3 <- status%>%filter(grepl('3',stage,ignore.case=T))
 stage_4 <- status%>%filter(grepl('4',stage,ignore.case=T))
 planning <- status%>%filter(grepl('planning',stage,ignore.case=T))
-
