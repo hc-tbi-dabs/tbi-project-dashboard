@@ -32,6 +32,8 @@ ui<-secure_app(
                    sidebarMenu(id='sidebar',
                                menuItem('Overview',tabName='overview'),
                                menuItem('Individual',tabName='individual'),
+                               menuItem('About',tabName='explanations'),
+                               #menuItem('KPIs',tabName='kpis'),
                                
                                conditionalPanel(
                                  condition="input.sidebar == 'individual' ",
@@ -111,23 +113,25 @@ ui<-secure_app(
                 div(style="display: inline-block;vertical-align:center; width: 300px;",HTML("<br>")),
                 bsModal('modal','IP Name','info',tableOutput('ip_tbl')),
                 br(),
-                br(),
-                valueBoxOutput("completed"),
-                valueBoxOutput("delayed"),
-                valueBoxOutput("stage_1"),
-                valueBoxOutput("stage_2"),
-                valueBoxOutput("stage_3"),
-                valueBoxOutput("stage_4")
+                br()
+                #valueBoxOutput("completed"),
+                #valueBoxOutput("delayed"),
                 # valueBoxOutput("planning")
               ),
+              valueBoxOutput("stage_1", width=2),
+              valueBoxOutput("stage_2", width=2),
+              valueBoxOutput("stage_3", width=2),
+              valueBoxOutput("stage_4", width=2),
+              valueBoxOutput("planning", width=2),
+              valueBoxOutput("testing", width=2),
+              uiOutput('ui_output1'),
+              uiOutput('ui_output2'),
               div(style="text-align:center;
                         color:#4086b8;
                         font-size:10;
                         font-weight:bold;
                   ",textOutput("caption")),
-              uiOutput('ui_output3'),
-              uiOutput('ui_output2'),
-              uiOutput('ui_output1')
+              uiOutput('ui_output3')
               
               # fluidRow(
               #   box(title='Project Risks',
@@ -150,15 +154,6 @@ ui<-secure_app(
               ),
               
               fluidRow(
-                column(12,
-                       box(title='Schedule',width=NULL,
-                           withSpinner(plotlyOutput('schedule_plt')),
-                           br(),
-                           br(),
-                           DT::dataTableOutput('schedule_tb')))
-              ),
-              
-              fluidRow(
                 
                 # box(title='Project Functionality',height='500px',
                 #     tabsetPanel(id='tabs',
@@ -167,17 +162,17 @@ ui<-secure_app(
                 #                          DT::dataTableOutput("function_tb"))
                 #     )),
                 
-                
-                box(title='Project Budget',height='500px',
+                box(title='Project Budget',
                     tabsetPanel(
                       tabPanel(title='Breakdown by Year',
-                               withSpinner(plotlyOutput('budget_plt'))),
+                               withSpinner(plotlyOutput('budget_plt', height=450))),
                       tabPanel(title='Table',
-                               DT::dataTableOutput('budget_tbl')),
-                      tabPanel(title='Projections',
-                               withSpinner(plotOutput('budget_all'))))
-                    
-                )),
+                               DT::dataTableOutput('budget_tbl', height=450)))
+                    ),
+                box(
+                  title='Projections',
+                  withSpinner(plotOutput('budget_all', height=490)))
+                ),
               
               
               fluidRow(
@@ -190,9 +185,36 @@ ui<-secure_app(
                 column(12,
                        box(title='Project Issues',width=NULL,
                            DT::dataTableOutput('proj_issue_tb')))
+              ),
+              
+              fluidRow(
+                column(12,
+                       box(title='Schedule',width=NULL,
+                           withSpinner(plotlyOutput('schedule_plt')),
+                           br(),
+                           br(),
+                           DT::dataTableOutput('schedule_tb')))
               )
               
+      ),
+      
+      tabItem(tabName='explanations',
               
+              fluidRow(width=12,
+                       uiOutput('explanations_header')
+              ),
+              
+              fluidRow(
+                column(12,
+                       includeHTML("explanations.html"))
+              )
+      ),
+      
+      tabItem(tabName='kpis',
+              
+              fluidRow(width=12,
+                       uiOutput('kpis_header')
+              )
       )
     )
     

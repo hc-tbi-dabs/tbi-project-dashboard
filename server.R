@@ -476,7 +476,7 @@ shinyServer(function(input, output,session) {
             tabPanel(title='Breakdown by Year',
                      withSpinner(plotlyOutput('budget_plt2',height=450))),
             tabPanel(title='Table',
-                     DT::dataTableOutput('budget_tbl2')),
+                     DT::dataTableOutput('budget_tbl2', height=450)),
             tabPanel(title='Projections',
                      withSpinner(plotOutput('budget_all2',height=450))))
       ),
@@ -492,8 +492,9 @@ shinyServer(function(input, output,session) {
       box(title='Schedule',width=12,
           withSpinner(plotOutput('schedule_plt2',height=500)),
           br(),
-          br(),
-          DT::dataTableOutput('schedule_tb2'))
+          br()
+          #DT::dataTableOutput('schedule_tb2')
+          )
     )
     
   })
@@ -528,7 +529,7 @@ shinyServer(function(input, output,session) {
       select(status,`Overall Project Health`)
     
     
-    valueBox(tags$p(status$status, style = "font-size: 80%;"),
+    valueBox(tags$p(status$`Overall Project Health`, style = "font-size: 80%;"),
              subtitle='Overall Project Health',color=tolower(status$`Overall Project Health`),
              width=3)
     
@@ -570,35 +571,42 @@ shinyServer(function(input, output,session) {
     count<-nrow(stage_1)
     
     valueBox(tags$p(count, style = "font-size: 80%;"),
-             subtitle='Number of Stage One Projects',color='light-blue',width=3,icon=icon("battery-empty"))
+             subtitle='Stage One Projects',color='aqua',width=2,icon=icon("battery-empty"))
   })
   
   output$stage_2<-renderValueBox({
     count<-nrow(stage_2)
     
     valueBox(tags$p(count, style = "font-size: 80%;"),
-             subtitle='Number of Stage Two Projects',color='light-blue',width=3,icon=icon("battery-quarter"))
+             subtitle='Stage Two Projects',color='yellow',width=2,icon=icon("battery-quarter"))
   })
   
   output$stage_3<-renderValueBox({
     count<-nrow(stage_3)
     
     valueBox(tags$p(count, style = "font-size: 80%;"),
-             subtitle='Number of Stage Three Projects',color='light-blue',width=3,icon=icon("battery-half"))
+             subtitle='Stage Three Projects',color='orange',width=2,icon=icon("battery-half"))
   })
   
   output$stage_4<-renderValueBox({
     count<-nrow(stage_4)
     
     valueBox(tags$p(count, style = "font-size: 80%;"),
-             subtitle='Number of Stage Four Projects',color='light-blue',width=3,icon=icon("battery-three-quarters"))
+             subtitle='Stage Four Projects',color='fuchsia',width=2,icon=icon("battery-three-quarters"))
   })
   
   output$planning<-renderValueBox({
     count<-nrow(planning)
     
     valueBox(tags$p(count, style = "font-size: 80%;"),
-             subtitle='Number of Covid Delayed Tasks',color='light-blue',width=3)
+             subtitle='Planning Stage',color='teal',width=2,icon=icon("seedling"))
+  })
+  
+  output$testing<-renderValueBox({
+    #count<-nrow(testing)
+    
+    valueBox(tags$p(2, style = "font-size: 80%;"),
+             subtitle='Testing Stage',color='olive',width=2,icon=icon("pagelines"))
   })
   
   
@@ -672,4 +680,21 @@ shinyServer(function(input, output,session) {
   )
   
   # ========= End of Downloaders
+  # ========= Explanations Tab ----
+  
+  # ========= Explanations Header ----
+ 
+   output$explanations_header<-renderUI({
+    
+    # explanations header
+    explanations_header<-"Explanation of Status Indicators & Project Stages"
+    h2(explanations_header,
+       style = "font-family: 'Arial';margin-left:20px;
+        font-weight: bold; line-height: 1.1;
+        color: #2E4053;")
+  })
+  
+  
+  # ======== End of Explanations Tab
+  
 })
