@@ -1,0 +1,449 @@
+<html>
+<head>
+  <style>
+  
+    .table.small-table {
+      font-family: arial, sans-serif;
+      border: 3px solid #7c7c7c;
+      border-collapse: collapse;
+      min-height: 175px;
+      width: 50%;
+    }
+
+    .table.invisi-table {
+      border-style: hidden;
+    }
+
+    .table.metric-table {
+      font-family: arial, sans-serif;
+      border: 3px solid #7c7c7c;
+      border-collapse: collapse;
+      min-height: 350px;
+      width: 50%;
+      /*The tables and such are not "responsive", hence will look bad at small screen sizes*/
+    }
+
+    .table.small-table td, .table.small-table th {
+      border: 1px solid #000000;
+      text-align: left;
+      padding: 5px;
+    }
+
+    .table.metric-table td, .table.metric-table th {
+      border: 1px solid #000000;
+      text-align: left;
+      padding: 5px;
+    }
+
+    .table.invisi-table td, .table.invisi-table th {
+      border-style: hidden;
+      padding: 1px;
+    }
+
+    .table-wrapper {
+      display: flex;
+    }
+
+    .table-wrapper-single {
+      display: block;
+    }
+
+    .squares-wrapper {
+      display: inline-flex;
+    }
+    
+  </style>
+</head>
+<body>
+
+<div id="content">
+
+<br/>
+
+<h3>Overall Project Health</h3>
+
+<p>The interpretation of the color section is based on the status of the core project management metrics as follows:</p>
+
+<br/>
+
+<div class="table-wrapper">
+  <!-- Overall project health table -->
+  <table class="table small-table" style="margin-right:10px;">
+      <tr>
+        <td style="width:40px; background-color:green"></td>
+        <td style="width:40px">Green</td>
+        <td>On scope, on schedule, on budget and managed risks.</td>
+      </tr>
+      <tr>
+          <td style="background-color:yellow"></td>
+          <td>Yellow</td>
+          <td>Slightly behind schedule or slightly over budget, with some impact on milestones, but corrective actions proposed and with most risks under control.</td>
+      </tr>
+      <tr>
+          <td style="background-color:red"></td>
+          <td>Red</td>
+          <td>In serious difficulty and needs immediate attention. Significant intervention required.</td>
+      </tr>
+  </table>
+
+  <!-- Color "calculations" -->
+  <table class="table invisi-table">
+    <tr>
+      <td>
+        <div class="squares-wrapper">
+        <span style="color:red">&#9632</span>
+        <span style="color:red">&#9632</span>
+        </div>
+      </td>
+      <td>2 Reds force the overall project health to "RED"</td>
+    </tr>
+    <tr>
+        <td>
+          <div class="squares-wrapper">
+            <span style="color:red">&#9632</span>
+          </div>
+        </td>
+        <td>1 Red force the overall project health to "YELLOW"</td>
+    </tr>
+    <tr>
+        <td>
+          <div class="squares-wrapper">
+            <span style="color:#f0ab18">&#9632</span>
+            <span style="color:#f0ab18">&#9632</span>
+          </div>
+        </td>
+        <td>2 Yellows force the overall project health to "YELLOW"</td>
+    </tr>
+    <tr>
+      <td>
+        <div class="squares-wrapper">
+          <span style="color:#f0ab18">&#9632</span>
+          <span style="color:#f0ab18">&#9632</span>
+          <span style="color:#f0ab18">&#9632</span>
+        </div>
+      </td>
+      <td>3 Yellows force the overall project health to "RED"</td>
+    </tr>
+    <tr>
+      <td>
+        <div class="squares-wrapper">
+          <span style="color:#f0ab18">&#9632</span>
+          <span style="color:red">&#9632</span>
+        </div>
+      </td>
+      <td>1 Yellow plus 1 Red force the overall project health to "RED"</td>
+    </tr>
+    <tr>
+      <td>
+        <div class="squares-wrapper">
+          <span style="color:#f0ab18">&#9632</span>
+          <span style="color:#f0ab18">&#9632</span>
+          <span style="color:red">&#9632</span>
+        </div>
+      </td>
+      <td>2 Yellow plus 1 Red force the overall project health to "RED"</td>
+    </tr>
+    <tr>
+      <td>
+        <div class="squares-wrapper">
+          <span style="color:green">&#9632</span>
+          <span style="color:#f0ab18">&#9632</span>
+          <span style="color:green">&#9632</span>
+          <span style="color:green">&#9632</span>
+          <span style="color:green">&#9632</span>
+        </div>
+      </td>
+      <td>Most other scenarios will result in the overall project health of "GREEN"</td>
+    </tr>
+  </table>
+</div>
+
+<br/>
+
+<h3>Individual Component Metric Status</h3>
+
+<div class="table-wrapper">
+  <!-- Cost metric status -->
+  <table class="table metric-table" style="margin-right:10px">
+    <caption><b>Cost</b></caption>
+      <tr>
+        <td style="width:40px; background-color:green"></td>
+        <!--<td style="width:40px">Green</td>-->
+        <td>
+          <ul>
+            <li>Variance of less than 10%.</li>
+            <li>project is progressing on track and the intended business outcomes are expected to be achieved.</li>
+            <li>Project completion is expected within budget.</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+          <td style="background-color:yellow"></td>
+          <!--<td>Yellow</td>-->
+          <td>
+            <ul>
+              <li>Variance of between 10% and 20%.</li>
+              <li>Some course correction <b><u>may</u></b> be required.
+              <li>One of more of the intended business outcomes <b><u>may not</u></b> be possible within budget.</li>
+              <li>Additional funding or re-profiling <b><u>may</u></b> be required.</li>
+            </ul>
+          </td>
+      </tr>
+      <tr>
+          <td style="background-color:red"></td>
+          <!--<td>Red</td>-->
+          <td>
+            <ul>
+              <li>Variance of over 20%.</li>
+              <li>Significant course correction <b><u>may</u></b> be required.</li>
+              <li>One of more of the intended business outcomes <b><u>may not</u></b> be possible within the budget.</li>
+              <li>Funding decisions <b><u>are</u></b> required.</li>
+            </ul>
+          </td>
+      </tr>
+  </table>
+  <!-- Schedule Metric Status -->
+  <table class="table metric-table" style="margin-right:10px">
+    <caption><b>Schedule</b></caption>
+    <tr>
+      <td style="width:40px; background-color:green"></td>
+      <td>
+          <ul>
+            <li>Variance of less than 10%.</li>
+            <li>The project is progressing on track and the intended business outcomes are expecte to be achieved.</li>
+            <li>Project completion is expected within the planned schedule.</li>
+          </ul>
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color:yellow"></td>
+        <td>
+          <ul>
+            <li>Variance of between 10% and 20%.</li>
+            <li>Some course correction <b><u>may</u></b> be required.</li>
+            <li>One or more of the intended business outcomes <b><u>may not</u></b> be achieved.</li>
+            <li>Project completion <b><u>may not</u></b> be achieved.</li>
+            <li>Project completion <b><u>may not</u></b> be possible within the planned schedule.</li>
+          </ul>
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color:red"></td>
+        <td>
+          <ul>
+            <li>Variance of over 20%.</li>
+            <li>Significant course correction <b><u>may</u></b> be required.</li>
+            <li>One or more of the intended business outcomes <b><u>may not</u></b> be achieved.</li>
+            <li>Project completion <b><u>may not</u></b> be possible within the planned schedule.</li>
+            <li>Scheduling decisions <b><u>are</u></b> required.</li>
+          </ul>
+        </td>
+    </tr>
+  </table>
+</div>
+
+<br/>
+
+<div class="table-wrapper">
+  <!-- Scope metric status -->
+  <table class="table metric-table" style="margin-right:10px">
+    <caption><b>Scope</b></caption>
+      <tr>
+        <td style="width:40px; background-color:green"></td>
+        <td>
+          <ul>
+            <li>The project is on track.</li>
+            <li>The intended business outcomes are expected to be achieved.</li>
+            <li>Identified changes are <b><u>not</u></b> expected to negatively impact the project's scope, cost or schedule.</li>
+          </ul></td>
+      </tr>
+      <tr>
+          <td style="background-color:yellow"></td>
+          <td>
+            <ul>
+              <li>Some course correction <b><u>may</u></b> be required.</li>
+              <li>One or more of the intended business outcomes <b><u>may not</u></b> be achieved.</li>
+              <li>Identified changes <b><u>may</u></b> negatively impact the project's scope, cost or schedule and some course correction <b><u>may</u></b> be required.</li>
+            </ul>
+          </td>
+      </tr>
+      <tr>
+          <td style="background-color:red"></td>
+          <td>
+            <ul>
+              <li>Significant course correction <b><u>may</u></b> be required.</li>
+              <li>One or more of the intended business outcomes <b><u>may not</u></b> be achieved.</li>
+              <li>Identified changes <b><u>may</u></b> negatively impact the project's scope, cost or schedule and significant course correction <b><u>may</u></b> be required.</li>
+            </ul>
+          </td>
+      </tr>
+  </table>
+  <!-- Risk Metric Status -->
+  <table class="table metric-table" style="margin-right:10px">
+    <caption><b>Risk</b></caption>
+    <tr>
+      <td style="width:40px; background-color:green"></td>
+      <td>
+        <ul>
+          <li>The project is on track.</li>
+          <li>The identified risks are <b><u>not</u></b> expected to impact theother project metrics or overall business outcomes.</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+        <td style="background-color:yellow"></td>
+        <td>
+          <ul>
+            <li>Some course correction <b><u>may</u></b> be required.</li>
+            <li>One or more of the intended risks <b><u>may</u></b> impact the other project metrics or overall business outcomes and some course correction <b><u>may</u></b> be requried.</li>
+          </ul>
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color:red"></td>
+        <td>
+          <ul>
+            <li>Significant course correction <b><u>may</u></b> be required.</li>
+            <li>One or more of the intended risks <b><u>may</u></b> impact the other project metrics or overall business outcomes and significant course correction <b><u>may</u></b> be required.</li>
+          </ul>
+        </td>
+    </tr>
+  </table>
+</div>
+
+<div class="table-wrapper-single">
+  <!-- Issues metric status -->
+  <table class="table metric-table" style="margin-right:10px; width:100%!important">
+    <caption><b>Issues</b></caption>
+      <tr>
+        <td style="width:40px; background-color:green"></td>
+        <td>
+          <ul>
+            <li>The project is on track.</li>
+            <li>The intended business outcomes are expected to be achieved.</li>
+            <li>Identified changes are <b><u>not</u></b> expected to negatively impact the project's scope, cost or schedule.</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+          <td style="background-color:yellow"></td>
+          <td>
+            <ul>
+              <li>Some course correction <b><u>may</u></b> be required.</li>
+              <li>One or more of the intended business outcomes <b><u>may not</u></b> be achieved.</li>
+              <li>Identified changes <b><u>may</u></b> negatively impact the project's scope, cost or schedule and some course correction <b><u>may</u></b> be required.</li>
+            </ul>
+          </td>
+      </tr>
+      <tr>
+          <td style="background-color:red"></td>
+          <td>
+            <ul>
+              <li>Significant course correction <b><u>may</u></b> be required.</li>
+              <li>One or more of the intended business outcomes <b><u>may not</u></b> be achieved.</li>
+              <li>Identified changes <b><u>may</u></b> negatively impact the project's scope, cost or schedule and significant course correction <b><u>may</u></b> be required.</li>
+            </ul>
+          </td>
+      </tr>
+  </table>
+</div>
+
+<br/>
+
+<h3>Individual Risk Classification</h3>
+
+<div class="table-wrapper">
+  <!-- Individual risks - impact -->
+  <table class="table small-table" style="margin-right:10px">
+    <caption><b>Individual Risks - Impact</b></caption>
+      <tr>
+        <td style="width:40px; background-color:green"></td>
+        <td>
+            Minor impact on the project, e.g. &lt; 5% deviation in scope, scheduled end-date or project budget.
+        </td>
+      </tr>
+      <tr>
+        <td style="background-color:yellow"></td>
+        <td>
+          Measurable impact on the project, e.g. 5-20% deviation in scope, scheduled end-date or project budget.
+        </td>
+      </tr>
+      <tr>
+        <td style="background-color:red"></td>
+        <td>
+          Major impact on the project, e.g. &gt; 25% deviation in scope, scheduled end-date or project budget.
+        </td>
+      </tr>
+  </table>
+  <!-- Individual risks - probability -->
+  <table class="table small-table" style="margin-right:10px">
+    <caption><b>Individual Risks - Probability</b></caption>
+    <tr>
+      <td style="width:40px; background-color:green"></td>
+      <td>
+        Unlikely to occur, based on current information, as the circumstances likely to trigger the risk are also unlikely to occur.
+      </td>
+    </tr>
+    <tr>
+        <td style="background-color:yellow"></td>
+        <td>
+          Likely to occur as it is clear that the risk will probably materialize.
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color:red"></td>
+        <td>
+          Highly likely to occur as the circumstances which will cause this risk to materialize are also very likely to be created.
+        </td>
+    </tr>
+  </table>
+</div>
+
+<br/>
+
+<div class="table-wrapper">
+  <!-- Individual issues - impcat -->
+  <table class="table metric-table" style="margin-right:10px; width:100%!important">
+    <caption><b>Individual Issues - Impact</b></caption>
+      <tr>
+        <td style="width:40px; background-color:green"></td>
+        <td>
+          Indicates that issues are under control and well managed. The following are in place, up-to-date and actively managed:
+          <ul style="list-style-type:square;">
+            <li>Resolution Plan and Target date for resolution;</li>
+            <li>Ownership identified and accepted, and;</li>
+            <li>All identified issues are manageable within the scope, cost and schedule baselines.</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+          <td style="background-color:yellow"></td>
+          <td>
+            Indicates caution as issues are not being adequately addressed. One or more of the following might be missing:
+            <ul style="list-style-type:square;">
+              <li>Resolution plan;</li>
+              <li>Target date for resolution;</li>
+              <li>Ownership identified and accepted, and;</li>
+              <li>One or more of the identified issues are potentially unmanageable within the scope, cost or schedule baselines.</li>
+            </ul>
+          </td>
+      </tr>
+      <tr>
+          <td style="background-color:red"></td>
+          <td>
+            Indicates alert, as issues are not being managed, or the resolution activities undertaken to date have not been effective in resolving the issues, and objectives are being impacted - serious attention is required to resolve the issues. One or more of the following is not in place, up-to-date or actively managed:
+            <ul style="list-style-type:square;">
+              <li>Resolution plan;</li>
+              <li>Target date for resoltuion;</li>
+              <li>Ownership identified and accepted, and;</li>
+              <li>One or more of the identified issues will seriously affect the scope, cost or schedule baselines.</li>
+            </ul>
+          </td>
+      </tr>
+  </table>
+</div>
+
+</div> <!--Content div-->
+
+</body>
+</html>
