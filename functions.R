@@ -36,31 +36,27 @@ dollar_y <- function(x){
 
 budget_plot2<-function(ds){
   
-  min <- ifelse(min(ds$value) < 0, abs(min(ds$value)) * -1.2, 0)
-  max <- max(ds$value) * 1.2
-    
-  ds$col <- ifelse(ds$value >= 0, '#1f77b4', '#980008')
+  min<-ifelse(min(ds$value)<0,abs(min(ds$value))*-1.2,0)
+  max<-max(ds$value)*1.2
   
-  p <- ggplot(data = ds,
-              aes(x = cat, y = value, fill = col)) +
-    geom_bar(stat = 'identity', position = 'dodge') +
-    scale_fill_manual(values = c('#1f77b4', '#980008')) +
-    guides(fill=FALSE) +
-    scale_y_continuous(labels = dollar_y, limits=c(min, max)) +
-    labs(y = 'Budget Amount') +
-    geom_text(
-      aes(label = dollar(value),
-          vjust = ifelse(value > 0, -1, 1.5)),
-      position = position_dodge(width = 1)) +
-    theme_minimal() +
+    
+  ds$col<-ifelse(ds$value>=0,'#1f77b4','#980008')
+  
+  p<-ggplot(ds,aes(x=cat,y=value,fill=col))+geom_bar(stat='identity',position='dodge')+
+    scale_fill_manual(values=c('#1f77b4','#980008'))+
+    guides(fill=FALSE)
+  
+  p+scale_y_continuous(labels=dollar_y,limits=c(min,max))+
+    labs(y='Budget Amount')+
+    geom_text(aes(label=dollar(value),vjust=ifelse(value>0,-1,1.5)),position = position_dodge(width = 1))+
+    theme_minimal()+
     theme(axis.title.x=element_blank(),
-          axis.text.x =element_text(size = 11,family='sans',color='#494949'),
+          axis.text.x =element_text(size=11,family='sans',color='#494949'),
           legend.text=element_text(size=12,family='sans',color='#494949'),
-          legend.justification = 'top') +
+          legend.justification = 'top')+
     coord_flip()
+  
 }
-
-
 
 # ========= Timeplot ----
 
@@ -177,33 +173,23 @@ status_plot<- function(df, x_axis_label) {
   y_max <- max(df[["Approved Budget"]])
   y_upper_limit <- y_max + 0.2 * y_max
  
-  print("Y MAX") 
-  print(y_max)
-  
   cols <- c("On-Track" = "#00B050",
             "Caution"  = "#FFC000",
             "Delayed"  = "#C00000")
   
   label = ""
   
-  print(df) 
-  
   df %>%
     arrange(status) %>%
     ggplot(
-      aes(
-        x = as.character(IP),
-        y = `Approved Budget`,
-        size = `Approved Budget`,
-        color = status,
-        text = dollar(`Approved Budget`))) +
+      aes(x = as.character(IP),
+          y = `Approved Budget`,
+          size = `Approved Budget`,
+          color = status,
+          text = dollar(`Approved Budget`))) +
     scale_color_manual(values = cols) +
     geom_point(alpha = 0.3) +
-    geom_text(
-      aes(label = IP2),
-      size = 4,
-      nudge_y = 0,
-      nudge_x = 0) +
+    geom_text(aes(label = IP2), size = 4) +
     scale_size_continuous(
       breaks = seq(from = y_max/6, to = y_max, length.out = 6), range=c(0, 36)) +
     scale_y_continuous(

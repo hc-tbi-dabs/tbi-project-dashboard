@@ -213,9 +213,41 @@ shinyServer(function(input, output,session) {
     
     return(no_completed_schedule)
   })
-  
 
-  output$timevis_plot <- renderTimevis({
+  
+  
+  output$timevis_plot_all <- renderTimevis({
+
+    df <- schedule
+
+    shiny::validate((
+      need(any(!is.na(df$Approved_finish_date)),
+           "There is no information on Approved_finish_date")
+    ))
+    
+    shiny::validate((
+      need(any(!is.na(df$Actual_date)),
+           "There is no information on Actual_date")
+    ))
+    
+    shiny::validate((
+      need(any(!is.na(df$Schedule.Health.Standard)),
+           "There is no information on Schedule.Health")
+    ))
+
+    data <- tibble(
+      id      = 1:nrow(df),
+      content = df["Major.Milestone"],
+      start   = df["Approved_finish_date"],
+      end     = rep(NA, nrow(df)) 
+    )
+   
+    timevis(data)
+    
+  })
+    
+
+  output$timevis_plot_individual <- renderTimevis({
 
     df <- schedule %>%
       filter(IP == ip_selected()$ip)
@@ -245,6 +277,8 @@ shinyServer(function(input, output,session) {
     timevis(data)
     
   })
+  
+  
   
   output$schedule_plt2 <- renderPlot({
     df <- schedule_overview() %>%
