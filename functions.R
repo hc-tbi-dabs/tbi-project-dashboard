@@ -44,7 +44,8 @@ budget_plot2<-function(ds){
   
   p<-ggplot(ds,aes(x=cat,y=value,fill=col))+geom_bar(stat='identity',position='dodge')+
     scale_fill_manual(values=c('#1f77b4','#980008'))+
-    guides(fill=FALSE)
+    guides(fill=FALSE) %>% 
+    config(displayModeBar = F) %>%
   
   p+scale_y_continuous(labels=dollar_y,limits=c(min,max))+
     labs(y='Budget Amount')+
@@ -63,20 +64,26 @@ budget_plot2<-function(ds){
 # ========= Timeplot ----
 
 timeplot<-function(df){  # removed argument internal
-  status_levels <- c("forecasted completion date is within 3 months of baseline date", # green
-                     "forecasted completion date within 3-6 months of baseline date", # yellow
-                     "forecasted completion over 6 months of baseline date", # red
-                     "completed" # black
-                     )
+  
+  status_levels <- c(
+    "forecasted completion date is within 3 months of baseline date", # green
+    "forecasted completion date within 3-6 months of baseline date", # yellow
+    "forecasted completion over 6 months of baseline date", # red
+    "completed" # black
+  )
+  
   status_colors <- c( "#00B050", "#FFC000", "#C00000", "#000000")
   
-  df$Schedule.Health.Standard <- factor(df$Schedule.Health.Standard, levels=status_levels, ordered=TRUE)
+  df$Schedule.Health.Standard <- factor(df$Schedule.Health.Standard,
+                                        levels = status_levels,
+                                        ordered = TRUE)
   
   positions <- c(0.4, -0.4, 0.5, -0.5,0.9,-0.9,1.2,-1.25)
+  
   directions <- c(1, -1)
   
   line_pos <- data.frame(
-    "date"=sort(unique(df$Actual_date),na.last=T),
+    "date" = sort(unique(df$Actual_date), na.last = T),
     "position"=rep(positions, length.out=length(unique(df$Actual_date))),
     "direction"=rep(directions, length.out=length(unique(df$Actual_date)))
   )
@@ -105,31 +112,27 @@ timeplot<-function(df){  # removed argument internal
   month_date_range <- seq(from, to, by='month')
   month_df <- data.frame(month_date_range)
   month_df$month_format <- paste0(year(month_df$month_date_range),' ',quarters(month_df$month_date_range))
-  month_df$month_format<-ifelse(month_df$month_format==lag(month_df$month_format,default=''),'',month_df$month_format)
   
-  # if(internal){
-  #   timeline_plot<-ggplot(df,aes(x=Actual_date,y=0,label=Major.Milestone,color=Schedule.Health))+
-  #     scale_color_manual(values=status_colors, labels=status_levels, drop = FALSE)+
-  #     scale_shape_manual(values=c(15,16))+
-  #     labs(col="",shape="")+
-  #     theme_classic()+
-  #     geom_hline(yintercept=0, color = "black", size=0.3)+
-  #     # Plot vertical segment lines for milestones
-  #     geom_segment(data=df[df$month_count == 1,], aes(y=position,yend=0,xend=Actual_date), color='black', size=0.2)+
-  #     geom_point(aes(y=0), size=4)+  # Plot scatter points at zero and date ..jodi got rid of shape=internal_external
-  #     geom_text(data=month_df, aes(x=month_date_range,y=-0.1,label=month_format),size=4,family='sans',vjust=0.5, color='gray23')+
-  #     geom_text(aes(y=text_position,label=Major.Milestone),size=4.5,family='sans')+
-  #     theme(
-  #       legend.text=element_text(size=12,family='sans',color='#494949')
-  #     )
+  month_df$month_format <- ifelse(
+    month_df$month_format == lag(month_df$month_format, default=''),
+    '',
+    month_df$month_format)
+  
+  timeline_plot <- ggplot(
+    data = df,
+    aes(x = Actual_date,
+        y = 0,
+        label = Major.Milestone,
+        color = Schedule.Health.Standard)) +
     
-  # }else{
-  
-  timeline_plot<-ggplot(df,aes(x=Actual_date,y=0,label=Major.Milestone,color=Schedule.Health.Standard))+
-    scale_color_manual(values=status_colors, labels=status_levels, drop = FALSE)+
-    labs(col="")+
-    theme_classic()+
-    geom_hline(yintercept=0, color = "black", size=0.3)+
+    scale_color_manual(values = status_colors,
+                       labels = status_levels,
+                       drop = FALSE) +
+    
+    labs(col="") +
+    theme_classic() +
+    geom_hline(yintercept = 0, color = "black", size=0.3) +
+    
     # Plot vertical segment lines for milestones
     geom_segment(data=df[df$month_count == 1,], aes(y=position,yend=0,xend=Actual_date), color='black', size=0.2)+
     geom_point(aes(y=0), size=3)+  # Plot scatter points at zero and date
@@ -139,8 +142,6 @@ timeplot<-function(df){  # removed argument internal
       legend.text=element_text(size=8,color='#494949')
     )
     
-  # }
-  
   # Don't show axes, appropriately position legend
   timeline_plot<-timeline_plot+
     theme(axis.line.y=element_blank(),
@@ -170,12 +171,22 @@ is.sf_proj<-function(proj_name){
 
 # ========= Status ----
 
-status_plot<-function(df){
+status_plot<- function(df, x_axis_label) {
+ 
   y_max <- max(df[["Approved Budget"]])
   y_upper_limit <- y_max + 0.2 * y_max
-  print(y_upper_limit)
-  cols<-c('On-Track'='#00B050','Caution'='#FFC000','Delayed'='#C00000')
-  label=""
+ 
+  print("Y MAX") 
+  print(y_max)
+  
+  cols <- c("On-Track" = "#00B050",
+            "Caution"  = "#FFC000",
+            "Delayed"  = "#C00000")
+  
+  label = ""
+  
+  print(df) 
+  
   df %>%
     arrange(status) %>%
     ggplot(
@@ -186,20 +197,27 @@ status_plot<-function(df){
         color = status,
         text = dollar(`Approved Budget`))) +
     scale_color_manual(values = cols) +
-    geom_point(alpha = 0.5) +
+    geom_point(alpha = 0.3) +
     geom_text(
       aes(label = IP2),
       size = 4,
-      nudge_y = 800000,
-      nudge_x = 0.4) +
+      nudge_y = 0,
+      nudge_x = 0) +
     scale_size_continuous(
-      breaks=c(500, 100000, 500000, 5000000, 20000000), range=c(1, 30)) +
+      breaks = seq(from = y_max/6, to = y_max, length.out = 6), range=c(0, 36)) +
     scale_y_continuous(
-      limits=c(0, y_upper_limit),breaks=seq(1500000,20000000,2000000),labels = dollar_y) +
+      limits = c(0, y_upper_limit),
+      breaks = seq(from = y_max/6, to = y_max, length.out = 6),
+      labels = dollar_y) +
     theme_minimal() +
-    labs(x='IP Project') +
-    annotate("text",x=length(unique(df$IP)),y=17*10^6,label=label,size=3) +
-    theme(axis.text.x=element_blank(),legend.position='none')
+    labs(x = x_axis_label) +
+    annotate("text",
+             x = length(unique(df$IP)),
+             y = 17*10^6,
+             label = label,
+             size = 3) +
+    theme(axis.text.x = element_blank(),
+          legend.position = 'none')
 }
 
 # ========= Stage ----

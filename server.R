@@ -3,11 +3,7 @@
 #' - First line, differentiate streams, resize.
 #' - Treemap, if I have time?
 #'   
-#'   - Last two boxes... someway to show they are a different kind of project. Different color? 
-#'   - Separate them with boxes.
 #' - Stream A, Stream B.
-#' - No icons.
-#' - Y axis can be lowered for bubble graph, Y 
 #' - Treemap for the Overall Project Health
 #' - Separate Graph for IP and Innovation Projects?
 #'   - Innovation projects have names
@@ -70,16 +66,6 @@ shinyServer(function(input, output,session) {
       #} else if(startsWith(project_name,"IPIP000")){
       #project_name<-paste("IP000",name)
     }
-    h2(project_name,
-       style = "font-family: 'Arial';margin-left:20px;
-        font-weight: bold; line-height: 1.1;
-        color: #2E4053;")
-  })
-  
-  output$project_name2<-renderUI({
-    
-    # "Project:All" header
-    project_name<-paste0('Projects:',input$selectdir)
     h2(project_name,
        style = "font-family: 'Arial';margin-left:20px;
         font-weight: bold; line-height: 1.1;
@@ -287,14 +273,13 @@ shinyServer(function(input, output,session) {
       need(any(!is.na(df$Schedule.Health.Standard)),'There is no information on Schedule.Health')
     ))
 
-    timeplot(df)%>%ggplotly(height=450,tooltip=NULL)%>%
+    timeplot(df)%>%ggplotly(height=450,tooltip=NULL) %>%
+      config(displayModeBar = F) %>%
       layout(legend=list(orientation='h', y=-10,x=0.2))
   })
   
   ## again, this is the plot in overview
   output$schedule_plt2<-renderPlot({
-
-
     #df<-no_completed_schedule_overview()%>%filter(!is.na(Approved_finish_date))
     df<-schedule_overview()%>%filter(!is.na(Approved_finish_date))%>%filter(if(Schedule.Health.Standard == "completed"){Actual_date >= as.IDate(paste0(as.character(year(now())), "-01-01"))})
     # using schedule ommitted completed tasks because too crowded
@@ -434,29 +419,51 @@ shinyServer(function(input, output,session) {
   })
   
   # ========= End of Project Issue
-  # ========= Overall Project Health ----
   
-  output$overall2<-renderPlotly({
-    status$IP2<-paste0(status$IP)
-    #status$IP2<-map(status$IP2,is.sf_proj)
-    df<-status%>%
+  # ========= Overall Project Health ----
+  output$overall2 <- renderPlotly({
+    #' IP Projects
+
+    status$IP2 <- paste0(status$IP)
+    
+    df <- status %>%
+      filter(grepl("\\d", IP)) %>%
       filter(`Overall Project Health`!='Blue')%>%
       filter(IP %in% ip_selected()$ips)%>%
       left_join(budget[,c('IP','Approved Budget')])
     df$status<-factor(df$status,levels=c('On-Track','Caution','Delayed'))
-    p<-status_plot(df)
-    ggplotly(p,tooltip='text')#%>%layout(legend=list(y=1,x=0.8))
+    p <- status_plot(df, "IP Projects")
+    ggplotly(p, tooltip = 'text') %>% config(displayModeBar = F)
   })
   
-  
-  output$ui_output1<-renderUI({
-    fluidRow(
-      box(title='Overall Project Health', width=12,
-          withSpinner(plotlyOutput('overall2',height=450)))
+  output$overall3 <- renderPlotly({
+    #' Innovation Projects
+
+    status$IP2<-paste0(status$IP)
+    #status$IP2<-map(status$IP2,is.sf_proj)
+    df<-status %>%
+      filter(!grepl("\\d", IP)) %>%
+      filter(`Overall Project Health`!='Blue')%>%
+      filter(IP %in% ip_selected()$ips)%>%
+      left_join(budget[,c('IP','Approved Budget')])
+    df$status<-factor(df$status,levels=c('On-Track','Caution','Delayed'))
+    p <- status_plot(df, "Innovation Projects")
+    ggplotly(p, tooltip = 'text') %>% config(displayModeBar = F)
+  })
+   
+  output$overall_project_health <- renderUI({
+    fluidRow(width = 12,
+      box(title='IP Projects: Health',
+          width = 7,
+          withSpinner(plotlyOutput('overall2'))),
+    
+      box(title = "Innovation Projects: Health",
+          width = 5,
+          withSpinner(plotlyOutput("overall3")))
     )
   })
-  
   # ========= End of Overall Project Health
+  
   # ========= UI Boxes for Overview ----
   
   # seems like for Overview
@@ -485,14 +492,13 @@ shinyServer(function(input, output,session) {
   
   output$ui_output3<-renderUI({
     fluidRow(
-      box(title='Schedule',width=12,
-          withSpinner(plotOutput('schedule_plt2',height=500)),
-          br(),
-          br()
-          #DT::dataTableOutput('schedule_tb2')
-          )
-    )
-    
+      box(
+        title='Schedule',
+        width = 12,
+        withSpinner(
+          plotOutput(
+            outputId = 'schedule_plt2',
+            height=500))))
   })
   
   
@@ -512,6 +518,7 @@ shinyServer(function(input, output,session) {
     p<-stage_plot(df)
     
     ggplotly(p,tooltip='none')%>%
+      config(displayModeBar = F) %>%
       layout(margin = list(b = 40, l=30))
     # g=ggplotGrob(p)
     # g$layout$clip[g$layout$name == "panel"] = "off"
@@ -554,36 +561,37 @@ shinyServer(function(input, output,session) {
     
     valueBox(
       value = count,
-      subtitle = 'Number of Completed Tasks',
-      color = 'light-blue',
-      width = 2)
+      subtitle = 'Completed',
+      color = 'light-blue')
   })
   
   output$delayed<-renderValueBox({
     valueBox(
       value = nrow(covid_delayed),
-      subtitle = 'Delayed Tasks',
+      subtitle = 'Delayed',
       color='light-blue')
   })
  
     output$stage_1<-renderValueBox({
-      valueBox(
-        value = nrow(stage_1),
-        subtitle = 'Stage One',
-        color = 'aqua')
+      valueBox(value = nrow(stage_1),
+               subtitle = 'Stage One',
+               color = 'aqua')
     })
+    
     output$stage_2<-renderValueBox({
       valueBox(
         value = nrow(stage_2),
         subtitle = 'Stage Two',
         color = 'yellow')
     })
+    
     output$stage_3<-renderValueBox({
       valueBox(
         value = nrow(stage_3),
         subtitle = 'Stage Three',
         color = 'orange')
     })
+    
     output$stage_4<-renderValueBox({
       valueBox(
         value = nrow(stage_4),

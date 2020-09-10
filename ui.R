@@ -19,60 +19,60 @@ t = setTimeout(logout, 120000);  // time is in milliseconds (1000 is 1 second)
 idleTimer();"
 
 
-# data.frame with credentials info
-# runApp(host = "192.168.0.110", port=8080)
+                                        # data.frame with credentials info
+                                        # runApp(host = "192.168.0.110", port=8080)
 
 ui<-secure_app(
   head_auth = tags$script(inactivity),
   dashboardPage(
-  dashboardHeader(title=paste0('TBI Projects Dashboard \n as of ',dat),
-                  titleWidth=500),
-  
-  dashboardSidebar(width=150,
-                   sidebarMenu(id='sidebar',
-                               menuItem('Overview',tabName='overview'),
-                               menuItem('Individual',tabName='individual'),
-                               menuItem('About',tabName='explanations'),
-                               #menuItem('KPIs',tabName='kpis'),
-                               
-                               conditionalPanel(
-                                 condition="input.sidebar == 'individual' ",
-                                 selectInput('selectip',label="Select an IP project",choices=ip)
-                               ),
-                               conditionalPanel(
-                                 condition="input.sidebar == 'overview' ",
-                                 selectInput('selectdir',label="Select a Directorate",choices=directorate),
-                                 actionButton('info','View IP Name',icon=icon('eye'))
-                               ),
-                               
-                               br(),br(),
-                               tags$b('Download:',style="margin-left:10px;"),
-                               br(),
-                               br(),
-                               tags$style(type="text/css", "#downloadData {color: black;margin-left:10px;}"),
-                               downloadButton('downloadData','Data'),
-                               br(),
-                               br(),
-                               conditionalPanel(
-                                 condition="input.sidebar == 'individual' ",
-                                 tags$style(type="text/css", "#downloadreport_individual {color: black;margin-left:10px;}"),
-                                 downloadButton('downloadreport_individual','Report')
-                               ),
-                               conditionalPanel(
-                                 condition="input.sidebar == 'overview' ",
-                                 tags$style(type="text/css", "#downloadreport_overview {color: black;margin-left:10px;}"),
-                                 downloadButton('downloadreport_overview','Report')
-                               ),
-                               br(),
-                               br(),
-                               br(),
-                               br(),
-                               br(),
-                               actionButton('contact','Contact us',icon=icon('phone')))
-  ),
-  dashboardBody(
-    
-    tags$head(tags$style(HTML('
+    dashboardHeader(title=paste0('TBI Projects Dashboard \n as of ',dat),
+                    titleWidth=500),
+
+    dashboardSidebar(width=150,
+                     sidebarMenu(id='sidebar',
+                                 menuItem('Overview',tabName='overview'),
+                                 menuItem('Individual',tabName='individual'),
+                                 menuItem('About',tabName='explanations'),
+                                        #menuItem('KPIs',tabName='kpis'),
+
+                                 conditionalPanel(
+                                   condition="input.sidebar == 'individual' ",
+                                   selectInput('selectip',label="Select an IP project",choices=ip)
+                                 ),
+                                 conditionalPanel(
+                                   condition="input.sidebar == 'overview' ",
+                                   selectInput('selectdir',label="Select a Directorate",choices=directorate),
+                                   actionButton('info','View IP Name',icon=icon('eye'))
+                                 ),
+
+                                 br(),br(),
+                                 tags$b('Download:',style="margin-left:10px;"),
+                                 br(),
+                                 br(),
+                                 tags$style(type="text/css", "#downloadData {color: black;margin-left:10px;}"),
+                                 downloadButton('downloadData','Data'),
+                                 br(),
+                                 br(),
+                                 conditionalPanel(
+                                   condition="input.sidebar == 'individual' ",
+                                   tags$style(type="text/css", "#downloadreport_individual {color: black;margin-left:10px;}"),
+                                   downloadButton('downloadreport_individual','Report')
+                                 ),
+                                 conditionalPanel(
+                                   condition="input.sidebar == 'overview' ",
+                                   tags$style(type="text/css", "#downloadreport_overview {color: black;margin-left:10px;}"),
+                                   downloadButton('downloadreport_overview','Report')
+                                 ),
+                                 br(),
+                                 br(),
+                                 br(),
+                                 br(),
+                                 br(),
+                                 actionButton('contact','Contact us',icon=icon('phone')))
+                     ),
+    dashboardBody(
+
+      tags$head(tags$style(HTML('
       .main-header .logo {
         font-family: Arial, Helvetica, sans-serif;
         font-weight: bold;
@@ -106,45 +106,41 @@ ui<-secure_app(
     tabItems(
       
       tabItem(tabName='overview',
-              
               fluidRow(
-                div(style='display: inline-block;vertical-align:center;width:100px;', uiOutput('project_name2')),
-                div(style="display: inline-block;vertical-align:center; width: 300px;",HTML("<br>")),
-                bsModal('modal','IP Name','info',tableOutput('ip_tbl')),
-                br(),
-                br()
-                #valueBoxOutput("completed"),
-                #valueBoxOutput("delayed"),
-                # valueBoxOutput("planning")
-              ),
-              box(
-                width = 8,
-                title = "IP Projects",
-                valueBoxOutput("stage_1", width = 3),
-                valueBoxOutput("stage_2", width = 3),
-                valueBoxOutput("stage_3", width = 3),
-                valueBoxOutput("stage_4", width = 3)),
-              box(
-                width = 4,
-                title = "Innovation Projects",
-                valueBoxOutput("planning", width = 6),
-                valueBoxOutput("testing", width = 6)),
-              uiOutput('ui_output1'),
+                box(width = 6,
+                    title = "IP Projects",
+                    valueBoxOutput("stage_1", width = 3),
+                    valueBoxOutput("stage_2", width = 3),
+                    valueBoxOutput("stage_3", width = 3),
+                    valueBoxOutput("stage_4", width = 3)),
+                box(width = 3,
+                    title = "Innovation Projects",
+                    valueBoxOutput("planning", width = 6),
+                    valueBoxOutput("testing", width = 6)),
+                box(width = 3,
+                    title = "Alerts",
+                    valueBoxOutput("delayed", width = 6),
+                    valueBoxOutput("completed", width = 6))),
+              
+              uiOutput('overall_project_health'),
+              
               uiOutput('ui_output2'),
+              
               div(style="text-align:center;
                         color:#4086b8;
                         font-size:10;
                         font-weight:bold;
                   ",textOutput("caption")),
+              
               uiOutput('ui_output3')
               
-              # fluidRow(
-              #   box(title='Project Risks',
-              #       plotOutput('projrisk')),
-              #   box(title='Project Issues',
-              #       plotOutput('projissue'))
-              # )
-      ),
+                                        # fluidRow(
+                                        #   box(title='Project Risks',
+                                        #       plotOutput('projrisk')),
+                                        #   box(title='Project Issues',
+                                        #       plotOutput('projissue'))
+                                        # )
+              ),
       
       
       tabItem(tabName='individual',
@@ -156,16 +152,16 @@ ui<-secure_app(
                        valueBoxOutput('overall_stage'),
                        valueBoxOutput('directorate')
                        
-              ),
+                       ),
               
               fluidRow(
                 
-                # box(title='Project Functionality',height='500px',
-                #     tabsetPanel(id='tabs',
-                #                 
-                #                 tabPanel(title='Table',
-                #                          DT::dataTableOutput("function_tb"))
-                #     )),
+                                        # box(title='Project Functionality',height='500px',
+                                        #     tabsetPanel(id='tabs',
+                                        #
+                                        #                 tabPanel(title='Table',
+                                        #                          DT::dataTableOutput("function_tb"))
+                                        #     )),
                 
                 box(title='Project Budget',
                     tabsetPanel(
@@ -177,7 +173,7 @@ ui<-secure_app(
                 box(
                   title='Projections',
                   withSpinner(plotOutput('budget_all', height=490)))
-                ),
+              ),
               
               
               fluidRow(
@@ -201,28 +197,28 @@ ui<-secure_app(
                            DT::dataTableOutput('schedule_tb')))
               )
               
-      ),
+              ),
       
       tabItem(tabName='explanations',
               
               fluidRow(width=12,
                        uiOutput('explanations_header')
-              ),
+                       ),
               
               fluidRow(
                 column(12,
                        includeHTML("explanations.html"))
               )
-      ),
+              ),
       
       tabItem(tabName='kpis',
               
               fluidRow(width=12,
                        uiOutput('kpis_header')
+                       )
               )
-      )
     )
     
-  )             
-)
+    )
+  )
 )
