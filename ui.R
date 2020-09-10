@@ -30,10 +30,9 @@ ui<-secure_app(
 
     dashboardSidebar(width=150,
                      sidebarMenu(id='sidebar',
-                                 menuItem('Overview', tabName='overview'),
-                                 menuItem('Individual', tabName='individual'),
-                                 menuItem('About', tabName='explanations'),
-                                        #menuItem('KPIs',tabName='kpis'),
+                                 menuItem('Overview', tabName = 'overview'),
+                                 menuItem('Individual', tabName = 'individual'),
+                                 menuItem('About', tabName = 'explanations'),
 
                                  conditionalPanel(
                                    condition="input.sidebar == 'individual' ",
@@ -130,7 +129,7 @@ ui<-secure_app(
                 box(width = 12,
                     title = "Fiscal Year Schedule",
                     footer = textOutput("caption"),
-                    withSpinner(timevisOutput("timevis_plot"))))),
+                    withSpinner(timevisOutput("timevis_plot_all"))))),
       
       tabItem(
         tabName = 'individual',
@@ -170,7 +169,7 @@ ui<-secure_app(
               fluidRow(
                 column(12,
                        box(title='Schedule',width=NULL,
-                           withSpinner(timevisOutput('schedule_plt')),
+                           withSpinner(timevisOutput('timevis_plot_individual')),
                            br(),
                            br(),
                            DT::dataTableOutput('schedule_tb')))
