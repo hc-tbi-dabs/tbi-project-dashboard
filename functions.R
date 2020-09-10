@@ -30,33 +30,34 @@ budget_plot<-function(ds){
     layout(legend=list(y=1,x=0.7))
 }
 
-dollar_y<-function(x){
-  paste0('$',round(x/10^6,1),'M')
+dollar_y <- function(x){
+  paste0('$', round(x / 10 ^ 6, 1), 'M')
 }
 
 budget_plot2<-function(ds){
   
-  min<-ifelse(min(ds$value)<0,abs(min(ds$value))*-1.2,0)
-  max<-max(ds$value)*1.2
-  
+  min <- ifelse(min(ds$value) < 0, abs(min(ds$value)) * -1.2, 0)
+  max <- max(ds$value) * 1.2
     
-  ds$col<-ifelse(ds$value>=0,'#1f77b4','#980008')
+  ds$col <- ifelse(ds$value >= 0, '#1f77b4', '#980008')
   
-  p<-ggplot(ds,aes(x=cat,y=value,fill=col))+geom_bar(stat='identity',position='dodge')+
-    scale_fill_manual(values=c('#1f77b4','#980008'))+
-    guides(fill=FALSE) %>% 
-    config(displayModeBar = F) %>%
-  
-  p+scale_y_continuous(labels=dollar_y,limits=c(min,max))+
-    labs(y='Budget Amount')+
-    geom_text(aes(label=dollar(value),vjust=ifelse(value>0,-1,1.5)),position = position_dodge(width = 1))+
-    theme_minimal()+
+  p <- ggplot(data = ds,
+              aes(x = cat, y = value, fill = col)) +
+    geom_bar(stat = 'identity', position = 'dodge') +
+    scale_fill_manual(values = c('#1f77b4', '#980008')) +
+    guides(fill=FALSE) +
+    scale_y_continuous(labels = dollar_y, limits=c(min, max)) +
+    labs(y = 'Budget Amount') +
+    geom_text(
+      aes(label = dollar(value),
+          vjust = ifelse(value > 0, -1, 1.5)),
+      position = position_dodge(width = 1)) +
+    theme_minimal() +
     theme(axis.title.x=element_blank(),
-          axis.text.x =element_text(size=11,family='sans',color='#494949'),
+          axis.text.x =element_text(size = 11,family='sans',color='#494949'),
           legend.text=element_text(size=12,family='sans',color='#494949'),
-          legend.justification = 'top')+
+          legend.justification = 'top') +
     coord_flip()
-  
 }
 
 

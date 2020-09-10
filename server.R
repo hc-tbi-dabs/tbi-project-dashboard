@@ -1,43 +1,32 @@
 #' TODOs:
 #' 
-#' - First line, differentiate streams, resize.
-#' - Treemap, if I have time?
-#'   
-#' - Stream A, Stream B.
-#' - Treemap for the Overall Project Health
-#' - Separate Graph for IP and Innovation Projects?
-#'   - Innovation projects have names
-#' - Have streams 1, 2
-#' - IP Projects have number/letter names.
-#' - Have stages 1, 2, 3, 4
-#' 
 #' - Remove for now the "Select a Directorate".
-#' 
 #' - Stage 1, 2, 3, 4 should be labeled in X axis for Project Health and Current Stage
-#' 
 #' - Differentiate between Stream / Stage in Individual Page 
 
 shinyServer(function(input, output,session) {
-  result_auth <- secure_server(check_credentials = check_credentials(credentials))
+  
+  result_auth <- secure_server(
+    check_credentials = check_credentials(credentials))
   
   output$res_auth <- renderPrint({
     reactiveValuesToList(result_auth)
     })
   
   # ========= Contact Button ----
-  
-  observeEvent(input$contact,{
-    
-    showModal(modalDialog(
-      title='Contact Us',
-      HTML(paste(
+  observeEvent(
+    eventExpr = input$contact,
+    handlerExpr = {
+      showModal(modalDialog(
+        title='Contact Us',
+        HTML(paste(
         # "If you have any questions regarding data source or data quality, please contact:",br(),
         # "Sarah-Emily Carle",br(),
         # "Management, Program Support",br(),
         # "Business Informatics Division",br(),
         # "RMOD, HFPB",br(),
         # "sarah-emily.carle@canada.ca",br(),br(),
-        "If you have technical questions regarding the application, please contact:",br(),
+        "If you have technical questions regarding the application, please contact:", br(),
         br(),
         "Jodi Qiao",br(),
         "Jr Data Scientist",br(),
@@ -45,7 +34,7 @@ shinyServer(function(input, output,session) {
         "TBI, POD",br(),
         "di.qiao@canada.ca; dqiao100@uottawa.ca"
       )),
-      easyClose=T
+      easyClose = T
     ))
   })
   
@@ -55,8 +44,9 @@ shinyServer(function(input, output,session) {
   
   # this is the "view IP" table
   output$ip_tbl<-renderTable(
-    all_proj[,1:2]%>%mutate(IP=as.character(IP))
-  )
+    all_proj[, 1:2] %>%
+      mutate(IP = as.character(IP)))
+  
   output$project_name<-renderUI({
     # Project by IP name header
     name<-all_proj%>%filter(IP== input$selectip)%>%pull(`Project`)
@@ -90,51 +80,41 @@ shinyServer(function(input, output,session) {
   
   # ========= End of Select IP Side Menu 
   
-  # ========= Project Selected ----
-  
-  project_selected<-reactive({
-    
-    ip<-input$selectip
-    names<-all_proj$`Project`[all_proj$IP==input$selectip]
-    
-    return(list(ip=ip,names=names))
+  project_selected <- reactive({
+    ip <- input$selectip
+    names <- all_proj$`Project`[all_proj$IP == input$selectip]
+    return(list(ip = ip, names = names))
   })
   
-  # ========= End of Project Selected
-  
-  # ========= Report Title ----
-  
-  report_title<-reactive({
-    ip<-input$selectip
-    project_title<-project_selected()$names[project_selected()$ip==ip]
-    if(ip!=project_title){
-      report_title<-paste(ip, project_title)
+  report_title <- reactive({
+    ip <- input$selectip
+    project_title <- project_selected()$names[project_selected()$ip == ip]
+    if(ip != project_title) {
+      report_title <- paste(ip, project_title)
     } else {
-      report_title<-ip
+      report_title <- ip
     }
     return(report_title)
   })
   
-  # ========= Removed Functionality Plots
-  
   # ========= Project Portfolio Budget ----
   
-  output$budget_all<-renderPlot({
-    ds<-budget%>%filter(IP==input$selectip)%>%
-      summarise(`Approved Budget`=sum(`Approved Budget`,na.rm=T),
-                `Forecasted Total Expenditures`=sum(`Forecasted Total Expenditures`,na.rm=T),
-                `Expenditure to Date`=sum(`Expenditure to Date`,na.rm=T),
-                `Project Forecasted Expenditures 2020-21`=sum(`Variance / Remaining budget`,na.rm=T))%>%
+  output$budget_all <- renderPlot({
+    ds <- budget %>%
+      filter(IP == input$selectip) %>%
+      summarise(
+        `Approved Budget` = sum(`Approved Budget`, na.rm = T),
+        `Forecasted Total Expenditures` = sum(`Forecasted Total Expenditures`, na.rm = T),
+        `Expenditure to Date` = sum(`Expenditure to Date`, na.rm = T),
+        `Project Forecasted Expenditures 2020-21` = sum(`Variance / Remaining budget`, na.rm = T)) %>%
       gather(cat)
-    
     budget_plot2(ds)
   })
 
-  output$budget_all2<-renderPlot({
-    
-    ds<-budget%>%
-      filter(IP %in% ip_selected()$ips)%>%
-      left_join(all_proj%>%select(IP=IP))%>%
+  output$budget_all2 <- renderPlot({
+    ds <- budget %>%
+      filter(IP %in% ip_selected()$ips) %>%
+      left_join(all_proj%>%select(IP=IP)) %>%
       summarise(`Approved Budget`=sum(`Approved Budget`,na.rm=T),
                 `Forecasted Total Expenditures`=sum(`Forecasted Total Expenditures`,na.rm=T),
                 `Expenditure to Date`=sum(`Expenditure to Date`,na.rm=T),
@@ -145,58 +125,37 @@ shinyServer(function(input, output,session) {
     
   })
   
-  #   ds<-budget%>%
-  #     filter(IP %in% ip_selected()$ips)%>%
-  #     left_join(all_proj%>%select(IP=IP))%>%
-  #     summarise(`Approved Budget`=sum(`Approved Budget`,na.rm=T),
-  #               `Expenditure to Date`=sum(expenditure_to_date,na.rm=T),
-  #               `Remaining Budget Projected`=sum(`Variance between remaining approved budget projected spending`,na.rm=T))%>%
-  #     gather(cat,value)
-  #   
-  #   budget_plot2(ds,TRUE)
-  #   
-  #   
-  # })
-  
-  
-  output$budget_plt<-renderPlotly({
-    ds<-budget_yr%>%filter(IP==input$selectip)
-      #spread(`Authority vs. Expenditures`,Value)%>%
-    
+  output$budget_plt <- renderPlotly({
+    ds <- budget_yr %>%
+      filter(IP == input$selectip)
     budget_plot(ds)
-    #ggplotly(p,tooltip = "text")%>%layout(margin=list(b=50),xaxis=list(tickangle=-45))
   })
-  
   
   output$budget_plt2<-renderPlotly({
-    
-    ds<-budget_yr%>%
-      filter(IP %in% ip_selected()$ips)%>%
-      #left_join(all_proj%>%select(IP=IP,internal_external=`Internal or External`))%>%
-      group_by(Year,year,`Authority vs. Expenditures`)%>%
-      summarise(Capital=sum(Capital,na.rm=T),
-                Non_Capital=sum(Non_Capital,na.rm=T))
-    
+    ds <- budget_yr %>%
+      filter(IP %in% ip_selected()$ips) %>%
+      group_by(Year,year,`Authority vs. Expenditures`) %>%
+      summarise(Capital = sum(Capital, na.rm = T),
+                Non_Capital = sum(Non_Capital, na.rm = T))
     budget_plot(ds)
-    
-    #ggplotly(p,tooltip = "text")%>%layout(margin=list(b=50),xaxis=list(tickangle=-45),
-    #                                      legend=list(y=1,x=0.7))
-    
-    
   })
   
-  
-  output$budget_tbl<-DT::renderDataTable({
-    
-    
-    ds<-budget_yr%>%filter(IP==input$selectip)%>%
-      spread(`Authority vs. Expenditures`,Value)%>%
-      select(-year)%>%
-      mutate_at(c('Capital','Non_Capital','Project Authority', 'Project Expenditures'),dollar)
+  output$budget_tbl <- renderDataTable({
+    ds <- budget_yr %>%
+      filter(IP == input$selectip) %>%
+      spread(`Authority vs. Expenditures`, Value) %>%
+      select(-year) %>%
+      mutate_at(c('Capital',
+                  'Non_Capital',
+                  'Project Authority',
+                  'Project Expenditures'),
+                dollar)
 
-    DT::datatable
-    
-    datatable(ds, options = list(searching = FALSE,pageLength = 5,lengthMenu = c(5, 10, 15, 20), scrollX = T))
+    datatable(data = ds,
+              options = list(searching = FALSE,
+                             pageLength = 5,
+                             lengthMenu = c(5, 10, 15, 20),
+                             scrollX = T))
   })
   
   
@@ -209,7 +168,6 @@ shinyServer(function(input, output,session) {
                 non_capital=sum(Non_Capital,na.rm=T),
                 value=sum(Value,na.rm=T))%>%
       mutate_at(c('capital','non_capital','value'),dollar)
-    
     
     # left_join(all_proj%>%select(IP=IP,internal_external=`Internal or External`))%>%
     # group_by(var,Year,internal_external)%>%
@@ -277,12 +235,12 @@ shinyServer(function(input, output,session) {
     ))
 
     data <- tibble(
-      id      = 1:4,
-      content = c("Item one"  , "Item two"  ,"Ranged item", "Item four"),
-      start   = c("2016-01-10", "2016-01-11", "2016-01-20", "2016-02-14 15:00:00"),
-      end     = c(NA          ,           NA, "2016-02-04", NA)
+      id      = 1:nrow(df),
+      content = df["Major.Milestone"],
+      start   = df["Approved_finish_date"],
+      end     = rep(NA, nrow(df)) 
     )
-    
+   
     timevis(data)
     
   })
@@ -317,7 +275,7 @@ shinyServer(function(input, output,session) {
 
     df<-schedule_overview()%>%
       select(Milestone=Major.Milestone,
-             `Baseline Finish Date`=Approved_finish_date,
+             `Baseline Finish Date` = Approved_finish_date,
              `Actual/Forecasted Finish Date`=Actual_date
              )
 
@@ -551,10 +509,8 @@ shinyServer(function(input, output,session) {
   })
   
   output$completed<-renderValueBox({
-    count<-nrow(schedule_completed)
-    
     valueBox(
-      value = count,
+      value = nrow(schedule_completed),
       subtitle = 'Completed',
       color = 'light-blue')
   })
