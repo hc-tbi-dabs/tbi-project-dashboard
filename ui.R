@@ -42,7 +42,6 @@ ui<-secure_app(
                                conditionalPanel(
                                  condition="input.sidebar == 'overview' ",
                                  selectInput('selectdir',label="Select a Directorate",choices=directorate),
-                                 #radioButtons('internal','Show internal or external status:',c("Yes","No"),selected="No",inline=TRUE),
                                  actionButton('info','View IP Name',icon=icon('eye'))
                                ),
                                
@@ -118,12 +117,18 @@ ui<-secure_app(
                 #valueBoxOutput("delayed"),
                 # valueBoxOutput("planning")
               ),
-              valueBoxOutput("stage_1", width=2),
-              valueBoxOutput("stage_2", width=2),
-              valueBoxOutput("stage_3", width=2),
-              valueBoxOutput("stage_4", width=2),
-              valueBoxOutput("planning", width=2),
-              valueBoxOutput("testing", width=2),
+              box(
+                width = 8,
+                title = "IP Projects",
+                valueBoxOutput("stage_1", width = 3),
+                valueBoxOutput("stage_2", width = 3),
+                valueBoxOutput("stage_3", width = 3),
+                valueBoxOutput("stage_4", width = 3)),
+              box(
+                width = 4,
+                title = "Innovation Projects",
+                valueBoxOutput("planning", width = 6),
+                valueBoxOutput("testing", width = 6)),
               uiOutput('ui_output1'),
               uiOutput('ui_output2'),
               div(style="text-align:center;

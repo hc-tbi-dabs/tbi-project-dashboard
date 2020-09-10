@@ -1,37 +1,32 @@
-
+#' TODOs:
+#' 
+#' - First line, differentiate streams, resize.
+#' - Treemap, if I have time?
+#'   
+#'   - Last two boxes... someway to show they are a different kind of project. Different color? 
+#'   - Separate them with boxes.
+#' - Stream A, Stream B.
+#' - No icons.
+#' - Y axis can be lowered for bubble graph, Y 
+#' - Treemap for the Overall Project Health
+#' - Separate Graph for IP and Innovation Projects?
+#'   - Innovation projects have names
+#' - Have streams 1, 2
+#' - IP Projects have number/letter names.
+#' - Have stages 1, 2, 3, 4
+#' 
+#' - Remove for now the "Select a Directorate".
+#' 
+#' - Stage 1, 2, 3, 4 should be labeled in X axis for Project Health and Current Stage
+#' 
+#' - Differentiate between Stream / Stage in Individual Page 
 
 shinyServer(function(input, output,session) {
   result_auth <- secure_server(check_credentials = check_credentials(credentials))
   
   output$res_auth <- renderPrint({
     reactiveValuesToList(result_auth)
-  })
-  # plot_height<-reactive({
-  #   
-  #   n<-all_proj%>%filter(IP %in% ip_selected()$ips)%>%distinct(`Internal or External`)
-  #   
-  #   if(input$internal=='Yes' & nrow(n)==2){
-  #     height<-600
-  #   }else{
-  #     height<-400
-  #   }
-  #   
-  #   height
-  # })
-  # 
-  # 
-  # plot_height2<-reactive({
-  #   
-  #   n<-all_proj%>%filter(IP %in% ip_selected()$ips)%>%distinct(`Internal or External`)
-  #   
-  #   if(input$internal=='Yes' & nrow(n)==2){
-  #     height<-800
-  #   }else{
-  #     height<-450
-  #   }
-  #   
-  #   height
-  # })
+    })
   
   # ========= Contact Button ----
   
@@ -59,6 +54,7 @@ shinyServer(function(input, output,session) {
   })
   
   # ========= End of Contact Button
+  
   # ========= Texts/Headers of Dashboard ----
   
   # this is the "view IP" table
@@ -544,7 +540,7 @@ shinyServer(function(input, output,session) {
              subtitle='Project Stage',color='purple',width=3)
   })
   
-  output$directorate<-renderValueBox({
+  output$directorate <- renderValueBox({
     internal<-all_proj%>%
       filter(IP ==input$selectip)%>%
       pull(`Directorate`)
@@ -556,57 +552,57 @@ shinyServer(function(input, output,session) {
   output$completed<-renderValueBox({
     count<-nrow(schedule_completed)
     
-    valueBox(tags$p(count, style = "font-size: 80%;"),
-             subtitle='Number of Completed Tasks',color='light-blue',width=3,icon=icon("trophy"))
+    valueBox(
+      value = count,
+      subtitle = 'Number of Completed Tasks',
+      color = 'light-blue',
+      width = 2)
   })
   
   output$delayed<-renderValueBox({
-    count<-nrow(covid_delayed)
-    
-    valueBox(tags$p(count, style = "font-size: 80%;"),
-             subtitle='Number of Delayed Tasks',color='light-blue',width=3,icon=icon("medkit"))
+    valueBox(
+      value = nrow(covid_delayed),
+      subtitle = 'Delayed Tasks',
+      color='light-blue')
   })
-  
-  output$stage_1<-renderValueBox({
-    count<-nrow(stage_1)
-    
-    valueBox(tags$p(count, style = "font-size: 80%;"),
-             subtitle='Stage One Projects',color='aqua',width=2,icon=icon("battery-empty"))
-  })
-  
-  output$stage_2<-renderValueBox({
-    count<-nrow(stage_2)
-    
-    valueBox(tags$p(count, style = "font-size: 80%;"),
-             subtitle='Stage Two Projects',color='yellow',width=2,icon=icon("battery-quarter"))
-  })
-  
-  output$stage_3<-renderValueBox({
-    count<-nrow(stage_3)
-    
-    valueBox(tags$p(count, style = "font-size: 80%;"),
-             subtitle='Stage Three Projects',color='orange',width=2,icon=icon("battery-half"))
-  })
-  
-  output$stage_4<-renderValueBox({
-    count<-nrow(stage_4)
-    
-    valueBox(tags$p(count, style = "font-size: 80%;"),
-             subtitle='Stage Four Projects',color='fuchsia',width=2,icon=icon("battery-three-quarters"))
-  })
+ 
+    output$stage_1<-renderValueBox({
+      valueBox(
+        value = nrow(stage_1),
+        subtitle = 'Stage One',
+        color = 'aqua')
+    })
+    output$stage_2<-renderValueBox({
+      valueBox(
+        value = nrow(stage_2),
+        subtitle = 'Stage Two',
+        color = 'yellow')
+    })
+    output$stage_3<-renderValueBox({
+      valueBox(
+        value = nrow(stage_3),
+        subtitle = 'Stage Three',
+        color = 'orange')
+    })
+    output$stage_4<-renderValueBox({
+      valueBox(
+        value = nrow(stage_4),
+        subtitle='Stage Four',
+        color='fuchsia')
+    })
   
   output$planning<-renderValueBox({
-    count<-nrow(planning)
-    
-    valueBox(tags$p(count, style = "font-size: 80%;"),
-             subtitle='Planning Stage',color='teal',width=2,icon=icon("seedling"))
+    valueBox(
+      value = nrow(planning),
+      subtitle = 'Planning Stage',
+      color = 'teal')
   })
   
   output$testing<-renderValueBox({
-    #count<-nrow(testing)
-    
-    valueBox(tags$p(2, style = "font-size: 80%;"),
-             subtitle='Testing Stage',color='olive',width=2,icon=icon("pagelines"))
+    valueBox(
+      value = 2,  # nrow(testing)
+      subtitle='Testing Stage',
+      color='olive')
   })
   
   
