@@ -30,9 +30,9 @@ ui<-secure_app(
 
     dashboardSidebar(width=150,
                      sidebarMenu(id='sidebar',
-                                 menuItem('Overview',tabName='overview'),
-                                 menuItem('Individual',tabName='individual'),
-                                 menuItem('About',tabName='explanations'),
+                                 menuItem('Overview', tabName='overview'),
+                                 menuItem('Individual', tabName='individual'),
+                                 menuItem('About', tabName='explanations'),
                                         #menuItem('KPIs',tabName='kpis'),
 
                                  conditionalPanel(
@@ -132,23 +132,20 @@ ui<-secure_app(
                     footer = textOutput("caption"),
                     withSpinner(timevisOutput("timevis_plot"))))),
       
-      tabItem(tabName='individual',
+      tabItem(
+        tabName = 'individual',
+        fluidRow(width = 12,
+                 uiOutput('project_name'),
+                 tags$style(".small-box.bg-red {background-color: #C00000 !important;}"),
+                 valueBoxOutput('overall'),
+                 valueBoxOutput('overall_stage'),
+                 valueBoxOutput('directorate')),
               
-              fluidRow(width=12,
-                       uiOutput('project_name'),
-                       tags$style(".small-box.bg-red {background-color: #C00000 !important;}"),
-                       valueBoxOutput('overall'),
-                       valueBoxOutput('overall_stage'),
-                       valueBoxOutput('directorate')
-                       
-                       ),
-              
-              fluidRow(
-                
-                box(title='Project Budget',
-                    tabsetPanel(
-                      tabPanel(title='Breakdown by Year',
-                               withSpinner(plotlyOutput('budget_plt', height=450))),
+        fluidRow(
+          box(title = 'Project Budget',
+              tabsetPanel(
+                tabPanel(title='Breakdown by Year',
+                         withSpinner(plotlyOutput('budget_plt', height=450))),
                       tabPanel(title='Table',
                                DT::dataTableOutput('budget_tbl', height=450)))
                     ),
