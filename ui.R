@@ -122,26 +122,15 @@ ui<-secure_app(
                     valueBoxOutput("delayed", width = 6),
                     valueBoxOutput("completed", width = 6))),
               
-              uiOutput('overall_project_health'),
+              uiOutput("overall_project_health"),
               
-              uiOutput('ui_output2'),
-              
-              div(style="text-align:center;
-                        color:#4086b8;
-                        font-size:10;
-                        font-weight:bold;
-                  ",textOutput("caption")),
-              
-              uiOutput('ui_output3')
-              
-                                        # fluidRow(
-                                        #   box(title='Project Risks',
-                                        #       plotOutput('projrisk')),
-                                        #   box(title='Project Issues',
-                                        #       plotOutput('projissue'))
-                                        # )
-              ),
-      
+              uiOutput("ui_output2"),
+             
+              fluidRow( 
+                box(width = 12,
+                    title = "Fiscal Year Schedule",
+                    footer = textOutput("caption"),
+                    withSpinner(timevisOutput("timevis_plot"))))),
       
       tabItem(tabName='individual',
               
@@ -155,13 +144,6 @@ ui<-secure_app(
                        ),
               
               fluidRow(
-                
-                                        # box(title='Project Functionality',height='500px',
-                                        #     tabsetPanel(id='tabs',
-                                        #
-                                        #                 tabPanel(title='Table',
-                                        #                          DT::dataTableOutput("function_tb"))
-                                        #     )),
                 
                 box(title='Project Budget',
                     tabsetPanel(
@@ -191,7 +173,7 @@ ui<-secure_app(
               fluidRow(
                 column(12,
                        box(title='Schedule',width=NULL,
-                           withSpinner(plotlyOutput('schedule_plt')),
+                           withSpinner(timevisOutput('schedule_plt')),
                            br(),
                            br(),
                            DT::dataTableOutput('schedule_tb')))
