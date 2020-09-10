@@ -217,95 +217,99 @@ shinyServer(function(input, output,session) {
     # mutate(value=dollar(value))%>%
     # spread(var,value)
     
-
-    
-    DT::datatable
-    
     # Jodi added this scrollbar to the table that is too long
-    # https://stackoverflow.com/questions/46709404/adjusting-the-width-of-the-datatable-using-dt-in-r
-    datatable(ds, options = list(searching = FALSE,pageLength = 5,lengthMenu = c(5, 10, 15, 20), scrollX = T))
+    datatable(data = ds,
+              options = list(searching = FALSE,
+                             pageLength = 5,
+                             lengthMenu = c(5, 10, 15, 20),
+                             scrollX = T))
   })
-  
   # ========= End of Project Portfolio Budget
-  # ========= Schedule ----
   
-  schedule_overview<-reactive({
-    schedule<-schedule%>%filter(IP %in% ip_selected()$ips)%>%
-      left_join(all_proj%>%select(IP=IP))
-      # filter(grepl('Start Date|End Date|Go live',Major.Milestone,ignore.case=T))
+  
+  # ========= Schedule ----
+  schedule_overview <- reactive({
+    #' TODO: This logic looks backwards.
+    schedule <- schedule %>%
+      filter(IP %in% ip_selected()$ips) %>%
+      left_join(all_proj) %>%
+      select(IP = IP)
 
-    if(input$selectdir=='All'){
-      schedule<-schedule
-       # filter(grepl('Go live',Major.Milestone,ignore.case=T))
+    if(input$selectdir == "All") {
+      schedule <- schedule
     }
 
     return(schedule)
   })
   
-  # the schedule without any of the completed projects
-  no_completed_schedule_overview<-reactive({
-    no_completed_schedule<-no_completed_schedule%>%filter(IP %in% ip_selected()$ips)%>%
-      left_join(all_proj%>%select(IP=IP))
-    # filter(grepl('Start Date|End Date|Go live',Major.Milestone,ignore.case=T))
+  no_completed_schedule_overview <- reactive({
+    #' TODO: This logic looks backwards.
+    no_completed_schedule <- no_completed_schedule %>%
+      filter(IP %in% ip_selected()$ips) %>%
+      left_join(all_proj %>% select(IP = IP))
     
-    if(input$selectdir=='All'){
-      no_completed_schedule<-no_completed_schedule
-      # filter(grepl('Go live',Major.Milestone,ignore.case=T))
+    if(input$selectdir == "All") {
+      no_completed_schedule <- no_completed_schedule
     }
     
     return(no_completed_schedule)
   })
   
 
-  output$schedule_plt<-renderPlotly({
+  output$timevis_plot <- renderTimevis({
 
-    df<-schedule%>%filter(IP==ip_selected()$ip)
+    df <- schedule %>%
+      filter(IP == ip_selected()$ip)
 
     shiny::validate((
-      need(any(!is.na(df$Approved_finish_date)),'There is no information on Approved_finish_date')
+      need(any(!is.na(df$Approved_finish_date)),
+           "There is no information on Approved_finish_date")
     ))
     
     shiny::validate((
-      need(any(!is.na(df$Actual_date)),'There is no information on Actual_date')
+      need(any(!is.na(df$Actual_date)),
+           "There is no information on Actual_date")
     ))
     
     shiny::validate((
-      need(any(!is.na(df$Schedule.Health.Standard)),'There is no information on Schedule.Health')
+      need(any(!is.na(df$Schedule.Health.Standard)),
+           "There is no information on Schedule.Health")
     ))
 
-    timeplot(df)%>%ggplotly(height=450,tooltip=NULL) %>%
-      config(displayModeBar = F) %>%
-      layout(legend=list(orientation='h', y=-10,x=0.2))
+    data <- tibble(
+      id      = 1:4,
+      content = c("Item one"  , "Item two"  ,"Ranged item", "Item four"),
+      start   = c("2016-01-10", "2016-01-11", "2016-01-20", "2016-02-14 15:00:00"),
+      end     = c(NA          ,           NA, "2016-02-04", NA)
+    )
+    
+    timevis(data)
+    
   })
   
-  ## again, this is the plot in overview
-  output$schedule_plt2<-renderPlot({
-    #df<-no_completed_schedule_overview()%>%filter(!is.na(Approved_finish_date))
-    df<-schedule_overview()%>%filter(!is.na(Approved_finish_date))%>%filter(if(Schedule.Health.Standard == "completed"){Actual_date >= as.IDate(paste0(as.character(year(now())), "-01-01"))})
-    # using schedule ommitted completed tasks because too crowded
-    # only show tasks completed this year
+  output$schedule_plt2 <- renderPlot({
+    df <- schedule_overview() %>%
+      filter(!is.na(Approved_finish_date)) %>%
+      filter(if(Schedule.Health.Standard == "completed") {
+        Actual_date >= as.IDate(paste0(as.character(year(now())), "-01-01"))})
 
     shiny::validate((
-      need(any(!is.na(df$Approved_finish_date)),'There is no information on project schedule')
+      need(any(!is.na(df$Approved_finish_date)),
+           "There is no information on project schedule")
     ))
 
     incProgress(0.5)
 
     timeplot(df)
-    # ggplotly(timeplot(df,T),height=450,tooltip=NULL)%>%
-    #         layout(legend=list(orientation='h', y=-10,x=0.2))
-
-
   })
 
-  output$schedule_tb<-DT::renderDataTable({
+  output$schedule_tb <- renderDataTable({
     df<-schedule%>%filter(IP==ip_selected()$ip)%>%
-      #filter(grepl('Start Date|End Date|Go live',Major.Milestone,ignore.case=T))%>%
       select(Milestone=Major.Milestone,
              `Baseline Finish Date`=Approved_finish_date,
              `Actual/Forecasted Finish Date`=Actual_date)
 
-    DT::datatable(df,options = list(dom = 'tip'), rownames = FALSE)
+    datatable(df,options = list(dom = 'tip'), rownames = FALSE)
   })
 
 
@@ -490,16 +494,6 @@ shinyServer(function(input, output,session) {
   })
   
   
-  output$ui_output3<-renderUI({
-    fluidRow(
-      box(
-        title='Schedule',
-        width = 12,
-        withSpinner(
-          plotOutput(
-            outputId = 'schedule_plt2',
-            height=500))))
-  })
   
   
   # ========= End of UI Boxes
