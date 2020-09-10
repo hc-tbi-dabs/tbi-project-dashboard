@@ -150,8 +150,8 @@ ui<-secure_app(
                                DT::dataTableOutput('budget_tbl', height=450)))
                     ),
                 box(
-                  title='Projections',
-                  withSpinner(plotOutput('budget_all', height=490)))
+                  title = 'Projections',
+                  withSpinner(plotOutput('budget_all', height = 490)))
               ),
               
               
