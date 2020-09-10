@@ -1,5 +1,4 @@
-
-# ========= Project Portfolio Budget ----
+library(plotly)
 
 budget_plot<-function(ds){
   
@@ -29,34 +28,11 @@ budget_plot<-function(ds){
                       tickvals = list(2016, 2017, 2018, 2019, 2020,2021,2022),
                       tickmode='array'))%>%
     layout(legend=list(y=1,x=0.7))
-  
-  
-  # if(internal==TRUE){
-  #   ds$internal_external<-factor(ds$internal_external,levels=c('External','Internal'))
-  #   
-  #   p<- ggplot(ds,aes(x=Year,y=value,fill=var,alpha=internal_external,text=paste0('Amount: $',prettyNum(value,big.mark=','))))+
-  #       scale_y_continuous(labels=dollar_y,breaks=seq(1000000,12000000,2500000))+
-  #       scale_alpha_manual(values=c(1,0.3))+
-  #       labs(x='',y='Budget Amount',alpha='',fill='')
-  # }else{
-  #   
-  #   p<-ggplot(ds,aes(x=Year,y=value,fill=var,text=paste0('Amount: $',prettyNum(value,big.mark=','))))+
-  #      scale_y_continuous(labels=dollar_y)+
-  #      labs(x='',y='Budget Amount',fill='')
-  #     
-  # }
-  # 
-  #   p+
-  #   geom_bar(stat='identity',position='dodge',width=0.8)+
-  #   theme_minimal()
 }
-
 
 dollar_y<-function(x){
-  x<-paste0('$',round(x/10^6,1),'M')
-  x
+  paste0('$',round(x/10^6,1),'M')
 }
-
 
 budget_plot2<-function(ds){
   
@@ -195,28 +171,35 @@ is.sf_proj<-function(proj_name){
 # ========= Status ----
 
 status_plot<-function(df){
+  y_max <- max(df[["Approved Budget"]])
+  y_upper_limit <- y_max + 0.2 * y_max
+  print(y_upper_limit)
   cols<-c('On-Track'='#00B050','Caution'='#FFC000','Delayed'='#C00000')
-  
-  # df<-df%>%mutate(txt_position=case_when(status =='Elevated Risk'~3,
-  #                                        status=='Caution'~2,
-  #                                        status=='On Track'~1))
-  # df<-df%>%arrange(status,desc(`Approved Budget`))
-  # df$index<-ifelse(as.numeric(rownames(df))%%2==0,1,-1)
-  # df$txt_position<-df$txt_position+0.3*df$index
-  label=''
-  
-  df%>%
-    arrange(status)%>%
-    ggplot(aes(x=as.character(IP),y=`Approved Budget`,size=`Approved Budget`,color=status,text=dollar(`Approved Budget`)))+
-    scale_color_manual(values=cols)+
-    geom_point(alpha=0.5)+
-    geom_text(aes(label=IP2),size=3,nudge_y=800000,nudge_x=0.4)+
-    scale_size_continuous(breaks=c(500,100000,500000,5000000,20000000),range=c(1,30))+
-    scale_y_continuous(limits=c(0,17000000),breaks=seq(1500000,20000000,2000000),labels = dollar_y)+
-    theme_minimal()+
-    labs(x='IP Project')+
-    annotate("text",x=length(unique(df$IP)),y=17*10^6,label=label,size=3)+
-    theme(axis.text.x =element_blank(),legend.position='none')
+  label=""
+  df %>%
+    arrange(status) %>%
+    ggplot(
+      aes(
+        x = as.character(IP),
+        y = `Approved Budget`,
+        size = `Approved Budget`,
+        color = status,
+        text = dollar(`Approved Budget`))) +
+    scale_color_manual(values = cols) +
+    geom_point(alpha = 0.5) +
+    geom_text(
+      aes(label = IP2),
+      size = 4,
+      nudge_y = 800000,
+      nudge_x = 0.4) +
+    scale_size_continuous(
+      breaks=c(500, 100000, 500000, 5000000, 20000000), range=c(1, 30)) +
+    scale_y_continuous(
+      limits=c(0, y_upper_limit),breaks=seq(1500000,20000000,2000000),labels = dollar_y) +
+    theme_minimal() +
+    labs(x='IP Project') +
+    annotate("text",x=length(unique(df$IP)),y=17*10^6,label=label,size=3) +
+    theme(axis.text.x=element_blank(),legend.position='none')
 }
 
 # ========= Stage ----
