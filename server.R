@@ -115,11 +115,12 @@ shinyServer(function(input, output,session) {
     ds <- budget %>%
       filter(IP %in% ip_selected()$ips) %>%
       left_join(all_proj%>%select(IP=IP)) %>%
-      summarise(`Approved Budget`=sum(`Approved Budget`,na.rm=T),
-                `Forecasted Total Expenditures`=sum(`Forecasted Total Expenditures`,na.rm=T),
-                `Expenditure to Date`=sum(`Expenditure to Date`,na.rm=T),
-                `Project Forecasted Expenditures 2020-21`=sum(`Variance / Remaining budget`,na.rm=T))%>%
-      gather(cat,value)
+      summarise(
+        `Approved Budget`=sum(`Approved Budget`,na.rm=T),
+        `Forecasted Total Expenditures`=sum(`Forecasted Total Expenditures`,na.rm=T),
+        `Expenditure to Date`=sum(`Expenditure to Date`,na.rm=T),
+        `Project Forecasted Expenditures 2020-21`=sum(`Variance / Remaining budget`,na.rm=T))%>%
+      gather(cat, value)
     
     budget_plot2(ds)
     
