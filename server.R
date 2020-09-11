@@ -1,3 +1,5 @@
+library(lubridate)
+
 #' TODOs:
 #' 
 #' - Remove for now the "Select a Directorate".
@@ -123,7 +125,6 @@ shinyServer(function(input, output,session) {
       gather(cat, value)
     
     budget_plot2(ds)
-    
   })
   
   output$budget_plt <- renderPlotly({
@@ -214,11 +215,10 @@ shinyServer(function(input, output,session) {
     return(no_completed_schedule)
   })
 
-  
-  
   output$timevis_plot_all <- renderTimevis({
-
-    df <- schedule
+    
+    df <- schedule %>%
+      filter(year(Approved_finish_date) >= year(today()))
 
     shiny::validate((
       need(any(!is.na(df$Approved_finish_date)),
@@ -234,10 +234,42 @@ shinyServer(function(input, output,session) {
       need(any(!is.na(df$Schedule.Health.Standard)),
            "There is no information on Schedule.Health")
     ))
+    
+    makeContent <- function(df) {
+      #' @description: Take the information found in the dataframe, and use it
+      #' to make colorful stuff inside the timevis boxes. 
+      
+      status <- NA 
+     
+      #' This is just an example code I copied, it won't work, it's just to
+      #' get you started:
+      #'  
+      sprintf(
+        "<table>
+           <tbody>
+             <tr><td colspan='3'><em>%s</em></td></tr>
+             <tr>
+               <td>%s</td>
+               <th>&nbsp;%s - %s&nbsp;</th>
+               <td>%s</td>
+             </tr>
+             <tr>
+               <td><img src='flags/%s.png' width='31' height='20' alt='%s'></td>
+               <th></th>
+               <td><img src='flags/%s.png' width='31' height='20' alt='%s'></td>
+             </tr
+           </tbody>
+        </table>"
+        stage, team1, score1, score2, team2, gsub("\\s", "", tolower(team1)),
+        team1, gsub("\\s", "", tolower(team2)), team2
+      )
+    }
 
+    content <- makeContent(df)
+    
     data <- tibble(
       id      = 1:nrow(df),
-      content = df["Major.Milestone"],
+      content = content,
       start   = df["Approved_finish_date"],
       end     = rep(NA, nrow(df)) 
     )
@@ -607,7 +639,6 @@ shinyServer(function(input, output,session) {
   })
   
   # ========= End of Caption
-  # ========= Downloaders ----
   
   output$downloadData<-downloadHandler(
     
@@ -617,7 +648,6 @@ shinyServer(function(input, output,session) {
     
     content<-function(file){
       file.copy('dattbi.xlsx',file)
-      
     }
   )
   
@@ -668,11 +698,6 @@ shinyServer(function(input, output,session) {
     
   )
   
-  # ========= End of Downloaders
-  # ========= Explanations Tab ----
-  
-  # ========= Explanations Header ----
- 
    output$explanations_header<-renderUI({
     
     # explanations header
