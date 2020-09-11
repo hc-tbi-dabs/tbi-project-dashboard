@@ -155,18 +155,14 @@ timeplot<-function(df){  # removed argument internal
 }
 
 
-
-# ========= Seth's Function that Removes "IP" from SF projects ----
-
-is.sf_proj<-function(proj_name){
-  if(startsWith(proj_name,"Cipher") | startsWith(proj_name,"Cyclops") | startsWith(proj_name,"Hummingbird") | startsWith(proj_name,"Kelpie") | startsWith(proj_name,"IP000")){
+is.sf_proj <- function(proj_name) {
+  #' Seth's Function that Removes "IP" from SF projects
+  if(startsWith(proj_name, "Cipher") | startsWith(proj_name,"Cyclops") | startsWith(proj_name,"Hummingbird") | startsWith(proj_name,"Kelpie") | startsWith(proj_name,"IP000")){
     return(proj_name)
   } else {
-    return(paste0("IP",proj_name))
+    return(paste0("IP", proj_name))
   }
 }
-
-# ========= Status ----
 
 status_plot<- function(df, x_axis_label) {
  
@@ -207,14 +203,19 @@ status_plot<- function(df, x_axis_label) {
           legend.position = 'none')
 }
 
-# ========= Stage ----
-
-stage_plot<-function(df){
-  cols<-c('On-Track'='#00B050','Caution'='#FFC000','Delayed'='#C00000','Not yet started'='#1f77b4')
+stage_plot <- function(df) {
   
-  label=''
+  cols <- c("On-Track"        = "#00B050",
+            "Caution"         = "#FFC000",
+            "Delayed"         = "#C00000",
+            "Not yet started" = "#1f77b4")
   
-  ggplot(df,aes(x=stage,y=count,group=status,fill=status))+geom_bar(stat='identity',position='dodge',width=0.9,alpha=0.9)+
+  label = ""
+  
+  ggplot(
+    data = df,
+    aes(x = stage, y = count, group = status, fill = status)) +
+    geom_bar(stat='identity',position='dodge',width=0.9,alpha=0.9)+
     scale_fill_manual(values=cols)+
     scale_y_continuous(breaks=c(0,1,2,3,4,5))+
     geom_text(aes(y=count-0.5,label=IP),position=position_dodge(width=0.9),size=2.5)+

@@ -1,0 +1,186 @@
+---
+title: "Individual TBI Investment Projects"
+output: 
+  pdf_document:
+    latex_engine: xelatex
+always_allow_html: yes
+header-includes:
+  - \usepackage{booktabs}
+  - \usepackage{longtable}
+  - \usepackage{float}
+  - \usepackage{pdflscape}
+  - \newcommand{\blandscape}{\begin{landscape}}
+  - \newcommand{\elandscape}{\end{landscape}}
+  - \usepackage{array}
+  - \usepackage{multirow}
+  - \usepackage{wrapfig}
+  - \usepackage{colortbl}
+  - \usepackage{tabu}
+  - \usepackage{threeparttable}
+  - \usepackage{threeparttablex}
+  - \usepackage[normalem]{ulem}
+  - \usepackage{makecell}
+  - \usepackage{xcolor}
+---
+
+```{r,echo=FALSE,message=FALSE,warning=FALSE,results='hide'}
+library(knitr)
+library(kableExtra)
+knitr::opts_chunk$set(echo=FALSE,warning=FALSE,message=FALSE)
+options(knitr.table.format='latex')
+options(shiny.testmode = TRUE)
+```
+
+# Project `r report_title()`
+### Report created on `r Sys.Date()`
+The web dashboard can be found at [jodiqiao.shinyapps.io/tbi_dashboard](jodiqiao.shinyapps.io/tbi_dashboard).
+
+### Project Description
+```{r}
+project_desc<-description$`Description`[description$IP==ip_selected()$ip]
+```
+`r project_desc`
+
+### Project Objective
+```{r}
+project_status<-status%>%filter(IP==ip_selected()$ip)%>%pull(`Project Objectives`)
+```
+`r project_status`
+
+### Project Tidbits
+```{r}
+project_health<-all_proj%>%filter(IP == ip_selected()$ip)%>%pull(`Overall Project Health`)
+project_status<-all_proj%>%filter(IP == ip_selected()$ip)%>%pull(`status`)
+project_stage<-all_proj%>%filter(IP ==input$selectip)%>%pull(stage)
+project_stage<-gsub('\n',' ',project_stage)
+project_directorate<-all_proj%>%
+      filter(IP ==input$selectip)%>%
+      pull(`Directorate`)
+budget_rank<-which(sorted_budget$IP == ip_selected()$ip)
+num_risks<-length(which(proj_risk$IP == ip_selected()$ip))
+num_issues<-length(which(proj_issue$IP == ip_selected()$ip))
+
+bool_capital<-ip_selected()$ip%in%capital$IP
+if(bool_capital){
+  if_capital<-'Yes'
+}else{
+  if_capital<-'No'
+}
+```
+
+- This project's approved budget is ranked `r budget_rank` out of all TBI projects (1-largest, 13-smallest)
+- Directorate: `r project_directorate`
+- Project stage (1-4): `r project_stage`
+- Overall project health: `r project_health`
+- Overall project status: `r project_status`
+- Number of risks associated with this project: `r num_risks`
+- Number of issues associated with this project: `r num_issues`
+- Does this project have associated capital? `r if_capital`
+
+\newpage
+\blandscape
+
+### Project Schedule
+#### This timeplot shows project-related tasks planned for the ongoing fiscal year, forecasted completion status and fiscal quarter. Only all tasks with complete milestone, approved finish date, actual finish date, and schedule health information will appear on the timeplot. If fewer datapoints are visualized than expected, the spreadsheet contains missing information.
+```{r}
+schedule_df<-schedule%>%filter(schedule$IP == ip_selected()$ip)
+num_tasks<-length(which(schedule$IP == ip_selected()$ip))
+num_completed<-length(which(schedule_df$Schedule.Health.Standard == 'completed'))
+num_incomplete<-length(which(schedule_df$Schedule.Health.Standard != 'completed'))
+```
+- Total number of tasks planned: `r num_tasks`
+- Total completed tasks: `r num_completed`
+- Total incomplete tasks: `r num_incomplete`
+
+```{r,message=FALSE,warning=FALSE,results='hide',fig.width=12}
+  df<-schedule%>%filter(IP==ip_selected()$ip)
+  timeplot(df)
+```
+
+\elandscape
+
+\newpage
+\blandscape
+
+### Project Budget Breakdown by Year
+#### This stacked bar chart shows the project expenditure and authority (capital and non-capital) across all fiscal years with available information.
+
+```{r,fig.width=10, fig.height=2, results='hide'}
+ds<-budget_yr%>%filter(IP==input$selectip)
+      #spread(`Authority vs. Expenditures`,Value)%>%
+ img_name<-paste0(ip_selected()$ip,'.png')
+ p<-budget_plot(ds)
+ export(p,file=img_name)
+```
+
+```{r echo=FALSE,fig.align='center', out.width = "400px"}
+img_name<-paste0(ip_selected()$ip,'.png')
+knitr::include_graphics(img_name)
+```
+
+\elandscape
+
+\newpage
+### Project Budget Projections
+##### This horizontal bar chart shows the project forecasted expenditures for the ongoing fiscal year, forecasted total expenditures, expenditures to date and approved budget.
+
+```{r,fig.width=10, results='hide'}
+  ds<-budget%>%filter(IP==input$selectip)%>%
+        summarise(`Approved Budget`=sum(`Approved Budget`,na.rm=T),
+                  `Expenditure to Date`=sum(`Expenditure to Date`,na.rm=T),
+                  `Remaining Budget Projected`=sum(`Variance / Remaining budget`,na.rm=T))%>%
+        gather(cat)
+      
+  budget_plot2(ds)
+```
+
+\newpage
+
+### Project Risks
+
+```{r}
+  proj_risk%>%filter(IP == input$selectip)%>%
+                        select(3:7)%>%
+                        kable('latex',booktabs=T)%>%
+                        kable_styling(latex_options="scale_down")%>%
+                        column_spec(2,width='10em')%>%
+                        column_spec(5,width='20em')
+```
+
+### Project Issues
+
+```{r}
+
+  proj_issue%>%filter(IP == input$selectip)%>%
+          select(3:7)%>%
+          kable('latex',booktabs=T)%>%
+          kable_styling(latex_options="scale_down")%>%
+          column_spec(2,width='10em')%>%
+          column_spec(5,width='20em')
+
+```
+
+\newpage
+### Budget Breakdown by Year Data Table
+
+```{r}
+
+ds<-budget_yr%>%filter(IP==input$selectip)%>%
+      spread(`Authority vs. Expenditures`,Value)%>%
+      select(-year)%>%
+      mutate_at(c('Capital','Non_Capital','Project Authority', 'Project Expenditures'),dollar)
+
+knitr::kable(ds)
+
+```
+
+### Project Schedule Data Table
+
+```{r}
+  df<-schedule%>%filter(IP==ip_selected()$ip)%>%
+        #filter(grepl('Start Date|End Date|Go live',Major.Milestone,ignore.case=T))%>%
+        select(Milestone=Major.Milestone,
+               `Baseline Finish Date`=Approved_finish_date,
+               `Actual/Forecasted Finish Date`=Actual_date)
+  knitr::kable(df)
+```
