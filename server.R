@@ -216,6 +216,12 @@ shinyServer(function(input, output,session) {
   })
 
   output$timevis_plot_all <- renderTimevis({
+    #' @description: plot all projects.
+    #' 
+    #' @todo: Should have just one function for all and specific...
+    #' @todo: dates at bottom look wrong
+    #' @todo: add colors
+    #' @todo: group projects, timevis has grouping abilities.
     
     df <- schedule %>%
       filter(year(Approved_finish_date) >= year(today()))
@@ -244,25 +250,26 @@ shinyServer(function(input, output,session) {
       #' This is just an example code I copied, it won't work, it's just to
       #' get you started:
       #'  
-      sprintf(
-        "<table>
-           <tbody>
-             <tr><td colspan='3'><em>%s</em></td></tr>
-             <tr>
-               <td>%s</td>
-               <th>&nbsp;%s - %s&nbsp;</th>
-               <td>%s</td>
-             </tr>
-             <tr>
-               <td><img src='flags/%s.png' width='31' height='20' alt='%s'></td>
-               <th></th>
-               <td><img src='flags/%s.png' width='31' height='20' alt='%s'></td>
-             </tr
-           </tbody>
-        </table>"
-        stage, team1, score1, score2, team2, gsub("\\s", "", tolower(team1)),
-        team1, gsub("\\s", "", tolower(team2)), team2
-      )
+      #' sprintf(
+      #'   "<table>
+      #'      <tbody>
+      #'        <tr><td colspan='3'><em>%s</em></td></tr>
+      #'        <tr>
+      #'          <td>%s</td>
+      #'          <th>&nbsp;%s - %s&nbsp;</th>
+      #'          <td>%s</td>
+      #'        </tr>
+      #'        <tr>
+      #'          <td><img src='flags/%s.png' width='31' height='20' alt='%s'></td>
+      #'          <th></th>
+      #'          <td><img src='flags/%s.png' width='31' height='20' alt='%s'></td>
+      #'        </tr
+      #'      </tbody>
+      #'   </table>"
+      #'   stage, team1, score1, score2, team2, gsub("\\s", "", tolower(team1)),
+      #'   team1, gsub("\\s", "", tolower(team2)), team2
+      #' )
+      return(df["Major.Milestone"])
     }
 
     content <- makeContent(df)
