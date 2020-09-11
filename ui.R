@@ -1,3 +1,6 @@
+#' TODO: remove hard-coded numbers.
+#' TODO: update data?
+
 
 inactivity <- "function idleTimer() {
 var t = setTimeout(logout, 120000);
@@ -117,7 +120,7 @@ ui<-secure_app(
                     valueBoxOutput("planning", width = 6),
                     valueBoxOutput("testing", width = 6)),
                 box(width = 3,
-                    title = "Alerts",
+                    title = "Tasks",
                     valueBoxOutput("delayed", width = 6),
                     valueBoxOutput("completed", width = 6))),
               
