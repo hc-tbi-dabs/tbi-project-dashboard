@@ -1,35 +1,41 @@
+library(lubridate)
+library(rmarkdown)
+
+if(!require("timevis")) {
+  install.packages("timevis")
+}
+
+library(timevis)
+
+
 #' TODO: remove hard-coded numbers.
 #' TODO: update data?
 
 
-inactivity <- "function idleTimer() {
-var t = setTimeout(logout, 120000);
-window.onmousemove = resetTimer; // catches mouse movements
-window.onmousedown = resetTimer; // catches mouse movements
-window.onclick = resetTimer;     // catches mouse clicks
-window.onscroll = resetTimer;    // catches scrolling
-window.onkeypress = resetTimer;  //catches keyboard actions
+inactivity <- "
+  function idleTimer() {
+    var t = setTimeout(logout, 120000);
+      window.onmousemove = resetTimer;
+      window.onmousedown = resetTimer;
+      window.onclick     = resetTimer;
+      window.onscroll    = resetTimer;
+      window.onkeypress  = resetTimer;
+    
+    function logout() { window.close(); }
+    
+    function resetTimer() {
+      clearTimeout(t);
+      t = setTimeout(logout, 120000);  // milliseconds
+    }
+  }
+  idleTimer();"
 
-function logout() {
-window.close();  //close the window
-}
-
-function resetTimer() {
-clearTimeout(t);
-t = setTimeout(logout, 120000);  // time is in milliseconds (1000 is 1 second)
-}
-}
-idleTimer();"
-
-
-                                        # data.frame with credentials info
-                                        # runApp(host = "192.168.0.110", port=8080)
-
-ui<-secure_app(
+ui <- secure_app(
   head_auth = tags$script(inactivity),
   dashboardPage(
-    dashboardHeader(title=paste0('TBI Projects Dashboard \n as of ',dat),
-                    titleWidth=500),
+    dashboardHeader(
+      title = paste0('TBI Projects Dashboard \n as of ', dat),
+      titleWidth = 500),
 
     dashboardSidebar(width=150,
                      sidebarMenu(id='sidebar',
@@ -132,7 +138,7 @@ ui<-secure_app(
                 box(width = 12,
                     title = "Fiscal Year Schedule",
                     footer = textOutput("caption"),
-                    withSpinner(timevisOutput("timevis_plot_all"))))),
+                    withSpinner(timevis::timevisOutput("timevis_plot_all"))))),
       
       tabItem(
         tabName = 'individual',
@@ -172,7 +178,7 @@ ui<-secure_app(
               fluidRow(
                 column(12,
                        box(title='Schedule',width=NULL,
-                           withSpinner(timevisOutput('timevis_plot_individual')),
+                           withSpinner(timevis::timevisOutput('timevis_plot_individual')),
                            br(),
                            br(),
                            DT::dataTableOutput('schedule_tb')))
