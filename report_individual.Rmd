@@ -110,12 +110,12 @@ ds<-budget_yr%>%filter(IP==input$selectip)
       #spread(`Authority vs. Expenditures`,Value)%>%
  img_name<-paste0(ip_selected()$ip,'.png')
  p<-budget_plot(ds)
- export(p,file=img_name)
+ # export(p,file=img_name)
 ```
 
 ```{r echo=FALSE,fig.align='center', out.width = "400px"}
-img_name<-paste0(ip_selected()$ip,'.png')
-knitr::include_graphics(img_name)
+# img_name<-paste0(ip_selected()$ip,'.png')
+# knitr::include_graphics(img_name)
 ```
 
 \elandscape

@@ -1,10 +1,8 @@
 ---
 title: "Overview of TBI Investment Projects"
-geometry: margin=0.5cm
 output: 
   pdf_document:
     latex_engine: xelatex
-fontsize: 10pt
 always_allow_html: yes
 header-includes:
   - \usepackage{booktabs}
@@ -28,116 +26,166 @@ header-includes:
 ```{r setup,include=FALSE,message=FALSE,warning=FALSE}
 library(knitr)
 library(kableExtra)
-library(ggplot2)
-library(emojifont)
-library(tidyverse)
-library(lubridate)
-
 #' params$ip_selected
-
 knitr::opts_chunk$set(
 	echo = FALSE,
 	message = FALSE,
-	warning = FALSE)
-
-options(knitr.table.format = "latex")
+	warning = FALSE
+)
+options(knitr.table.format='latex')
 options(shiny.testmode = TRUE)
 ```
-# Date: `r lubridate::today()` 
 
-## Project Codes and Project Names
 
+# Overall Portfolio: All Projects
+### Report created on `r Sys.Date()`
+The web dashboard can be found at [jodiqiao.shinyapps.io/tbi_dashboard](jodiqiao.shinyapps.io/tbi_dashboard).
+
+
+### All Project Codes and Project Names
 ```{r}
-title_628 <- "628: Establishment Licensing and Inspections"
-title_A03 <- "A03: Enabling Compliance and Enforcement Program Delivery"
-title_A04 <- "A04: ROEB Aging IT (Stabilization/Modernization/Transformation)"
+title_628<-'628: Establishment Licensing and Inspections'
+title_A03<-'A03: Enabling Compliance and Enforcement Program Delivery'
+title_A04<-'A04: ROEB Aging IT (Stabilization/Modernization/Transformation)'
 
-title_A05 <- "A05: Drug and Health Product Inspections Database"
-title_A06 <- "A06: Modernizing the ROEB Employee eToolkit"
-title_701 <- "701: Border IM/IT Modernization"
+title_A05<-'A05: Drug and Health Product Inspections Database'
+title_A06<-'A06: Modernizing the ROEB Employee eToolkit'
+title_701<-'701: Border IM/IT Modernization'
 
-title_704 <- "704: Quality Management System"
-title_705 <- "705: DAS Modernization"
-title_cyclops <- "Cyclops"
+title_704<-'704: Quality Management System'
+title_705<-'705: DAS Modernization'
+title_cyclops<-'Cyclops'
 
-title_hummingbird <- "Hummingbird"
-title_cipher <- "Cipher"
-title_kelpie <- "Kelpie"
+title_hummingbird<-'Hummingbird'
+title_cipher<-'Cipher'
+title_kelpie<-'Kelpie'
 
-title_ip000 <- "IP000: PCP IT Modernization"
+title_ip000<-'IP000: PCP IT Modernization'
+```
 
-codes <- c(
-  "628",        
-  "A03",        
-  "A04",        
-  "A05",        
-  "A06",        
-  "701",          
-  "704",        
-  "705",        
-  "Cyclops",    
-  "Hummingbird",
-  "Cipher",     
-  "Kelpie",     
-  "IP000")
+- `r title_628`
+- `r title_A03`
+- `r title_A04`
+- `r title_A05`
+- `r title_A06`
+- `r title_701`
+- `r title_704`
+- `r title_705`
+- `r title_cyclops`
+- `r title_hummingbird`
+- `r title_kelpie`
+- `r title_ip000`
 
-descriptions <- c(
-  "Establishment Licensing and Inspections",
-  "Enabling Compliance and Enforcement Program Delivery",
-  "ROEB Aging IT (Stabilization/Modrnization/Transformation)",
-  "Drug and Health Product Inspections Database",
-  "Modernizing the ROEB Empleoyee eToolkit",
-  "Border IM/IT Modernization",
-  "Quality Management System",
-  "DAS Modernization",
-  "Cyclops",
-  "Hummingbird",
-  "Cipher",
-  "Kelpie",
-  "PCP IT Modernization")
 
-projects = list(
-  "Codes" = codes,
-  "Description" = descriptions
+### Overall Project Health Metadata
+Project Health is evaluated by three components:
+
+- Deliverability of functional elements
+- Budget status
+- Schedule
+
+Out of 13 TBI projects with overall status information:
+```{r}
+num_del<-length(which(status$status == 'Delayed'))
+num_cau<-length(which(status$status == 'Caution'))
+num_ont<-length(which(status$status == 'On-Track'))
+
+library(ggplot2)
+library(emojifont)
+df <- data.frame(
+    x = rep(seq(2, 15, 6.5)),
+    y = c(rep(6.5, 3)),
+    h = rep(4.25, 3),
+    w = rep(6.25, 3),
+    value = c(num_del,
+              num_cau,
+              num_ont),
+    info = c("Delayed",
+             "Caution",
+             "On-Track"),
+    shape = c(fontawesome(search_fontawesome("chart")),
+              emoji("none")),
+    font_family = c(rep("fontawesome-webfont", 1),
+                    "EmojiOne"),
+    color = factor(1:3)
 )
+
+ggplot(df, aes(x, y, height = h, width = w, label = info)) +
+    geom_tile(aes(fill = color)) +
+    geom_text(color = "white", fontface = "bold", size = 10,
+              aes(label = value, x = x - 2.9, y = y + 1), hjust = 0) +
+    geom_text(color = "white", fontface = "bold",
+              aes(label = info, x = x - 2.9, y = y - 1), hjust = 0) +
+    coord_fixed() +
+    scale_fill_brewer(type = "qual",palette = "Dark2") +
+    geom_text(size = 20, aes(label = shape, family = font_family,
+                             x = x + 1.5, y = y + 0.5), alpha = 0.25) +
+    theme_void() +
+    guides(fill = FALSE)
 ```
-```{R}
-kableExtra::kbl(as_tibble(projects), booktabs = T, linesep = "") %>%
-  kable_styling(latex_options = "striped")
+- `r num_del` delayed
+- `r num_cau` caution
+- `r num_ont` on-track
+
+Out of 13 TBI projects with overall health information:
+```{r}
+num_red<-length(which(status$`Overall Project Health` == 'Red'))
+num_yel<-length(which(status$`Overall Project Health` == 'Yellow'))
+num_gre<-length(which(status$`Overall Project Health` == 'Green'))
+
+library(ggplot2)
+library(emojifont)
+df <- data.frame(
+    x = rep(seq(2, 15, 6.5)),
+    y = c(rep(6.5, 3)),
+    h = rep(4.25, 3),
+    w = rep(6.25, 3),
+    value = c(num_red,
+              num_yel,
+              num_gre),
+    info = c("Red",
+             "Yellow",
+             "Green"),
+    shape = c(fontawesome(search_fontawesome("chart")),
+              emoji("none")),
+    font_family = c(rep("fontawesome-webfont", 1),
+                    "EmojiOne"),
+    color = factor(1:6)
+)
+
+ggplot(df, aes(x, y, height = h, width = w, label = info)) +
+    geom_tile(aes(fill = color)) +
+    geom_text(color = "white", fontface = "bold", size = 10,
+              aes(label = value, x = x - 2.9, y = y + 1), hjust = 0) +
+    geom_text(color = "white", fontface = "bold",
+              aes(label = info, x = x - 2.9, y = y - 1), hjust = 0) +
+    coord_fixed() +
+    scale_fill_brewer(type = "qual",palette = "Dark2") +
+    geom_text(size = 20, aes(label = shape, family = font_family,
+                             x = x + 1.5, y = y + 0.5), alpha = 0.25) +
+    theme_void() +
+    guides(fill = FALSE)
 ```
+- `r num_red` red
+- `r num_yel` yellow
+- `r num_gre` green
 
-```{R}
-#' - `r title_628`
-#' - `r title_A03`
-#' - `r title_A04`
-#' - `r title_A05`
-#' - `r title_A06`
-#' - `r title_701`
-#' - `r title_704`
-#' - `r title_705`
-#' - `r title_cyclops`
-#' - `r title_hummingbird`
-#' - `r title_kelpie`
-#' - `r title_ip000`
-```
+\newpage
+\blandscape
 
-## Overall Project Budget Status
+### Overall Project Budget Status
+#### This bubble plot visualizes project budget health. The size of each circular area is relative to the size of the approved budget. The colors of these circles reflect project statuses where **Delayed** is red, **Caution** is yellow and **On-Track** is green.
 
-The size of each circular area is relative to the size of the approved budget. 
+```{r,message=FALSE,warning=FALSE, fig.width=10}
 
-The colors of these circles reflect project statuses where **Delayed** is red, **Caution** is yellow and **On-Track** is green.
-
-```{r, out.width="50%"}
-
-  status$IP2 <- paste0(status$IP)
-      status$IP2 <- map(status$IP2, is.sf_proj)
-      df <- status %>%
-        filter(`Overall Project Health` != 'Blue') %>%
-        filter(IP %in% ip_selected()$ips) %>%
+  status$IP2<-paste0(status$IP)
+      status$IP2<-map(status$IP2,is.sf_proj)
+      df<-status%>%
+        filter(`Overall Project Health`!='Blue')%>%
+        filter(IP %in% ip_selected()$ips)%>%
         left_join(budget[,c('IP','Approved Budget')])
       df$status<-factor(df$status,levels=c('On-Track','Caution','Delayed'))
-      status_plot(df)
-      
+      status_plot(df, "IP Projects")
 ```
 
 #### Color code rules:
@@ -146,27 +194,22 @@ The colors of these circles reflect project statuses where **Delayed** is red, *
 - Yellow: Some course correction may be required. One or more of the intended project outputs may not be achieved. Identified changes may negatively impact the project's scope, cost or schedule and some course correction may be required.
 - Greem: The project is on track. The intended projet outputs are expected to be achieved. Identified changes are not expected to negatively impact the project's scope, cost or schedule.
 
+\elandscape
+
 \newpage
 \blandscape
 
 ### Overall Project Stages & Project Status
 
 ```{r,fig.width=10}
-#' What are we doing here?
 
-df <- all_proj %>%
-  filter(IP %in% ip_selected()$ips) %>%
-  group_by(stage, status) %>%
-  summarise(IP = paste(IP, collapse='\n'), count = n())
-
-df$status <- factor(
-  df$status,
-  levels = c("On-Track",
-             "Caution",
-             "Delayed",
-             "Not yet started"))
+  df<-all_proj%>%
+        filter(IP %in% ip_selected()$ips)%>%
+        group_by(stage,status)%>%
+        summarise(IP=paste(IP,collapse='\n'),count=n())
+      df$status<-factor(df$status,levels=c('On-Track','Caution','Delayed','Not yet started'))
       
-stage_plot(df)
+  stage_plot(df)
 ```
 
 \elandscape
@@ -191,12 +234,12 @@ stage_plot(df)
     
   # solution for plotly graphs not rendering in Rmarkdown PDF
   # tmpfile<-tempfile(fileext='.png')
-  export(p, file = "overall.png")
+  # export(p, file = "overall.png")
   # this doesn't work in shinyapps, but works in rstudio instance
 ```
 
 ```{r echo=FALSE,fig.align='center'}
-knitr::include_graphics("overall.png")
+# knitr::include_graphics("overall.png")
 ```
 
 \elandscape
@@ -228,13 +271,16 @@ total_tasks<-nrow(schedule)
 total_completed<-length(which(schedule$Schedule.Health.Standard == 'completed'))
 total_incomplete<-length(which(schedule$Schedule.Health.Standard != 'completed'))
 ```
+
 - All TBI tasks planned: `r total_tasks`
 - Completed tasks: `r total_completed`
 - Incomplete tasks: `r total_incomplete`
 
 ```{r,message=FALSE,warning=FALSE,results='hide',fig.width=12}
 
-  df<-schedule_overview()%>%filter(!is.na(Approved_finish_date))%>%filter(if(Schedule.Health.Standard == "completed"){Actual_date >= as.IDate(paste0(as.character(year(now())), "-01-01"))})
+  df <- schedule %>%
+    filter(!is.na(Approved_finish_date)) %>%
+    filter(if(Schedule.Health.Standard == "completed"){Actual_date >= as.IDate(paste0(as.character(year(now())), "-01-01"))})
       # using schedule ommitted completed tasks because too crowded
       # only show tasks completed this year
   
