@@ -256,43 +256,27 @@ shinyServer(function(input, output,session) {
       #' to make colorful stuff inside the timevis boxes. 
       
       status <- NA 
-     
+
       #' This is just an example code I copied, it won't work, it's just to
       #' get you started:
-      #'  
-      #' sprintf(
-      #'   "<table>
-      #'      <tbody>
-      #'        <tr><td colspan='3'><em>%s</em></td></tr>
-      #'        <tr>
-      #'          <td>%s</td>
-      #'          <th>&nbsp;%s - %s&nbsp;</th>
-      #'          <td>%s</td>
-      #'        </tr>
-      #'        <tr>
-      #'          <td><img src='flags/%s.png' width='31' height='20' alt='%s'></td>
-      #'          <th></th>
-      #'          <td><img src='flags/%s.png' width='31' height='20' alt='%s'></td>
-      #'        </tr
-      #'      </tbody>
-      #'   </table>"
-      #'   stage, team1, score1, score2, team2, gsub("\\s", "", tolower(team1)),
-      #'   team1, gsub("\\s", "", tolower(team2)), team2
-      #' )
-      return(df["Major.Milestone"])
-    }
+      #'        
+      sprintf(
+        "<table><tbody>
+        <tr><td>%s<br>%s</td></tr>
+        </tbody></table>",
+        df["Directorate"], df["Major.Milestone"], df["Schedule.Health.Standard"])
 
-    content <- makeContent(df)
-    
+    }
+    content <- apply(df, 1, makeContent)
     data <- tibble(
       id      = 1:nrow(df),
       content = content,
-      start   = df["Approved_finish_date"],
-      end     = rep(NA, nrow(df)) 
+      start   = format(df["Approved_finish_date"][[1]], "%Y-%m-%d"),
+      end     = rep(NA, nrow(df)),
+      group = df["IP"]
     )
-   
-    timevis::timevis(data)
-    
+    data_groups <- tibble(id=unique(df["IP"]), content=unique(df["IP"]))
+    timevis(data, groups=data_groups)
   })
     
 
@@ -319,12 +303,11 @@ shinyServer(function(input, output,session) {
     data <- tibble(
       id      = 1:nrow(df),
       content = df["Major.Milestone"],
-      start   = df["Approved_finish_date"],
-      end     = rep(NA, nrow(df)) 
+      start   = format(df["Approved_finish_date"][[1]], "%Y-%m-%d"),
+      end     = rep(NA, nrow(df))
     )
-   
-    timevis::timevis(data)
-    
+  
+    timevis(data)    
   })
   
   
