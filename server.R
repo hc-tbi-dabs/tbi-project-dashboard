@@ -1,4 +1,13 @@
+#!/usr/bin/env Rscript
+
 library(lubridate)
+library(rmarkdown)
+
+if(!require("timevis")) {
+  install.packages("timevis")
+}
+
+library(timevis)
 
 #' TODOs:
 #' 
@@ -178,11 +187,12 @@ shinyServer(function(input, output,session) {
     # spread(var,value)
     
     # Jodi added this scrollbar to the table that is too long
-    datatable(data = ds,
-              options = list(searching = FALSE,
-                             pageLength = 5,
-                             lengthMenu = c(5, 10, 15, 20),
-                             scrollX = T))
+    datatable(
+      data = ds,
+      options = list(searching = FALSE,
+                     pageLength = 5,
+                     lengthMenu = c(5, 10, 15, 20),
+                     scrollX = T))
   })
   # ========= End of Project Portfolio Budget
   
@@ -215,7 +225,13 @@ shinyServer(function(input, output,session) {
     return(no_completed_schedule)
   })
 
-  output$timevis_plot_all <- renderTimevis({
+  output$timevis_plot_all <- timevis::renderTimevis({
+    #' @description: plot all projects.
+    #' 
+    #' @todo: Should have just one function for all and specific...
+    #' @todo: dates at bottom look wrong
+    #' @todo: add colors
+    #' @todo: group projects, timevis has grouping abilities.
     
     df <- schedule %>%
       filter(year(Approved_finish_date) >= year(today()))
@@ -243,13 +259,13 @@ shinyServer(function(input, output,session) {
 
       #' This is just an example code I copied, it won't work, it's just to
       #' get you started:
-      #'  
-      
+      #'        
       sprintf(
         "<table><tbody>
         <tr><td>%s<br>%s</td></tr>
         </tbody></table>",
         df["Directorate"], df["Major.Milestone"], df["Schedule.Health.Standard"])
+
     }
     content <- apply(df, 1, makeContent)
     data <- tibble(
@@ -264,7 +280,7 @@ shinyServer(function(input, output,session) {
   })
     
 
-  output$timevis_plot_individual <- renderTimevis({
+  output$timevis_plot_individual <- timevis::renderTimevis({
 
     df <- schedule %>%
       filter(IP == ip_selected()$ip)
@@ -290,9 +306,8 @@ shinyServer(function(input, output,session) {
       start   = format(df["Approved_finish_date"][[1]], "%Y-%m-%d"),
       end     = rep(NA, nrow(df))
     )
-    
-    timevis(data)
-    
+  
+    timevis(data)    
   })
   
   
@@ -322,16 +337,16 @@ shinyServer(function(input, output,session) {
     datatable(df,options = list(dom = 'tip'), rownames = FALSE)
   })
 
+  output$schedule_tb2 <- renderDataTable({
 
-  output$schedule_tb2<-DT::renderDataTable({
-
-    df<-schedule_overview()%>%
-      select(Milestone=Major.Milestone,
+    df <- schedule_overview() %>%
+      select(Milestone = Major.Milestone,
              `Baseline Finish Date` = Approved_finish_date,
-             `Actual/Forecasted Finish Date`=Actual_date
-             )
+             `Actual/Forecasted Finish Date` = Actual_date)
 
-    DT::datatable(df,options = list(dom = 'tip'), rownames = FALSE)
+    datatable(data = df,
+              options = list(dom = 'tip'), rownames = FALSE)
+    
   })
 
   # ========= End of Schedule
@@ -442,27 +457,39 @@ shinyServer(function(input, output,session) {
     
     df <- status %>%
       filter(grepl("\\d", IP)) %>%
-      filter(`Overall Project Health`!='Blue')%>%
-      filter(IP %in% ip_selected()$ips)%>%
+      filter(`Overall Project Health` != 'Blue') %>%
+      filter(IP %in% ip_selected()$ips) %>%
       left_join(budget[,c('IP','Approved Budget')])
+    
     df$status<-factor(df$status,levels=c('On-Track','Caution','Delayed'))
+    
     p <- status_plot(df, "IP Projects")
-    ggplotly(p, tooltip = 'text') %>% config(displayModeBar = F)
+    
+    ggplotly(p, tooltip = 'text') %>%
+      config(displayModeBar = F) %>%
+      layout(xaxis = list(showgrid = F),
+             yaxis = list(showgrid = F))
   })
   
   output$overall3 <- renderPlotly({
     #' Innovation Projects
 
     status$IP2<-paste0(status$IP)
-    #status$IP2<-map(status$IP2,is.sf_proj)
+    
     df<-status %>%
       filter(!grepl("\\d", IP)) %>%
       filter(`Overall Project Health`!='Blue')%>%
       filter(IP %in% ip_selected()$ips)%>%
       left_join(budget[,c('IP','Approved Budget')])
-    df$status<-factor(df$status,levels=c('On-Track','Caution','Delayed'))
+    
+    df$ status <- factor(df$status,levels=c('On-Track','Caution','Delayed'))
+    
     p <- status_plot(df, "Innovation Projects")
-    ggplotly(p, tooltip = 'text') %>% config(displayModeBar = F)
+    
+    ggplotly(p, tooltip = 'text') %>% 
+      config(displayModeBar = F) %>%
+      layout(xaxis = list(showgrid = F),
+             yaxis = list(showgrid = F))
   })
    
   output$overall_project_health <- renderUI({
@@ -652,7 +679,6 @@ shinyServer(function(input, output,session) {
       file.copy(src, 'report_overall.Rmd', overwrite = TRUE)
       file.copy(src2, 'overall.png')
       
-      library(rmarkdown)
       out <- render('report_overall.Rmd', pdf_document())
       file.rename(out, file)
     }
