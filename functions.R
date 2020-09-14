@@ -14,11 +14,11 @@ budget_plot<-function(ds){
   plot_ly(ds%>%filter(`Authority vs. Expenditures`=='Project Authority'),x=~year-0.2,y=~Capital,type='bar',name='Project Authority - Capital',
           marker=list(color='rgb(252,205,201)'),
           hoverinfo='text',
-          text=~paste('Capital: $',prettyNum(Capital,big.mark=',')))%>%
+          text=~paste('Capital: $',prettyNum(Capital,big.mark=','))) %>%
     add_trace(y=~Non_Capital,name='Project Authority - Non-Capital',marker=list(color='rgb(248,118,109)'),
               hoverinfo='text',
               text=~ label)%>%
-    layout(barmode='stack',yaxis=list(title='Budget'))%>%
+    layout(barmode='stack',yaxis=list(title='Budget')) %>%
     add_trace(data=ds%>%filter(`Authority vs. Expenditures`=='Project Expenditures'),x=~year+0.2,y=~Non_Capital,type='bar',name='Project Expenditure',
               marker=list(color='rgb(0,191,196)'),
               hoverinfo='text',
@@ -26,7 +26,7 @@ budget_plot<-function(ds){
     layout(xaxis=list(title='Fiscal Year',
                       ticktext=list("2016-17","2017-18","2018-19","2019-20","2020-21","2021-22","2022-23"),
                       tickvals = list(2016, 2017, 2018, 2019, 2020,2021,2022),
-                      tickmode='array'))%>%
+                      tickmode='array')) %>%
     layout(legend=list(y=1,x=0.7))
 }
 
