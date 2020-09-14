@@ -29,6 +29,7 @@ library(orca)
 library(processx)
 library(rsconnect)
 library(webshot)
+library(timevis)
 
 credentials <- data.frame(
   user = c("dabs"),
