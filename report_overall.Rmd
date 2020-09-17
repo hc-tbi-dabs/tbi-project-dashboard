@@ -1,24 +1,10 @@
 ---
-title: "Overview of TBI Investment Projects"
+title: "TBI Investment Projects"
+geometry: "left=1.25cm, right=1.25cm, top=1cm, bottom=1cm"
 output: 
   pdf_document:
     latex_engine: xelatex
 always_allow_html: yes
-header-includes:
-  - \usepackage{booktabs}
-  - \usepackage{longtable}
-  - \usepackage{float}
-  - \usepackage{pdflscape}
-  - \usepackage{array}
-  - \usepackage{multirow}
-  - \usepackage{wrapfig}
-  - \usepackage{colortbl}
-  - \usepackage{tabu}
-  - \usepackage{threeparttable}
-  - \usepackage{threeparttablex}
-  - \usepackage[normalem]{ulem}
-  - \usepackage{makecell}
-  - \usepackage{xcolor}
 ---
 
 ```{R Setup, include = FALSE, message = FALSE, warning = FALSE}
@@ -27,6 +13,7 @@ library(knitr)
 library(kableExtra)
 library(ggplot2)
 library(emojifont)
+library(timevis)
 
 knitr::opts_chunk$set(echo    = FALSE,
                       message = FALSE,
@@ -39,7 +26,7 @@ options(shiny.testmode = TRUE)
 
 # Report for All Projects
 
-## Up to date as of: `r Sys.Date()`.
+**Up to date as of: `r Sys.Date()`.**
 
 ```{R Titles}
 
@@ -76,15 +63,13 @@ title_ip000<-'IP000: PCP IT Modernization'
 #' - `r title_kelpie`
 #' - `r title_ip000`
 
+#' Project Health is evaluated by three components:
+#' 
+#' - Deliverability of functional elements
+#' - Budget status
+#' - Schedule
+
 ```
-
-## Overall Project Health Metadata
-
-Project Health is evaluated by three components:
-
-- Deliverability of functional elements
-- Budget status
-- Schedule
 
 Out of 13 TBI projects with overall status information:
 
@@ -95,6 +80,10 @@ num_caution <- length(which(status$status == "Caution"))
 num_ontrack <- length(which(status$status == "On-Track"))
 
 ```
+
+| Delayed  | Caution  | On Track |
+|---|---|---|
+| `r num_delayed` | `r num_caution` | `r num_ontrack` |
 
 - `r num_delayed` Delayed
 - `r num_caution` Caution
@@ -109,6 +98,11 @@ num_yellow <- length(which(status$`Overall Project Health` == 'Yellow'))
 num_green  <- length(which(status$`Overall Project Health` == 'Green'))
 
 ```
+
+| Red | Yellow | Green |
+|---|---|---|
+| `r num_red` | `r num_yellow` | `r num_green` |
+
 - `r num_red` Red
 - `r num_yellow` Yellow
 - `r num_green` Green
@@ -117,9 +111,7 @@ num_green  <- length(which(status$`Overall Project Health` == 'Green'))
 
 # Project Budget Status
 
-_These bubble plots visualize project budget health._
-
-_The size of each circular area is relative to the size of the approved budget. The colors of these circles reflect project statuses where **Delayed** is red, **Caution** is yellow and **On-Track** is green._
+_These bubble plots visualize project budget health: The size of each circular area is relative to the size of the approved budget. The colors of these circles reflect project statuses where **Delayed** is red, **Caution** is yellow and **On-Track** is green._
 
 ## IP Projects
 
@@ -161,7 +153,7 @@ _The size of each circular area is relative to the size of the approved budget. 
 
 - Red: Significant course correction may be required. One or more of the intended project outputs may not be achieved. Identified changes may negatively impact the project's scope, cost or schedule and significant course correction may be required.
 - Yellow: Some course correction may be required. One or more of the intended project outputs may not be achieved. Identified changes may negatively impact the project's scope, cost or schedule and some course correction may be required.
-- Greem: The project is on track. The intended projet outputs are expected to be achieved. Identified changes are not expected to negatively impact the project's scope, cost or schedule.
+- Green: The project is on track. The intended project outputs are expected to be achieved. Identified changes are not expected to negatively impact the project's scope, cost or schedule.
 
 \newpage
 
@@ -244,36 +236,61 @@ total_incomplete <- length(which(schedule$Schedule.Health.Standard != 'completed
 - Completed tasks: `r total_completed`
 - Incomplete tasks: `r total_incomplete`
 
-```{r,message=FALSE,warning=FALSE,results='hide',fig.width=12}
+```{r, message = FALSE, warning = FALSE, results = 'hide', fig.width = 12}
 
-  df <- schedule %>%
-    filter(!is.na(Approved_finish_date)) %>%
-    filter(if(Schedule.Health.Standard == "completed"){Actual_date >= as.IDate(paste0(as.character(year(now())), "-01-01"))})
-      # using schedule ommitted completed tasks because too crowded
-      # only show tasks completed this year
-  
-      # shiny::validate((
-      #   need(any(!is.na(df$Approved_finish_date)),'There is no information on project schedule')
-      # ))
-  
-      incProgress(0.5)
-  
-      timeplot(df)
+#' Original Data filtering:
+#' df <- schedule %>%
+#'   filter(!is.na(Approved_finish_date)) %>%
+#'   filter(if(Schedule.Health.Standard == "completed") {
+#'     Actual_date >= as.IDate(paste0(as.character(year(now())), "-01-01"))
+#'     })
+    
+df <- schedule %>%
+  filter(year(Approved_finish_date) >= year(today()))
+
+
+makeContent <- function(df) {
+  #' @description: Take the information found in the dataframe, and use it
+  #' to make colorful stuff inside the timevis boxes. 
+      
+  status <- NA 
+
+  sprintf(
+    "<table><tbody>
+    <tr><td>%s<br>%s</td></tr>
+    </tbody></table>",
+    df["Directorate"], df["Major.Milestone"], df["Schedule.Health.Standard"])
+}
+
+content <- apply(df, 1, makeContent)
+
+data <- tibble(
+  id      = 1:nrow(df),
+  content = content,
+  start   = format(df["Approved_finish_date"][[1]], "%Y-%m-%d"),
+  end     = rep(NA, nrow(df)),
+  group = df["IP"]
+)
+
+data_groups <- tibble(id=unique(df["IP"]), content=unique(df["IP"]))
+
+timevis(data, groups=data_groups)
 
 ```  
 
 \newpage
 
-### Overall Budget Breakdown by Year Data Table
+# Overall Budget Breakdown by Year Data Table
 
 ```{r}
 
-  ds<-budget_yr%>%
-        filter(IP %in% ip_selected()$ips)%>%
-        group_by(Year,year,`Authority vs. Expenditures`)%>%
-        summarise(capital=sum(Capital,na.rm=T),
-                  non_capital=sum(Non_Capital,na.rm=T),
-                  value=sum(Value,na.rm=T))%>%
+  ds <- budget_yr %>%
+        filter(IP %in% ip_selected()$ips) %>%
+        group_by(Year,year,`Authority vs. Expenditures`) %>%
+        summarise(
+          capital     = sum(Capital,na.rm=T),
+          non_capital = sum(Non_Capital,na.rm=T),
+          value       = sum(Value,na.rm=T)) %>%
         mutate_at(c('capital','non_capital','value'),dollar)
     
   knitr::kable(ds)
@@ -282,7 +299,8 @@ total_incomplete <- length(which(schedule$Schedule.Health.Standard != 'completed
 
 \newpage
 
-### List of All Project Descriptions
+# List of All Project Descriptions
+
 ```{r}
 title_628<-'628: Establishment Licensing and Inspections'
 title_A03<-'A03: Enabling Compliance and Enforcement Program Delivery'
