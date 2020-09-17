@@ -1,0 +1,13 @@
+name: TBI-Project-Dashboard
+title: TBI-Project-Dashboard
+username:
+account: bryanpaget
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 2791626
+bundleId: 3640157
+url: https://bryanpaget.shinyapps.io/TBI-Project-Dashboard/
+when: 1600353912.97266
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: .RData|TBI-PPM-Dashboard.epgz|tmp/Overview of TBI Investment Projects-2020-08-14.pdf

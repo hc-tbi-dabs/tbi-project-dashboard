@@ -9,8 +9,6 @@ header-includes:
   - \usepackage{longtable}
   - \usepackage{float}
   - \usepackage{pdflscape}
-  - \newcommand{\blandscape}{\begin{landscape}}
-  - \newcommand{\elandscape}{\end{landscape}}
   - \usepackage{array}
   - \usepackage{multirow}
   - \usepackage{wrapfig}
@@ -23,30 +21,31 @@ header-includes:
   - \usepackage{xcolor}
 ---
 
-```{r setup,include=FALSE,message=FALSE,warning=FALSE}
+```{R Setup, include = FALSE, message = FALSE, warning = FALSE}
+
 library(knitr)
 library(kableExtra)
-#' params$ip_selected
-knitr::opts_chunk$set(
-	echo = FALSE,
-	message = FALSE,
-	warning = FALSE
-)
-options(knitr.table.format='latex')
+library(ggplot2)
+library(emojifont)
+
+knitr::opts_chunk$set(echo    = FALSE,
+                      message = FALSE,
+                      warning = FALSE)
+
+options(knitr.table.format = "latex")
 options(shiny.testmode = TRUE)
+
 ```
 
+# Report for All Projects
 
-# Overall Portfolio: All Projects
-### Report created on `r Sys.Date()`
-The web dashboard can be found at [jodiqiao.shinyapps.io/tbi_dashboard](jodiqiao.shinyapps.io/tbi_dashboard).
+## Up to date as of: `r Sys.Date()`.
 
+```{R Titles}
 
-### All Project Codes and Project Names
-```{r}
-title_628<-'628: Establishment Licensing and Inspections'
-title_A03<-'A03: Enabling Compliance and Enforcement Program Delivery'
-title_A04<-'A04: ROEB Aging IT (Stabilization/Modernization/Transformation)'
+title_628 <- "628: Establishment Licensing and Inspections"
+title_A03 <- "A03: Enabling Compliance and Enforcement Program Delivery"
+title_A04 <- "A04: ROEB Aging IT (Stabilization/Modernization/Transformation)"
 
 title_A05<-'A05: Drug and Health Product Inspections Database'
 title_A06<-'A06: Modernizing the ROEB Employee eToolkit'
@@ -61,23 +60,26 @@ title_cipher<-'Cipher'
 title_kelpie<-'Kelpie'
 
 title_ip000<-'IP000: PCP IT Modernization'
+
+## All Project Codes and Project Names
+
+#' - `r title_628`
+#' - `r title_A03`
+#' - `r title_A04`
+#' - `r title_A05`
+#' - `r title_A06`
+#' - `r title_701`
+#' - `r title_704`
+#' - `r title_705`
+#' - `r title_cyclops`
+#' - `r title_hummingbird`
+#' - `r title_kelpie`
+#' - `r title_ip000`
+
 ```
 
-- `r title_628`
-- `r title_A03`
-- `r title_A04`
-- `r title_A05`
-- `r title_A06`
-- `r title_701`
-- `r title_704`
-- `r title_705`
-- `r title_cyclops`
-- `r title_hummingbird`
-- `r title_kelpie`
-- `r title_ip000`
+## Overall Project Health Metadata
 
-
-### Overall Project Health Metadata
 Project Health is evaluated by three components:
 
 - Deliverability of functional elements
@@ -85,121 +87,85 @@ Project Health is evaluated by three components:
 - Schedule
 
 Out of 13 TBI projects with overall status information:
-```{r}
-num_del<-length(which(status$status == 'Delayed'))
-num_cau<-length(which(status$status == 'Caution'))
-num_ont<-length(which(status$status == 'On-Track'))
 
-library(ggplot2)
-library(emojifont)
-df <- data.frame(
-    x = rep(seq(2, 15, 6.5)),
-    y = c(rep(6.5, 3)),
-    h = rep(4.25, 3),
-    w = rep(6.25, 3),
-    value = c(num_del,
-              num_cau,
-              num_ont),
-    info = c("Delayed",
-             "Caution",
-             "On-Track"),
-    shape = c(fontawesome(search_fontawesome("chart")),
-              emoji("none")),
-    font_family = c(rep("fontawesome-webfont", 1),
-                    "EmojiOne"),
-    color = factor(1:3)
-)
+```{R SatusInformation}
 
-ggplot(df, aes(x, y, height = h, width = w, label = info)) +
-    geom_tile(aes(fill = color)) +
-    geom_text(color = "white", fontface = "bold", size = 10,
-              aes(label = value, x = x - 2.9, y = y + 1), hjust = 0) +
-    geom_text(color = "white", fontface = "bold",
-              aes(label = info, x = x - 2.9, y = y - 1), hjust = 0) +
-    coord_fixed() +
-    scale_fill_brewer(type = "qual",palette = "Dark2") +
-    geom_text(size = 20, aes(label = shape, family = font_family,
-                             x = x + 1.5, y = y + 0.5), alpha = 0.25) +
-    theme_void() +
-    guides(fill = FALSE)
+num_delayed <- length(which(status$status == "Delayed"))
+num_caution <- length(which(status$status == "Caution"))
+num_ontrack <- length(which(status$status == "On-Track"))
+
 ```
-- `r num_del` delayed
-- `r num_cau` caution
-- `r num_ont` on-track
+
+- `r num_delayed` Delayed
+- `r num_caution` Caution
+- `r num_ontrack` On Track
 
 Out of 13 TBI projects with overall health information:
+
 ```{r}
-num_red<-length(which(status$`Overall Project Health` == 'Red'))
-num_yel<-length(which(status$`Overall Project Health` == 'Yellow'))
-num_gre<-length(which(status$`Overall Project Health` == 'Green'))
 
-library(ggplot2)
-library(emojifont)
-df <- data.frame(
-    x = rep(seq(2, 15, 6.5)),
-    y = c(rep(6.5, 3)),
-    h = rep(4.25, 3),
-    w = rep(6.25, 3),
-    value = c(num_red,
-              num_yel,
-              num_gre),
-    info = c("Red",
-             "Yellow",
-             "Green"),
-    shape = c(fontawesome(search_fontawesome("chart")),
-              emoji("none")),
-    font_family = c(rep("fontawesome-webfont", 1),
-                    "EmojiOne"),
-    color = factor(1:6)
-)
+num_red    <- length(which(status$`Overall Project Health` == 'Red'))
+num_yellow <- length(which(status$`Overall Project Health` == 'Yellow'))
+num_green  <- length(which(status$`Overall Project Health` == 'Green'))
 
-ggplot(df, aes(x, y, height = h, width = w, label = info)) +
-    geom_tile(aes(fill = color)) +
-    geom_text(color = "white", fontface = "bold", size = 10,
-              aes(label = value, x = x - 2.9, y = y + 1), hjust = 0) +
-    geom_text(color = "white", fontface = "bold",
-              aes(label = info, x = x - 2.9, y = y - 1), hjust = 0) +
-    coord_fixed() +
-    scale_fill_brewer(type = "qual",palette = "Dark2") +
-    geom_text(size = 20, aes(label = shape, family = font_family,
-                             x = x + 1.5, y = y + 0.5), alpha = 0.25) +
-    theme_void() +
-    guides(fill = FALSE)
 ```
-- `r num_red` red
-- `r num_yel` yellow
-- `r num_gre` green
+- `r num_red` Red
+- `r num_yellow` Yellow
+- `r num_green` Green
 
 \newpage
-\blandscape
 
-### Overall Project Budget Status
-#### This bubble plot visualizes project budget health. The size of each circular area is relative to the size of the approved budget. The colors of these circles reflect project statuses where **Delayed** is red, **Caution** is yellow and **On-Track** is green.
+# Project Budget Status
 
-```{r,message=FALSE,warning=FALSE, fig.width=10}
+_These bubble plots visualize project budget health._
 
-  status$IP2<-paste0(status$IP)
-      status$IP2<-map(status$IP2,is.sf_proj)
-      df<-status%>%
-        filter(`Overall Project Health`!='Blue')%>%
-        filter(IP %in% ip_selected()$ips)%>%
-        left_join(budget[,c('IP','Approved Budget')])
-      df$status<-factor(df$status,levels=c('On-Track','Caution','Delayed'))
-      status_plot(df, "IP Projects")
+_The size of each circular area is relative to the size of the approved budget. The colors of these circles reflect project statuses where **Delayed** is red, **Caution** is yellow and **On-Track** is green._
+
+## IP Projects
+
+```{R IP_Projects, message = FALSE, warning = FALSE, fig.width = 10}
+
+    status$IP2 <- paste0(status$IP)
+    
+    df <- status %>%
+      filter(grepl("\\d", IP)) %>%
+      filter(`Overall Project Health` != 'Blue') %>%
+      filter(IP %in% ip_selected()$ips) %>%
+      left_join(budget[,c('IP','Approved Budget')])
+    
+    df$status<-factor(df$status,levels=c('On-Track','Caution','Delayed'))
+    
+    status_plot(df, "IP Projects")
+    
 ```
 
-#### Color code rules:
+## Innovation Projects
+
+```{R Innovation_Projects, message = FALSE, warning = FALSE, fig.width = 10}
+    
+    status$IP2<-paste0(status$IP)
+    
+    df <- status %>%
+      filter(!grepl("\\d", IP)) %>%
+      filter(`Overall Project Health`!='Blue')%>%
+      filter(IP %in% ip_selected()$ips)%>%
+      left_join(budget[,c('IP','Approved Budget')])
+    
+    df$status <- factor(df$status,levels=c('On-Track','Caution','Delayed'))
+    
+  status_plot(df, "Innovation Projects")
+   
+```
+
+### Color code rules:
 
 - Red: Significant course correction may be required. One or more of the intended project outputs may not be achieved. Identified changes may negatively impact the project's scope, cost or schedule and significant course correction may be required.
 - Yellow: Some course correction may be required. One or more of the intended project outputs may not be achieved. Identified changes may negatively impact the project's scope, cost or schedule and some course correction may be required.
 - Greem: The project is on track. The intended projet outputs are expected to be achieved. Identified changes are not expected to negatively impact the project's scope, cost or schedule.
 
-\elandscape
-
 \newpage
-\blandscape
 
-### Overall Project Stages & Project Status
+# Project Stages & Project Status
 
 ```{r,fig.width=10}
 
@@ -212,12 +178,9 @@ ggplot(df, aes(x, y, height = h, width = w, label = info)) +
   stage_plot(df)
 ```
 
-\elandscape
-
 \newpage
-\blandscape
 
-### Overall Budget Breakdown by Year
+# Budget Breakdown by Year
 
 ```{r, results='hide'}
 
@@ -242,14 +205,15 @@ ggplot(df, aes(x, y, height = h, width = w, label = info)) +
 # knitr::include_graphics("overall.png")
 ```
 
-\elandscape
 
 \newpage
 
-### Overall Budget Projections
-#### This horizontal bar chart shows all project forecasted expenditures for the ongoing fiscal year, forecasted total expenditures, expenditures to date and approved budget.
+# Budget Projections
 
-```{r,fig.width=10,fig.height=4}
+This horizontal bar chart shows all project forecasted expenditures for the ongoing fiscal year, forecasted total expenditures, expenditures to date and approved budget.
+
+```{R, fig.width = 10, fig.height = 4}
+
   ds<-budget%>%
         filter(IP %in% ip_selected()$ips)%>%
         left_join(all_proj%>%select(IP=IP))%>%
@@ -259,17 +223,21 @@ ggplot(df, aes(x, y, height = h, width = w, label = info)) +
         gather(cat,value)
       
       budget_plot2(ds)
+      
 ```
 
 \newpage
-\blandscape
 
-### Overall Schedule
-#### This timeplot shows all project tasks planned for the ongoing fiscal year, forecasted completion status and fiscal quarter. Completed tasks prior to the current fiscal year is hidden for simplicity. Only all tasks with complete milestone, approved finish date, actual finish date, and schedule health information will appear on the timeplot. If fewer datapoints are visualized than expected, the spreadsheet contains missing information.
+# Schedule
+
+This timeplot shows all project tasks planned for the ongoing fiscal year, forecasted completion status and fiscal quarter. Completed tasks prior to the current fiscal year is hidden for simplicity. Only all tasks with complete milestone, approved finish date, actual finish date, and schedule health information will appear on the timeplot. If fewer datapoints are visualized than expected, the spreadsheet contains missing information.
+
 ```{r}
-total_tasks<-nrow(schedule)
-total_completed<-length(which(schedule$Schedule.Health.Standard == 'completed'))
-total_incomplete<-length(which(schedule$Schedule.Health.Standard != 'completed'))
+
+total_tasks      <- nrow(schedule)
+total_completed  <- length(which(schedule$Schedule.Health.Standard == 'completed'))
+total_incomplete <- length(which(schedule$Schedule.Health.Standard != 'completed'))
+
 ```
 
 - All TBI tasks planned: `r total_tasks`
@@ -293,8 +261,6 @@ total_incomplete<-length(which(schedule$Schedule.Health.Standard != 'completed')
       timeplot(df)
 
 ```  
-
-\elandscape
 
 \newpage
 
