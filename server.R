@@ -449,7 +449,6 @@ shinyServer(function(input, output,session) {
   
   # ========= End of Project Issue
   
-  # ========= Overall Project Health ----
   output$overall2 <- renderPlotly({
     #' IP Projects
 

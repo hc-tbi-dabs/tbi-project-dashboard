@@ -7,7 +7,6 @@ if(!require("timevis")) {
 
 library(timevis)
 
-
 #' TODO: remove hard-coded numbers.
 #' TODO: update data?
 
@@ -33,52 +32,69 @@ inactivity <- "
 ui <- secure_app(
   head_auth = tags$script(inactivity),
   dashboardPage(
+    
     dashboardHeader(
-      title = paste0('TBI Projects Dashboard \n as of ', dat),
+      title      = paste0('TBI Projects Dashboard \n as of ', dat),
       titleWidth = 500),
 
-    dashboardSidebar(width=150,
-                     sidebarMenu(id='sidebar',
-                                 menuItem('Overview', tabName = 'overview'),
-                                 menuItem('Individual', tabName = 'individual'),
-                                 menuItem('About', tabName = 'explanations'),
+    dashboardSidebar(
+      width = 150,
+      
+      sidebarMenu(
+        id = 'sidebar',
+        menuItem(text = 'Overview',   tabName = 'overview'),
+        menuItem(text = 'Individual', tabName = 'individual'),
+        menuItem(text = 'About',      tabName = 'explanations'),
 
-                                 conditionalPanel(
-                                   condition="input.sidebar == 'individual' ",
-                                   selectInput('selectip',label="Select an IP project",choices=ip)
-                                 ),
-                                 conditionalPanel(
-                                   condition="input.sidebar == 'overview' ",
-                                   selectInput('selectdir',label="Select a Directorate",choices=directorate),
-                                   actionButton('info','View IP Name',icon=icon('eye'))
-                                 ),
+        conditionalPanel(
+          condition = "input.sidebar == 'individual' ",
+          selectInput(
+            inputId = 'selectip',
+            label   = "Select an IP project",
+            choices = ip)),
+        
+        conditionalPanel(
+          condition = "input.sidebar == 'overview' ",
+          
+          selectInput(
+            inputId = "selectdir",
+            label   = "Select a Directorate",
+            choices = directorate),
+                                   
+          actionButton(
+            inputId = 'info',
+            label   = 'View IP Name',
+            icon    = icon('eye'))),
+        
+        br(), br(),
+        
+        tags$b('Download:', style = "margin-left:10px;"),
+        
+        br(), br(),
+        
+        tags$style(type="text/css", "#downloadData {color: black;margin-left:10px;}"),
+        
+        downloadButton(outputId = 'downloadData', label = 'Data'),
+        
+        br(), br(),
+        
+        conditionalPanel(
+          condition = "input.sidebar == 'individual' ",
+          tags$style(type="text/css", "#downloadreport_individual {color: black;margin-left:10px;}"),
+          
+          downloadButton(outputId = 'downloadreport_individual', label = 'Report')),
 
-                                 br(),br(),
-                                 tags$b('Download:',style="margin-left:10px;"),
-                                 br(),
-                                 br(),
-                                 tags$style(type="text/css", "#downloadData {color: black;margin-left:10px;}"),
-                                 downloadButton('downloadData','Data'),
-                                 br(),
-                                 br(),
-                                 conditionalPanel(
-                                   condition="input.sidebar == 'individual' ",
-                                   tags$style(type="text/css", "#downloadreport_individual {color: black;margin-left:10px;}"),
-                                   downloadButton('downloadreport_individual','Report')
-                                 ),
-                                 conditionalPanel(
-                                   condition="input.sidebar == 'overview' ",
-                                   tags$style(type="text/css", "#downloadreport_overview {color: black;margin-left:10px;}"),
-                                   downloadButton('downloadreport_overview','Report')
-                                 ),
-                                 br(),
-                                 br(),
-                                 br(),
-                                 br(),
-                                 br(),
-                                 actionButton('contact','Contact us',icon=icon('phone')))
-                     ),
-    dashboardBody(
+        conditionalPanel(
+          condition="input.sidebar == 'overview' ",
+          tags$style(type="text/css", "#downloadreport_overview {color: black;margin-left:10px;}"),
+          
+          downloadButton(outputId = 'downloadreport_overview', label = 'Report')),
+
+        br(), br(), br(), br(), br(),
+
+        actionButton('contact','Contact us',icon=icon('phone')))),
+
+        dashboardBody(
 
       tags$head(tags$style(HTML('
       .main-header .logo {
