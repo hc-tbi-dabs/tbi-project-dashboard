@@ -1,16 +1,89 @@
 library(lubridate)
 library(rmarkdown)
-
-if(!require("timevis")) {
+library(htmltools)
+library(shinydashboard)
+library(shinydashboardPlus)
+ 
+if (!require("timevis")) {
   install.packages("timevis")
 }
 
+if (!require("webshot")) {
+  install.packages("webshot")
+}
+
+if (!require("exportwidget")) {
+  devtools::install_github("timelyportfolio/exportwidget")
+}
+
+library(webshot)
 library(timevis)
+library(exportwidget)
 
 #' TODO: remove hard-coded numbers.
 #' TODO: update data?
 
+style = "
 
+  h2 {
+    font-family: 'Arial';
+    margin-left:20px;
+    font-weight: bold;
+    line-height: 1.1;
+    color: #2E4053;
+  }
+  
+  .main-header .logo {
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    font-size:   20px;
+  }
+  
+  .skin-blue .main-header .logo:hover {
+    background-color: #000833;
+  }
+  
+  .skin-blue .main-header .logo {
+    background-color: #000833;
+  }
+  
+  .skin-blue .main-header .navbar {
+    background-color: #000833;
+  }
+  
+  .skin-blue .main-sidebar {
+    background-color: #000833;
+  }
+  
+  .skin-blue .main-sidebar .sidebar .sidebar-menu .active a {
+     background-color: #0278A4;
+  }
+  
+  .skin-blue .main-sidebar .sidebar .sidebar-menu a:hover {
+     background-color: #0278A4;
+  }
+  
+  #downloadData {
+    color: black;
+    margin-left: 10px;
+  }
+  
+  #downloadreport_individual {
+    color: black;
+    margin-left: 10px;
+  }
+
+  #downloadreport_overview {
+    color: black;
+    margin-left:10px;
+  }
+  
+  .small-box.bg-red {
+    background-color: #C00000 !important;
+  }
+
+"
+          
 inactivity <- "
   function idleTimer() {
     var t = setTimeout(logout, 120000);
@@ -31,25 +104,27 @@ inactivity <- "
 
 ui <- secure_app(
   head_auth = tags$script(inactivity),
-  dashboardPage(
+  
+  dashboardPagePlus(
     
-    dashboardHeader(
+    dashboardHeaderPlus(
+      fixed      = T,
       title      = paste0('TBI Projects Dashboard \n as of ', dat),
-      titleWidth = 500),
+      titleWidth = 512),
 
     dashboardSidebar(
-      width = 150,
-      
+      width = 256,
+     
       sidebarMenu(
-        id = 'sidebar',
-        menuItem(text = 'Overview',   tabName = 'overview'),
-        menuItem(text = 'Individual', tabName = 'individual'),
-        menuItem(text = 'About',      tabName = 'explanations'),
+        id = "sidebar",
+        menuItem(text = "Overview",   tabName = "overview"),
+        menuItem(text = "Individual", tabName = "individual"),
+        menuItem(text = "About",      tabName = "explanations"),
 
         conditionalPanel(
           condition = "input.sidebar == 'individual' ",
           selectInput(
-            inputId = 'selectip',
+            inputId = "selectip",
             label   = "Select an IP project",
             choices = ip)),
         
@@ -62,108 +137,99 @@ ui <- secure_app(
             choices = directorate),
                                    
           actionButton(
-            inputId = 'info',
-            label   = 'View IP Name',
-            icon    = icon('eye'))),
+            inputId = "info",
+            label   = "View IP Name",
+            icon    = icon("eye"))),
         
         br(), br(),
         
-        tags$b('Download:', style = "margin-left:10px;"),
+        tags$b("Download:", style = "margin-left: 10px;"),
         
         br(), br(),
-        
-        tags$style(type="text/css", "#downloadData {color: black;margin-left:10px;}"),
-        
-        downloadButton(outputId = 'downloadData', label = 'Data'),
+       
+        downloadButton(outputId = "downloadData", label = "Data"),
         
         br(), br(),
         
         conditionalPanel(
           condition = "input.sidebar == 'individual' ",
-          tags$style(type="text/css", "#downloadreport_individual {color: black;margin-left:10px;}"),
-          
-          downloadButton(outputId = 'downloadreport_individual', label = 'Report')),
+          downloadButton(outputId = "downloadreport_individual", label = "Report")),
 
         conditionalPanel(
           condition="input.sidebar == 'overview' ",
-          tags$style(type="text/css", "#downloadreport_overview {color: black;margin-left:10px;}"),
-          
-          downloadButton(outputId = 'downloadreport_overview', label = 'Report')),
+          downloadButton(outputId = "downloadreport_overview", label = "Report")),
 
         br(), br(), br(), br(), br(),
 
-        actionButton('contact','Contact us',icon=icon('phone')))),
-
-        dashboardBody(
-
-      tags$head(tags$style(HTML('
-      .main-header .logo {
-        font-family: Arial, Helvetica, sans-serif;
-        font-weight: bold;
-        font-size: 20px;
-      }
-
-     .skin-blue .main-header .logo:hover{
-        background-color: #000833;
-     }
-
-     .skin-blue .main-header .logo{
-        background-color: #000833;
-     }
-
-     .skin-blue .main-header .navbar{
-       background-color: #000833;
-     }
-
-     .skin-blue .main-sidebar {
-       background-color: #000833;
-     }
-
-     .skin-blue .main-sidebar .sidebar .sidebar-menu .active a{
-       background-color: #0278A4;
-
-    .skin-blue .main-sidebar .sidebar .sidebar-menu a:hover{
-       background-color: #0278A4;
-
-    '))),
+        actionButton(
+          inputId = "contact",
+          label   = "Contact us",
+          icon    = icon("phone")))),
+    
+    dashboardBody(
+      tags$head(tags$style(HTML(style))),
     
     tabItems(
-      
-      tabItem(tabName='overview',
-              fluidRow(
-                box(width = 6,
-                    title = "IP Projects",
-                    valueBoxOutput("stage_1", width = 3),
-                    valueBoxOutput("stage_2", width = 3),
-                    valueBoxOutput("stage_3", width = 3),
-                    valueBoxOutput("stage_4", width = 3)),
-                box(width = 3,
-                    title = "Innovation Projects",
-                    valueBoxOutput("planning", width = 6),
-                    valueBoxOutput("testing", width = 6)),
-                box(width = 3,
-                    title = "Tasks",
-                    valueBoxOutput("delayed", width = 6),
-                    valueBoxOutput("completed", width = 6))),
-              
-              uiOutput("overall_project_health"),
-              
-              uiOutput("ui_output2"),
+      tabItem(
+        tabName = "overview",
+        
+        fluidRow(
+          
+          gradientBox(
+            title         = "IT Projects",
+            width         = 12,
+            icon          = "fa fa-heart",
+            gradientColor = "maroon", 
+            boxToolSize   = "xs", 
+            closable      = F,
+            footer        = "Footer",
+            valueBoxOutput(outputId = "stage_1", width = 3),
+            valueBoxOutput(outputId = "stage_2", width = 3),
+            valueBoxOutput(outputId = "stage_3", width = 3),
+            valueBoxOutput(outputId = "stage_4", width = 3))),
+        
+         fluidRow(
+           box(
+             title = "Innovation Projects Status",
+             status = "primary",
+             boxProfile(
+               src = "https://minutes.co/wp-content/uploads/2019/10/best-innovation-teams.jpg",
+               title = "Innovation Projects",
+               subtitle = "What are Innovation Projects?",
+               boxProfileItemList(
+                 bordered = T,
+                 boxProfileItem(
+                   title = "Planning",
+                   description = valueBoxOutput(outputId = "testing"))),
+                 boxProfileItem(
+                   title = "Testing",
+                   description = valueBoxOutput(outputId = "planning"))))),
+       
+        fluidRow(
+          box(width = 12,
+              title = "Tasks",
+              valueBoxOutput(outputId = "delayed",   width = 6),
+              valueBoxOutput(outputId = "completed", width = 6))),
+        
+        uiOutput("overall_project_health"),
+        
+        uiOutput("ui_output2"),
              
-              fluidRow( 
-                box(width = 12,
-                    title = "Fiscal Year Schedule",
-                    footer = textOutput("caption"),
-                    withSpinner(timevis::timevisOutput("timevis_plot_all"))))),
+        fluidRow( 
+          box(width = 12,
+              title = "Fiscal Year Schedule",
+              footer = textOutput("caption"),
+              withSpinner(timevis::timevisOutput("timevis_plot_all"))))),
       
       tabItem(
-        tabName = 'individual',
-        fluidRow(width = 12,
-                 uiOutput('project_name'),
-                 tags$style(".small-box.bg-red {background-color: #C00000 !important;}"),
-                 valueBoxOutput('overall'),
-                 valueBoxOutput('overall_stage'),
-                 valueBoxOutput('directorate')),
+        tabName = "individual",
+        
+        fluidRow(
+          box(width = 12,
+              uiOutput("project_name"),
+              valueBoxOutput("overall"),
+              valueBoxOutput("overall_stage"),
+              valueBoxOutput("directorate"))),
               
         fluidRow(
           box(title = 'Project Budget',
@@ -197,31 +263,16 @@ ui <- secure_app(
                            withSpinner(timevis::timevisOutput('timevis_plot_individual')),
                            br(),
                            br(),
-                           DT::dataTableOutput('schedule_tb')))
-              )
-              
-              ),
+                           DT::dataTableOutput('schedule_tb'))))),
       
-      tabItem(tabName='explanations',
+      tabItem(
+        tabName = "explanations",
               
-              fluidRow(width=12,
-                       uiOutput('explanations_header')
-                       ),
-              
-              fluidRow(
-                column(12,
-                       includeHTML("explanations.html"))
-              )
-              ),
-      
-      tabItem(tabName='kpis',
-              
-              fluidRow(width=12,
-                       uiOutput('kpis_header')
-                       )
-              )
-    )
-    
-    )
-  )
-)
+        fluidRow(
+          width = 12,
+          tags$h2("Explanation of Status Indicators & Project Stages")),
+            
+        fluidRow(
+          column(
+            width = 12,
+            includeHTML("explanations.html"))))))))
