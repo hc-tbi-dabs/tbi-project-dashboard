@@ -2,12 +2,24 @@
 
 library(lubridate)
 library(rmarkdown)
-
-if(!require("timevis")) {
+library(htmltools)
+ 
+if (!require("timevis")) {
   install.packages("timevis")
 }
 
+if (!require("webshot")) {
+  install.packages("webshot")
+}
+
+if (!require("exportwidget")) {
+  devtools::install_github("timelyportfolio/exportwidget")
+}
+
+library(webshot)
 library(timevis)
+library(exportwidget)
+
 
 #' TODOs:
 #' 
@@ -22,74 +34,70 @@ shinyServer(function(input, output,session) {
   
   output$res_auth <- renderPrint({
     reactiveValuesToList(result_auth)
-    })
+  })
   
-  # ========= Contact Button ----
+                                        # ========= Contact Button ----
   observeEvent(
     eventExpr = input$contact,
     handlerExpr = {
       showModal(modalDialog(
         title='Contact Us',
         HTML(paste(
-        # "If you have any questions regarding data source or data quality, please contact:",br(),
-        # "Sarah-Emily Carle",br(),
-        # "Management, Program Support",br(),
-        # "Business Informatics Division",br(),
-        # "RMOD, HFPB",br(),
-        # "sarah-emily.carle@canada.ca",br(),br(),
-        "If you have technical questions regarding the application, please contact:", br(),
-        br(),
-        "Jodi Qiao",br(),
-        "Jr Data Scientist",br(),
-        "Data Analytics and Business Solutions",br(),
-        "TBI, POD",br(),
-        "di.qiao@canada.ca; dqiao100@uottawa.ca"
-      )),
-      easyClose = T
-    ))
-  })
+                                        # "If you have any questions regarding data source or data quality, please contact:",br(),
+                                        # "Sarah-Emily Carle",br(),
+                                        # "Management, Program Support",br(),
+                                        # "Business Informatics Division",br(),
+                                        # "RMOD, HFPB",br(),
+                                        # "sarah-emily.carle@canada.ca",br(),br(),
+          "If you have technical questions regarding the application, please contact:", br(),
+          br(),
+          "Jodi Qiao",br(),
+          "Jr Data Scientist",br(),
+          "Data Analytics and Business Solutions",br(),
+          "TBI, POD",br(),
+          "di.qiao@canada.ca; dqiao100@uottawa.ca"
+        )),
+        easyClose = T
+      ))
+    })
   
-  # ========= End of Contact Button
-  
-  # ========= Texts/Headers of Dashboard ----
-  
-  # this is the "view IP" table
-  output$ip_tbl<-renderTable(
+  output$ip_tbl <- renderTable(
     all_proj[, 1:2] %>%
-      mutate(IP = as.character(IP)))
+    mutate(IP = as.character(IP)))
   
-  output$project_name<-renderUI({
-    # Project by IP name header
-    name<-all_proj%>%filter(IP== input$selectip)%>%pull(`Project`)
-    project_name<-paste0(input$selectip,': ',name)
-    if(startsWith(project_name,"Cipher") | startsWith(project_name,"Cyclops") | startsWith(project_name,"Hummingbird") | startsWith(project_name,"Kelpie")){
-      project_name<-name
-      #} else if(startsWith(project_name,"IPIP000")){
-      #project_name<-paste("IP000",name)
-    }
-    h2(project_name,
-       style = "font-family: 'Arial';margin-left:20px;
-        font-weight: bold; line-height: 1.1;
-        color: #2E4053;")
+  output$project_name <- renderUI({
+    
+    name <- all_proj %>%
+      filter(IP == input$selectip) %>%
+      pull(`Project`)
+    
+    project_name <- paste0(input$selectip, ": ", name)
+    
+    if (startsWith(project_name, "Cipher") |
+        startsWith(project_name, "Cyclops") |
+        startsWith(project_name, "Hummingbird") |
+        startsWith(project_name, "Kelpie"))
+    { project_name <- name }
+    
+    h2(project_name)
+    
   })
   
-  # ========= End of Texts/Headers of Dashboard
-  # ========= Select IP Side Menu ----
-  
-  ip_selected<-reactive({
+  ip_selected <- reactive({
     
-    ip<-input$selectip
+    ip <- input$selectip
     
-    if(input$selectdir=='All'){
-      ips<-all_proj$IP
-    }else{
-      ips<-all_proj$IP[all_proj$`Directorate`==input$selectdir]
+    if (input$selectdir == "All") {
+      ips <- all_proj$IP
+    } else {
+      ips <- all_proj$IP[all_proj$`Directorate` == input$selectdir]
     }
     
-    return(list(ip=ip,ips=ips))
+    return(list(ip = ip, ips = ips))
+    
   })
   
-  # ========= End of Select IP Side Menu 
+                                        # ========= End of Select IP Side Menu
   
   project_selected <- reactive({
     ip <- input$selectip
@@ -108,7 +116,7 @@ shinyServer(function(input, output,session) {
     return(report_title)
   })
   
-  # ========= Project Portfolio Budget ----
+                                        # ========= Project Portfolio Budget ----
   
   output$budget_all <- renderPlot({
     ds <- budget %>%
@@ -180,13 +188,13 @@ shinyServer(function(input, output,session) {
                 value=sum(Value,na.rm=T))%>%
       mutate_at(c('capital','non_capital','value'),dollar)
     
-    # left_join(all_proj%>%select(IP=IP,internal_external=`Internal or External`))%>%
-    # group_by(var,Year,internal_external)%>%
-    # summarise(value=sum(value,na.rm=T))%>%
-    # mutate(value=dollar(value))%>%
-    # spread(var,value)
+                                        # left_join(all_proj%>%select(IP=IP,internal_external=`Internal or External`))%>%
+                                        # group_by(var,Year,internal_external)%>%
+                                        # summarise(value=sum(value,na.rm=T))%>%
+                                        # mutate(value=dollar(value))%>%
+                                        # spread(var,value)
     
-    # Jodi added this scrollbar to the table that is too long
+                                        # Jodi added this scrollbar to the table that is too long
     datatable(
       data = ds,
       options = list(searching = FALSE,
@@ -194,10 +202,8 @@ shinyServer(function(input, output,session) {
                      lengthMenu = c(5, 10, 15, 20),
                      scrollX = T))
   })
-  # ========= End of Project Portfolio Budget
   
   
-  # ========= Schedule ----
   schedule_overview <- reactive({
     #' TODO: This logic looks backwards.
     schedule <- schedule %>%
@@ -278,7 +284,7 @@ shinyServer(function(input, output,session) {
     data_groups <- tibble(id=unique(df["IP"]), content=unique(df["IP"]))
     timevis(data, groups=data_groups)
   })
-    
+
 
   output$timevis_plot_individual <- timevis::renderTimevis({
 
@@ -306,7 +312,7 @@ shinyServer(function(input, output,session) {
       start   = format(df["Approved_finish_date"][[1]], "%Y-%m-%d"),
       end     = rep(NA, nrow(df))
     )
-  
+
     timevis(data)    
   })
   
@@ -316,7 +322,7 @@ shinyServer(function(input, output,session) {
     df <- schedule_overview() %>%
       filter(!is.na(Approved_finish_date)) %>%
       filter(if(Schedule.Health.Standard == "completed") {
-        Actual_date >= as.IDate(paste0(as.character(year(now())), "-01-01"))})
+               Actual_date >= as.IDate(paste0(as.character(year(now())), "-01-01"))})
 
     shiny::validate((
       need(any(!is.na(df$Approved_finish_date)),
@@ -349,29 +355,29 @@ shinyServer(function(input, output,session) {
     
   })
 
-  # ========= End of Schedule
-  # ========= Project Risk ----
-    
-    output$proj_risk_tb<-DT::renderDataTable({
-      options<- list(pageLength=5,
-                     scrollX=TRUE,
-                     autoWidth=T,
-                     columnDefs=list(list(width='500px',targets=2),
-                                     list(width='50px',targets=3),
-                                     list(width='50px',targets=4)))
-      
-      df<-proj_risk%>%filter(IP == input$selectip)%>%
-        select(3:7)
-      datatable(df,options=options)%>%
-        formatStyle('Probability',
-                    backgroundColor=styleEqual(c("Green","Yellow","Red"),
-                                               c( "#00B050", "#FFC000", "#C00000"))
-        )%>%
-        formatStyle('Impact',
-                    backgroundColor=styleEqual(c("Green","Yellow","Red"),
-                                               c( "#00B050", "#FFC000", "#C00000")))
-      
-    })
+                                        # ========= End of Schedule
+                                        # ========= Project Risk ----
+
+  output$proj_risk_tb<-DT::renderDataTable({
+    options<- list(pageLength=5,
+                   scrollX=TRUE,
+                   autoWidth=T,
+                   columnDefs=list(list(width='500px',targets=2),
+                                   list(width='50px',targets=3),
+                                   list(width='50px',targets=4)))
+
+    df<-proj_risk%>%filter(IP == input$selectip)%>%
+      select(3:7)
+    datatable(df,options=options)%>%
+      formatStyle('Probability',
+                  backgroundColor=styleEqual(c("Green","Yellow","Red"),
+                                             c( "#00B050", "#FFC000", "#C00000"))
+                  )%>%
+      formatStyle('Impact',
+                  backgroundColor=styleEqual(c("Green","Yellow","Red"),
+                                             c( "#00B050", "#FFC000", "#C00000")))
+
+  })
   
   output$proj_issue_tb<-DT::renderDataTable({
     
@@ -387,7 +393,7 @@ shinyServer(function(input, output,session) {
       formatStyle('Impact',
                   backgroundColor=styleEqual(c("Green","Yellow","Red"),
                                              c( "#00B050", "#FFC000", "#C00000"))
-      )
+                  )
     
   })
   
@@ -395,7 +401,7 @@ shinyServer(function(input, output,session) {
     
     shiny::validate({
       need(nrow(proj_risk%>%
-                  filter(IP %in% ip_selected()$ips & !is.na(Risk)))>0,'Data Not Available')
+                filter(IP %in% ip_selected()$ips & !is.na(Risk)))>0,'Data Not Available')
     })
     
     
@@ -417,8 +423,8 @@ shinyServer(function(input, output,session) {
     
   })
   
-  # ========= End of Project Risk
-  # ========= Project Issue ---- 
+                                        # ========= End of Project Risk
+                                        # ========= Project Issue ----
   
   
   
@@ -427,7 +433,7 @@ shinyServer(function(input, output,session) {
     
     shiny::validate({
       need(nrow(proj_issue%>%
-                  filter(IP %in% ip_selected()$ips & !is.na(Issue)))>0,'Data Not Available')
+                filter(IP %in% ip_selected()$ips & !is.na(Issue)))>0,'Data Not Available')
     })
     
     proj_issue%>%
@@ -447,7 +453,7 @@ shinyServer(function(input, output,session) {
     
   })
   
-  # ========= End of Project Issue
+                                        # ========= End of Project Issue
   
   output$overall2 <- renderPlotly({
     #' IP Projects
@@ -490,30 +496,30 @@ shinyServer(function(input, output,session) {
       layout(xaxis = list(showgrid = F),
              yaxis = list(showgrid = F))
   })
-   
+
   output$overall_project_health <- renderUI({
     fluidRow(width = 12,
-      box(title='IP Projects: Health',
-          width = 7,
-          withSpinner(plotlyOutput('overall2'))),
-    
-      box(title = "Innovation Projects: Health",
-          width = 5,
-          withSpinner(plotlyOutput("overall3")))
-    )
+             box(title='IP Projects: Health',
+                 width = 7,
+                 withSpinner(plotlyOutput('overall2'))),
+
+             box(title = "Innovation Projects: Health",
+                 width = 5,
+                 withSpinner(plotlyOutput("overall3")))
+             )
   })
-  # ========= End of Overall Project Health
+                                        # ========= End of Overall Project Health
   
-  # ========= UI Boxes for Overview ----
+                                        # ========= UI Boxes for Overview ----
   
-  # seems like for Overview
+                                        # seems like for Overview
   output$ui_output2<-renderUI({
     fluidRow(
-      # box(title='Project Functionality',
-      #     tabsetPanel(id='tabs',
-      #                 tabPanel(title='Graph',
-      #                          withSpinner(plotOutput("function_plt",height=450)))
-      #     )),
+                                        # box(title='Project Functionality',
+                                        #     tabsetPanel(id='tabs',
+                                        #                 tabPanel(title='Graph',
+                                        #                          withSpinner(plotOutput("function_plt",height=450)))
+                                        #     )),
       box(title='Project Portfolio Budget',
           tabsetPanel(
             tabPanel(title='Breakdown by Year',
@@ -522,7 +528,7 @@ shinyServer(function(input, output,session) {
                      DT::dataTableOutput('budget_tbl2', height=450)),
             tabPanel(title='Projections',
                      withSpinner(plotOutput('budget_all2',height=450))))
-      ),
+          ),
       box(title='Project Health and Current Stage',
           withSpinner(plotlyOutput('overall_stage2',height=490)))
     )
@@ -532,12 +538,12 @@ shinyServer(function(input, output,session) {
   
   
   
-  # ========= End of UI Boxes
-  # ========= ValueBoxes for Individual ----
+                                        # ========= End of UI Boxes
+                                        # ========= ValueBoxes for Individual ----
   
   output$overall_stage2<-renderPlotly({
     
-    # all_proj$IP2<-paste0(all_proj$IP,':\n',substr(all_proj$`Internal or External`,1,1))
+                                        # all_proj$IP2<-paste0(all_proj$IP,':\n',substr(all_proj$`Internal or External`,1,1))
     
     df<-all_proj%>%
       filter(IP %in% ip_selected()$ips)%>%
@@ -550,9 +556,9 @@ shinyServer(function(input, output,session) {
     ggplotly(p,tooltip='none')%>%
       config(displayModeBar = F) %>%
       layout(margin = list(b = 40, l=30))
-    # g=ggplotGrob(p)
-    # g$layout$clip[g$layout$name == "panel"] = "off"
-    # grid.draw(g)
+                                        # g=ggplotGrob(p)
+                                        # g$layout$clip[g$layout$name == "panel"] = "off"
+                                        # grid.draw(g)
   })
   
   
@@ -599,57 +605,58 @@ shinyServer(function(input, output,session) {
       subtitle = 'Delayed',
       color='light-blue')
   })
- 
-    output$stage_1<-renderValueBox({
-      valueBox(value = nrow(stage_1),
-               subtitle = 'Stage One',
-               color = 'aqua')
-    })
-    
-    output$stage_2<-renderValueBox({
-      valueBox(
-        value = nrow(stage_2),
-        subtitle = 'Stage Two',
-        color = 'yellow')
-    })
-    
-    output$stage_3<-renderValueBox({
-      valueBox(
-        value = nrow(stage_3),
-        subtitle = 'Stage Three',
-        color = 'orange')
-    })
-    
-    output$stage_4<-renderValueBox({
-      valueBox(
-        value = nrow(stage_4),
-        subtitle='Stage Four',
-        color='fuchsia')
-    })
-  
-  output$planning<-renderValueBox({
+
+  output$stage_1<-renderValueBox({
     valueBox(
-      value = nrow(planning),
-      subtitle = 'Planning Stage',
-      color = 'teal')
+      value    = nrow(stage_1),
+      subtitle = "Stage One",
+      color    = "aqua")
+  })
+
+  output$stage_2 <- renderValueBox({
+    valueBox(
+      value    = nrow(stage_2),
+      subtitle = "Stage Two",
+      color    = "yellow")
+  })
+
+  output$stage_3 <- renderValueBox({
+    valueBox(
+      value    = nrow(stage_3),
+      subtitle = "Stage Three",
+      color    = "orange")
+  })
+
+  output$stage_4 <- renderValueBox({
+    valueBox(
+      value    = nrow(stage_4),
+      subtitle = "Stage Four",
+      color    = "fuchsia")
   })
   
-  output$testing<-renderValueBox({
+  output$planning <- renderValueBox({
     valueBox(
-      value = 2,  # nrow(testing)
-      subtitle='Testing Stage',
-      color='olive')
+      value    = nrow(planning),
+      subtitle = "Planning",
+      color    = "teal")
+  })
+  
+  output$testing <- renderValueBox({
+    valueBox(
+      value    = 1, #nrow(testing),
+      subtitle = "Testing",
+      color    = "olive")
   })
   
   
-  # ========= End of ValueBoxes
-  # ========= Caption ----
+                                        # ========= End of ValueBoxes
+                                        # ========= Caption ----
   
   output$caption <- renderText({
     text="*** tasks completed before 2020 are hidden in main plot ***"
   })
   
-  # ========= End of Caption
+                                        # ========= End of Caption
   
   output$downloadData<-downloadHandler(
     
@@ -662,23 +669,44 @@ shinyServer(function(input, output,session) {
     }
   )
   
-  output$downloadreport_overview<-downloadHandler(
-    filename=function() {
-      paste0('Overview of TBI Investment Projects','-', Sys.Date(),'.pdf')
-    },
+  output$downloadreport_overview <- downloadHandler(
+    
+    filename = function() {
+      paste0("TBI Investment Projects", '-', Sys.Date(), ".pdf")},
     
     content = function(file) {
-      src <- normalizePath('report_overall.Rmd')
-      src2 <- normalizePath('overall.png')
+      #' @description: first call plotPNG to save some of the plots as pictures.
+
+      .make_timevis <- function() {
+        df <- schedule %>%
+          filter(IP == ip_selected()$ip)
+        data <- tibble(
+          id      = 1:nrow(df),
+          content = df["Major.Milestone"],
+          start   = format(df["Approved_finish_date"][[1]], "%Y-%m-%d"),
+          end     = rep(NA, nrow(df))
+        )
+        timevis(data)
+      }
+
+      saveWidget(widget        = .make_timevis(),
+                 file          = "timevis.html",
+                 selfcontained = F)      
+
+      markdown_source <- normalizePath("report_overall.Rmd")
+      overall_source  <- normalizePath("overall.png")
       
-      # temporarily switch to the temp dir, in case you do not have write
-      # permission to the current working directory
+      #' temporarily switch to the temp dir, in case you do not have write
+      #' permission to the current working directory
+
       owd <- setwd(tempdir())
       on.exit(setwd(owd))
-      file.copy(src, 'report_overall.Rmd', overwrite = TRUE)
-      file.copy(src2, 'overall.png')
       
-      out <- render('report_overall.Rmd', pdf_document())
+      file.copy(markdown_source, "report_overall.Rmd", overwrite = TRUE)
+      file.copy(overall_source,  "overall.png")
+      
+      out <- render("report_overall.Rmd", pdf_document())
+      
       file.rename(out, file)
     }
   )
@@ -694,8 +722,8 @@ shinyServer(function(input, output,session) {
       img_name <- paste0(ip_selected()$ip,'.png')
       src2 <- normalizePath(img_name)
       
-      # temporarily switch to the temp dir, in case you do not have write
-      # permission to the current working directory
+                                        # temporarily switch to the temp dir, in case you do not have write
+                                        # permission to the current working directory
       owd <- setwd(tempdir())
       on.exit(setwd(owd))
       file.copy(src, 'report_individual.Rmd', overwrite = TRUE)
@@ -707,18 +735,5 @@ shinyServer(function(input, output,session) {
     }
     
   )
-  
-   output$explanations_header<-renderUI({
-    
-    # explanations header
-    explanations_header<-"Explanation of Status Indicators & Project Stages"
-    h2(explanations_header,
-       style = "font-family: 'Arial';margin-left:20px;
-        font-weight: bold; line-height: 1.1;
-        color: #2E4053;")
-  })
-  
-  
-  # ======== End of Explanations Tab
   
 })
