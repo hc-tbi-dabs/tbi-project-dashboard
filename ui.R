@@ -9,21 +9,32 @@ library(exportwidget)
 
 
 left_menu <- tagList(
-
+  
   dropdownBlock(
     id    = "download-menu",
     title = "Download",
     icon  = icon("download"),
-
-    downloadButton(outputId = "download_data", label = "Data", icon = icon("download")),
-
+    
+    downloadButton(
+      outputId = "download_data",
+      label    = "Data",
+      icon     = icon("download")),
+    
     conditionalPanel(
       condition = "input.sidebar == 'individual' ",
-      downloadButton(outputId = "downloadreport_individual", label = "Report")),
-
+      
+      downloadButton(
+        outputId = "downloadreport_individual", 
+        label    = "Report",
+        icon     = icon("download"))),
+    
     conditionalPanel(
-      condition="input.sidebar == 'overview' ",
-      downloadButton(outputId = "downloadreport_overview", label = "Report"))),
+      condition = "input.sidebar == 'overview' ",
+      
+      downloadButton(
+        outputId = "downloadreport_overview",
+        label    = "Report",
+        icon     = icon("download")))),
   
   actionButton(
     inputId = "contact",
@@ -31,67 +42,82 @@ left_menu <- tagList(
     icon    = icon("phone")))
 
 
+#' @todo: put the date somwhere.
 #' tagList(paste0('As of ', dat))
 
 
 header <- dashboardHeaderPlus(
   left_menu  = left_menu,
   fixed      = F,
-  title      = paste0("TBI Projects"))
+  title      = paste0("TBI Projects")
+)
 
 
 sidebar_menu <- sidebarMenu(
-
   id = "sidebar",
-
-  menuItem(text = "Overview",   tabName = "overview",     icon = icon("globe-africa")),
-
-  menuItem(text = "Individual", tabName = "individual",   icon = icon("search")),
   
-  menuItem(text = "About",      tabName = "explanations", icon = icon("info")),
-
+  menuItem(
+    text    = "Overview",
+    tabName = "overview",
+    icon    = icon("globe-africa")),
+  
+  menuItem(
+    text    = "Individual",
+    tabName = "individual",
+    icon    = icon("search")),
+  
+  menuItem(
+    text    = "About",
+    tabName = "explanations",
+    icon    = icon("info")),
+  
   conditionalPanel(
-
     condition = "input.sidebar == 'individual' ",
-
-    selectInput(inputId = "selectip",
-                label   = "Select an IP project",
-                choices = ip)))
+    
+    selectInput(
+      inputId = "selectip",
+      label   = "Select an IP project",
+      choices = ip)))
 
 
 sidebar <- dashboardSidebar(sidebar_menu)
 
 
 rightsidebar <- rightSidebar(
-  
+  title = "Right Sidebar",
   background = "dark",
   
   rightSidebarTabContent(
-    id    = 1,
-    title = "Tab 1",
-    icon = "desktop",
-    active = TRUE,
+    id     = 1,
+    title  = "Tab 1",
+    icon   = "desktop",
+    active = T,
     sliderInput(
-      "obs",
-      "Number of observations:",
-      min = 0, max = 1000, value = 500
-    )
-  ),
+      inputId = "obs",
+      label   = "Number of observations:",
+      min     = 0,
+      max     = 1000,
+      value   = 500)),
+  
   rightSidebarTabContent(
-    id = 2,
+    id    = 2,
     title = "Tab 2",
-    textInput("caption", "Caption", "Data Summary")
-  ),
+    textInput(inputId = "caption",
+              label = "Caption",
+              "Data Summary")),
+  
   rightSidebarTabContent(
-    id = 3,
-    icon = "paint-brush",
+    id    = 3,
+    icon  = "paint-brush",
     title = "Tab 3",
-    numericInput("obs", "Observations:", 10, min = 1, max = 100)), 
-  title = "Right Sidebar")
+    numericInput(inputId = "obs",
+                 label = "Observations:",
+                 value = 10,
+                 min   = 1,
+                 max   = 100)))
 
 
 body <- dashboardBody(
-
   tabItems(
     tabItem(
       tabName = "overview",
@@ -103,26 +129,34 @@ body <- dashboardBody(
         width = 12,
         status = "danger",
         footer = fluidRow(
-          column(width = 6,
-                 descriptionBlock(
-                   number = "17%", 
-                   numberColor = "green", 
-                   numberIcon = "fa fa-caret-up",
-                   header = "$35,210.43", 
-                   text = "TOTAL REVENUE", 
-                   rightBorder = TRUE,
-                   marginBottom = FALSE)),
+          column(
+            width = 6,
+            descriptionBlock(
+              number = "17%",
+              numberColor = "green",
+              numberIcon = "fa fa-caret-up",
+              header = "$35,210.43",
+              text = "TOTAL REVENUE",
+              rightBorder = TRUE,
+              marginBottom = FALSE
+            )
+          ),
           
-          column(width = 6,
-                 descriptionBlock(
-                   number = "18%", 
-                   numberColor = "red", 
-                   numberIcon = "fa fa-caret-down",
-                   header = "1200", 
-                   text = "GOAL COMPLETION", 
-                   rightBorder = FALSE,
-                   marginBottom = FALSE)))),
-
+          column(
+            width = 6,
+            descriptionBlock(
+              number = "18%",
+              numberColor = "red",
+              numberIcon = "fa fa-caret-down",
+              header = "1200",
+              text = "GOAL COMPLETION",
+              rightBorder = FALSE,
+              marginBottom = FALSE
+            )
+          )
+        )
+      ),
+      
       boxPlus(
         title = "Nav Pills",
         status = "info",
@@ -139,43 +173,37 @@ body <- dashboardBody(
             pillName = "Item 2",
             pillColor = "red",
             pillIcon = "fa fa-angle-down",
-            pillText = "10%"))),
-
+            pillText = "10%"
+          )
+        )
+      ),
+      
       box(
         title = "Box with a green boxPad",
         status = "warning",
-        fluidRow(
-          column(width = 6),
-          column(
-            width = 6,
-            boxPad(
-              color = "green",
-              descriptionBlock(
-                header = "8390",
-                text = "VISITS"
-              ),
-              descriptionBlock(
-                header = "30%",
-                text = "REFERRALS"
-              ),
-              descriptionBlock(
-                header = "70%",
-                text = "ORGANIC"))))),
-
+        fluidRow(column(width = 6),
+                 column(
+                   width = 6,
+                   boxPad(
+                     color = "green",
+                     descriptionBlock(header = "8390",
+                                      text = "VISITS"),
+                     descriptionBlock(header = "30%",
+                                      text = "REFERRALS"),
+                     descriptionBlock(header = "70%",
+                                      text = "ORGANIC")
+                   )
+                 ))
+      ),
+      
       gradientBox(
         title         = "IT Projects",
         icon          = "fa fa-heart",
         gradientColor = "teal",
         boxToolSize   = "md",
         closable      = F,
-        footer        = "This is a test.",
-        box(width = 12,
-            tagList(
-              textOutput(outputId = "stage_1"),
-              textOutput(outputId = "stage_2"),
-              textOutput(outputId = "stage_3"),
-              textOutput(outputId = "stage_4")))),
-
+        footer        = "This is a test."),
+      
       gradientBox(
         title         = "IT Projects",
         icon          = "fa fa-heart",
@@ -188,12 +216,13 @@ body <- dashboardBody(
           dashboardLabel("Label 3", status = "warning"),
           dashboardLabel("Label 4", status = "primary"),
           dashboardLabel("Label 5", status = "danger"),
-          ),
-
+        ),
+        
         textOutput(outputId = "stage_1"),
         textOutput(outputId = "stage_2"),
         textOutput(outputId = "stage_3"),
-        textOutput(outputId = "stage_4")),
+        textOutput(outputId = "stage_4")
+      ),
       
       widgetUserBox(
         title = "Innovation Projects Status",
@@ -208,74 +237,88 @@ body <- dashboardBody(
             bordered = T,
             boxProfileItem(
               title = "Planning",
-              description = textOutput(outputId = "testing"))),
+              description = textOutput(outputId = "testing")
+            )
+          ),
           boxProfileItem(
             title = "Testing",
             description = textOutput(outputId = "planning")))),
-
-      box(width = 12,
-          title = "Tasks",
-          valueBoxOutput(outputId = "delayed",   width = 6),
-          valueBoxOutput(outputId = "completed", width = 6))),
-
+      
+      box(
+        width = 12,
+        title = "Tasks",
+        valueBoxOutput(outputId = "delayed",   width = 6),
+        valueBoxOutput(outputId = "completed", width = 6)),
+    
     uiOutput("overall_project_health"),
-
+    
     uiOutput("ui_output2"),
-
+    
     fluidRow(
-      box(width = 12,
-          title = "Fiscal Year Schedule",
-          footer = textOutput("caption"),
-          withSpinner(timevis::timevisOutput("timevis_plot_all"))))),
-
-  tabItem(
-    tabName = "individual",
-
-    fluidRow(
-      box(width = 12,
+      box(
+        width = 12,
+        title = "Fiscal Year Schedule",
+        footer = textOutput("caption"),
+        withSpinner(timevis::timevisOutput("timevis_plot_all"))))),
+    
+    tabItem(
+      tabName = "individual",
+      
+      fluidRow(
+        box(
+          width = 12,
           uiOutput("project_name"),
           valueBoxOutput("overall"),
           valueBoxOutput("overall_stage"),
           valueBoxOutput("directorate"))),
-
-    fluidRow(
-      box(title = 'Project Budget',
-          tabsetPanel(
-            tabPanel(title='Breakdown by Year',
-                     withSpinner(plotlyOutput('budget_plt', height=450))))),
-      box(
-        title = 'Projections',
-        withSpinner(plotOutput('budget_all', height = 490)))),
-
-    fluidRow(
-      column(
-        width = 12,
+      
+      fluidRow(
         box(
-          title = 'Project Risks',
-          width=NULL,
-          dataTableOutput('proj_risk_tb')))),
+          title = "Project Budget",
+          tabsetPanel(
+            tabPanel(
+              title = "Breakdown by Year",
+              withSpinner(plotlyOutput("budget_plt", height = 450))))),
+        box(
+          title = "Projections",
+          withSpinner(plotOutput("budget_all", height = 490)))),
+      
+      fluidRow(
+        column(
+          width = 12,
+          box(
+            title = "Project Risks",
+            width = NULL,
+            dataTableOutput("proj_risk_tb")))),
+      
+      fluidRow(
+        column(
+          width = 12,
+          box(
+            title = "Project Issues",
+            width = NULL,
+            dataTableOutput("proj_issue_tb")))),
+      
+      fluidRow(
+        box(title = "Schedule",
+            withSpinner(timevisOutput("timevis_plot_individual"))))),
+    
+    tabItem(
+      tabName = "explanations",
+      fluidRow(
+        uiOutput("explanations_header")),
+      
+      fluidRow(
+        includeHTML("explanations.html")))))
 
-    fluidRow(
-      column(12,
-             box(title = "Project Issues",
-                 width = NULL,
-                 DT::dataTableOutput('proj_issue_tb')))),
 
-  fluidRow(
-    box(title = "Schedule",
-        withSpinner(timevisOutput('timevis_plot_individual'))))),
-
-tabItem(
-  tabName = "explanations",
-  fluidRow(uiOutput("explanations_header")),
-  
-  fluidRow(includeHTML("explanations.html"))))
-                 
 ui <- secure_app(
-
   head_auth = tags$script(inactivity),
-
-  dashboardPagePlus(header       = header,
-                    sidebar      = sidebar,
-                    rightsidebar = rightsidebar,
-                    body         = body))
+  
+  dashboardPagePlus(
+    header       = header,
+    sidebar      = sidebar,
+    rightsidebar = rightsidebar,
+    body         = body
+  )
+)

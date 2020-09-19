@@ -36,23 +36,23 @@ shinyServer(
  
    
   output$project_name <- renderText({
-    
-    name <- all_proj %>%
-      filter(IP == input$selectip) %>%
-      pull(`Project`)
-    
-    project_name <- paste0(input$selectip, ": ", name)
+    #' @todo: maybe we don't need to treat project names differently?
+    #'  
     
     project_names <- c("Cipher",
                        "Cyclops",
                        "Hummingbird",
                        "Kelpie")
     
+    project_name <- all_proj %>%
+      filter(IP == input$selectip) %>%
+      pull(`Project`)
+    
     if (any(startsWith(project_names, project_name))) {
-      project_name <- name
+      return(h2(project_name))
     }
     
-    h2(project_name)
+    return(h2(paste0(input$selectip, ": ", name)))
     
   })
  
@@ -61,15 +61,17 @@ shinyServer(
  
    
   project_selected <- reactive({
-    ip <- input$selectip
-    names <- all_proj$`Project`[all_proj$IP == input$selectip]
-    return(list(ip = ip, names = names))
+    list(ip = input$selectip,
+         names = all_proj$`Project`[all_proj$IP == input$selectip])
   })
-  
+ 
+   
   report_title <- reactive({
+    
     ip <- input$selectip
     project_title <- project_selected()$names[project_selected()$ip == ip]
-    if(ip != project_title) {
+    
+    if (ip != project_title) {
       report_title <- paste(ip, project_title)
     } else {
       report_title <- ip
@@ -77,7 +79,6 @@ shinyServer(
     return(report_title)
   })
   
-                                        # ========= Project Portfolio Budget ----
   
   output$budget_all <- renderPlot({
     ds <- budget %>%
@@ -366,16 +367,18 @@ shinyServer(
     })
     
     
-    proj_risk%>%
-      filter(IP %in% ip_selected()$ips & !is.na(Risk))%>%
-      count(Risk,sort=TRUE)%>%
-      mutate(Risk=reorder(Risk,n))%>%
-      ggplot(aes(x=Risk,y=n))+geom_col(fill='#1f77b4')+
-      scale_y_continuous(breaks=c(0,2,4,6,8))+
-      labs(x='',y='')+
-      geom_text(aes(label=n,hjust=-1))+
-      coord_flip()+
-      theme_minimal()+
+    proj_risk %>%
+      filter(IP %in% ip_selected()$ips & !is.na(Risk)) %>%
+      count(x = Risk,
+            sort = TRUE) %>%
+      mutate(
+        Risk = reorder(Risk, n)) %>%
+      ggplot(aes(x=Risk,y=n))+geom_col(fill='#1f77b4') +
+      scale_y_continuous(breaks=c(0,2,4,6,8)) +
+      labs(x='',y='') +
+      geom_text(aes(label=n,hjust=-1)) +
+      coord_flip() +
+      theme_minimal() +
       theme(axis.title.x=element_blank(),
             axis.text.x =element_text(size=10),
             axis.text.y =element_text(size=11),
