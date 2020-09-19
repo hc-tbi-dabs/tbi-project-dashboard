@@ -1,5 +1,24 @@
 library(plotly)
 
+inactivity <- "
+  function idleTimer() {
+    var t = setTimeout(logout, 120000);
+      window.onmousemove = resetTimer;
+      window.onmousedown = resetTimer;
+      window.onclick     = resetTimer;
+      window.onscroll    = resetTimer;
+      window.onkeypress  = resetTimer;
+    
+    function logout() { window.close(); }
+    
+    function resetTimer() {
+      clearTimeout(t);
+      t = setTimeout(logout, 120000);  // milliseconds
+    }
+  }
+  idleTimer();"
+
+
 budget_plot<-function(ds){
   
   ds$total<-ds$Capital+ds$Non_Capital

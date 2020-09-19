@@ -3,276 +3,279 @@ library(rmarkdown)
 library(htmltools)
 library(shinydashboard)
 library(shinydashboardPlus)
- 
-if (!require("timevis")) {
-  install.packages("timevis")
-}
-
-if (!require("webshot")) {
-  install.packages("webshot")
-}
-
-if (!require("exportwidget")) {
-  devtools::install_github("timelyportfolio/exportwidget")
-}
-
-library(webshot)
 library(timevis)
+library(webshot)
 library(exportwidget)
 
-#' TODO: remove hard-coded numbers.
-#' TODO: update data?
 
-style = "
+left_menu <- tagList(
 
-  h2 {
-    font-family: 'Arial';
-    margin-left:20px;
-    font-weight: bold;
-    line-height: 1.1;
-    color: #2E4053;
-  }
-  
-  .main-header .logo {
-    font-family: Arial, Helvetica, sans-serif;
-    font-weight: bold;
-    font-size:   20px;
-  }
-  
-  .skin-blue .main-header .logo:hover {
-    background-color: #000833;
-  }
-  
-  .skin-blue .main-header .logo {
-    background-color: #000833;
-  }
-  
-  .skin-blue .main-header .navbar {
-    background-color: #000833;
-  }
-  
-  .skin-blue .main-sidebar {
-    background-color: #000833;
-  }
-  
-  .skin-blue .main-sidebar .sidebar .sidebar-menu .active a {
-     background-color: #0278A4;
-  }
-  
-  .skin-blue .main-sidebar .sidebar .sidebar-menu a:hover {
-     background-color: #0278A4;
-  }
-  
-  #downloadData {
-    color: black;
-    margin-left: 10px;
-  }
-  
-  #downloadreport_individual {
-    color: black;
-    margin-left: 10px;
-  }
+  dropdownBlock(
+    id    = "download-menu",
+    title = "Download",
+    icon  = icon("download"),
 
-  #downloadreport_overview {
-    color: black;
-    margin-left:10px;
-  }
+    downloadButton(outputId = "download_data", label = "Data", icon = icon("download")),
+
+    conditionalPanel(
+      condition = "input.sidebar == 'individual' ",
+      downloadButton(outputId = "downloadreport_individual", label = "Report")),
+
+    conditionalPanel(
+      condition="input.sidebar == 'overview' ",
+      downloadButton(outputId = "downloadreport_overview", label = "Report"))),
   
-  .small-box.bg-red {
-    background-color: #C00000 !important;
-  }
+  actionButton(
+    inputId = "contact",
+    label   = "Contact",
+    icon    = icon("phone")))
 
-"
-          
-inactivity <- "
-  function idleTimer() {
-    var t = setTimeout(logout, 120000);
-      window.onmousemove = resetTimer;
-      window.onmousedown = resetTimer;
-      window.onclick     = resetTimer;
-      window.onscroll    = resetTimer;
-      window.onkeypress  = resetTimer;
-    
-    function logout() { window.close(); }
-    
-    function resetTimer() {
-      clearTimeout(t);
-      t = setTimeout(logout, 120000);  // milliseconds
-    }
-  }
-  idleTimer();"
 
-ui <- secure_app(
-  head_auth = tags$script(inactivity),
+#' tagList(paste0('As of ', dat))
+
+
+header <- dashboardHeaderPlus(
+  left_menu  = left_menu,
+  fixed      = F,
+  title      = paste0("TBI Projects"))
+
+
+sidebar_menu <- sidebarMenu(
+
+  id = "sidebar",
+
+  menuItem(text = "Overview",   tabName = "overview",     icon = icon("globe-africa")),
+
+  menuItem(text = "Individual", tabName = "individual",   icon = icon("search")),
   
-  dashboardPagePlus(
-    
-    dashboardHeaderPlus(
-      fixed      = T,
-      title      = paste0('TBI Projects Dashboard \n as of ', dat),
-      titleWidth = 512),
+  menuItem(text = "About",      tabName = "explanations", icon = icon("info")),
 
-    dashboardSidebar(
-      width = 256,
-     
-      sidebarMenu(
-        id = "sidebar",
-        menuItem(text = "Overview",   tabName = "overview"),
-        menuItem(text = "Individual", tabName = "individual"),
-        menuItem(text = "About",      tabName = "explanations"),
+  conditionalPanel(
 
-        conditionalPanel(
-          condition = "input.sidebar == 'individual' ",
-          selectInput(
-            inputId = "selectip",
-            label   = "Select an IP project",
-            choices = ip)),
-        
-        conditionalPanel(
-          condition = "input.sidebar == 'overview' ",
-          
-          selectInput(
-            inputId = "selectdir",
-            label   = "Select a Directorate",
-            choices = directorate),
-                                   
-          actionButton(
-            inputId = "info",
-            label   = "View IP Name",
-            icon    = icon("eye"))),
-        
-        br(), br(),
-        
-        tags$b("Download:", style = "margin-left: 10px;"),
-        
-        br(), br(),
-       
-        downloadButton(outputId = "downloadData", label = "Data"),
-        
-        br(), br(),
-        
-        conditionalPanel(
-          condition = "input.sidebar == 'individual' ",
-          downloadButton(outputId = "downloadreport_individual", label = "Report")),
+    condition = "input.sidebar == 'individual' ",
 
-        conditionalPanel(
-          condition="input.sidebar == 'overview' ",
-          downloadButton(outputId = "downloadreport_overview", label = "Report")),
+    selectInput(inputId = "selectip",
+                label   = "Select an IP project",
+                choices = ip)))
 
-        br(), br(), br(), br(), br(),
 
-        actionButton(
-          inputId = "contact",
-          label   = "Contact us",
-          icon    = icon("phone")))),
-    
-    dashboardBody(
-      tags$head(tags$style(HTML(style))),
-    
-    tabItems(
-      tabItem(
-        tabName = "overview",
-        
-        fluidRow(
-          
-          gradientBox(
-            title         = "IT Projects",
-            width         = 12,
-            icon          = "fa fa-heart",
-            gradientColor = "maroon", 
-            boxToolSize   = "xs", 
-            closable      = F,
-            footer        = "Footer",
-            valueBoxOutput(outputId = "stage_1", width = 3),
-            valueBoxOutput(outputId = "stage_2", width = 3),
-            valueBoxOutput(outputId = "stage_3", width = 3),
-            valueBoxOutput(outputId = "stage_4", width = 3))),
-        
-         fluidRow(
-           box(
-             title = "Innovation Projects Status",
-             status = "primary",
-             boxProfile(
-               src = "https://minutes.co/wp-content/uploads/2019/10/best-innovation-teams.jpg",
-               title = "Innovation Projects",
-               subtitle = "What are Innovation Projects?",
-               boxProfileItemList(
-                 bordered = T,
-                 boxProfileItem(
-                   title = "Planning",
-                   description = valueBoxOutput(outputId = "testing"))),
-                 boxProfileItem(
-                   title = "Testing",
-                   description = valueBoxOutput(outputId = "planning"))))),
-       
-        fluidRow(
-          box(width = 12,
-              title = "Tasks",
-              valueBoxOutput(outputId = "delayed",   width = 6),
-              valueBoxOutput(outputId = "completed", width = 6))),
-        
-        uiOutput("overall_project_health"),
-        
-        uiOutput("ui_output2"),
-             
-        fluidRow( 
-          box(width = 12,
-              title = "Fiscal Year Schedule",
-              footer = textOutput("caption"),
-              withSpinner(timevis::timevisOutput("timevis_plot_all"))))),
+sidebar <- dashboardSidebar(sidebar_menu)
+
+
+rightsidebar <- rightSidebar(
+  
+  background = "dark",
+  
+  rightSidebarTabContent(
+    id    = 1,
+    title = "Tab 1",
+    icon = "desktop",
+    active = TRUE,
+    sliderInput(
+      "obs",
+      "Number of observations:",
+      min = 0, max = 1000, value = 500
+    )
+  ),
+  rightSidebarTabContent(
+    id = 2,
+    title = "Tab 2",
+    textInput("caption", "Caption", "Data Summary")
+  ),
+  rightSidebarTabContent(
+    id = 3,
+    icon = "paint-brush",
+    title = "Tab 3",
+    numericInput("obs", "Observations:", 10, min = 1, max = 100)), 
+  title = "Right Sidebar")
+
+
+body <- dashboardBody(
+
+  tabItems(
+    tabItem(
+      tabName = "overview",
       
-      tabItem(
-        tabName = "individual",
-        
+      box(
+        solidHeader = FALSE,
+        title = "Status summary",
+        background = NULL,
+        width = 12,
+        status = "danger",
+        footer = fluidRow(
+          column(width = 6,
+                 descriptionBlock(
+                   number = "17%", 
+                   numberColor = "green", 
+                   numberIcon = "fa fa-caret-up",
+                   header = "$35,210.43", 
+                   text = "TOTAL REVENUE", 
+                   rightBorder = TRUE,
+                   marginBottom = FALSE)),
+          
+          column(width = 6,
+                 descriptionBlock(
+                   number = "18%", 
+                   numberColor = "red", 
+                   numberIcon = "fa fa-caret-down",
+                   header = "1200", 
+                   text = "GOAL COMPLETION", 
+                   rightBorder = FALSE,
+                   marginBottom = FALSE)))),
+
+      boxPlus(
+        title = "Nav Pills",
+        status = "info",
+        footer_padding = FALSE,
+        footer = navPills(
+          navPillsItem(
+            active = TRUE,
+            pillName = "Item 1",
+            pillColor = "green",
+            pillIcon = NULL,
+            pillText = "Some text here"
+          ),
+          navPillsItem(
+            pillName = "Item 2",
+            pillColor = "red",
+            pillIcon = "fa fa-angle-down",
+            pillText = "10%"))),
+
+      box(
+        title = "Box with a green boxPad",
+        status = "warning",
         fluidRow(
-          box(width = 12,
-              uiOutput("project_name"),
-              valueBoxOutput("overall"),
-              valueBoxOutput("overall_stage"),
-              valueBoxOutput("directorate"))),
-              
-        fluidRow(
-          box(title = 'Project Budget',
-              tabsetPanel(
-                tabPanel(title='Breakdown by Year',
-                         withSpinner(plotlyOutput('budget_plt', height=450))),
-                      tabPanel(title='Table',
-                               DT::dataTableOutput('budget_tbl', height=450)))
-                    ),
-                box(
-                  title = 'Projections',
-                  withSpinner(plotOutput('budget_all', height = 490)))
-              ),
-              
-              
-              fluidRow(
-                column(12,
-                       box(title='Project Risks',width=NULL,
-                           DT::dataTableOutput('proj_risk_tb')))
-              ),
-              
-              fluidRow(
-                column(12,
-                       box(title='Project Issues',width=NULL,
-                           DT::dataTableOutput('proj_issue_tb')))
-              ),
-              
-              fluidRow(
-                column(12,
-                       box(title='Schedule',width=NULL,
-                           withSpinner(timevis::timevisOutput('timevis_plot_individual')),
-                           br(),
-                           br(),
-                           DT::dataTableOutput('schedule_tb'))))),
-      
-      tabItem(
-        tabName = "explanations",
-              
-        fluidRow(
-          width = 12,
-          tags$h2("Explanation of Status Indicators & Project Stages")),
-            
-        fluidRow(
+          column(width = 6),
           column(
-            width = 12,
-            includeHTML("explanations.html"))))))))
+            width = 6,
+            boxPad(
+              color = "green",
+              descriptionBlock(
+                header = "8390",
+                text = "VISITS"
+              ),
+              descriptionBlock(
+                header = "30%",
+                text = "REFERRALS"
+              ),
+              descriptionBlock(
+                header = "70%",
+                text = "ORGANIC"))))),
+
+      gradientBox(
+        title         = "IT Projects",
+        icon          = "fa fa-heart",
+        gradientColor = "teal",
+        boxToolSize   = "md",
+        closable      = F,
+        footer        = "This is a test.",
+        box(width = 12,
+            tagList(
+              textOutput(outputId = "stage_1"),
+              textOutput(outputId = "stage_2"),
+              textOutput(outputId = "stage_3"),
+              textOutput(outputId = "stage_4")))),
+
+      gradientBox(
+        title         = "IT Projects",
+        icon          = "fa fa-heart",
+        gradientColor = "teal",
+        boxToolSize   = "md",
+        closable      = F,
+        footer        = tagList(
+          dashboardLabel("Label 1", status = "info"),
+          dashboardLabel("Label 2", status = "success"),
+          dashboardLabel("Label 3", status = "warning"),
+          dashboardLabel("Label 4", status = "primary"),
+          dashboardLabel("Label 5", status = "danger"),
+          ),
+
+        textOutput(outputId = "stage_1"),
+        textOutput(outputId = "stage_2"),
+        textOutput(outputId = "stage_3"),
+        textOutput(outputId = "stage_4")),
+      
+      widgetUserBox(
+        title = "Innovation Projects Status",
+        icon   = "fa fa-heart",
+        gradientColor = "red",
+        boxProfile(
+          src = "https://minutes.co/wp-content/uploads/2019/10/best-innovation-teams.jpg",
+          title = "Innovation Projects",
+          subtitle = "What are Innovation Projects?",
+          footer        = "Footer",
+          boxProfileItemList(
+            bordered = T,
+            boxProfileItem(
+              title = "Planning",
+              description = textOutput(outputId = "testing"))),
+          boxProfileItem(
+            title = "Testing",
+            description = textOutput(outputId = "planning")))),
+
+      box(width = 12,
+          title = "Tasks",
+          valueBoxOutput(outputId = "delayed",   width = 6),
+          valueBoxOutput(outputId = "completed", width = 6))),
+
+    uiOutput("overall_project_health"),
+
+    uiOutput("ui_output2"),
+
+    fluidRow(
+      box(width = 12,
+          title = "Fiscal Year Schedule",
+          footer = textOutput("caption"),
+          withSpinner(timevis::timevisOutput("timevis_plot_all"))))),
+
+  tabItem(
+    tabName = "individual",
+
+    fluidRow(
+      box(width = 12,
+          uiOutput("project_name"),
+          valueBoxOutput("overall"),
+          valueBoxOutput("overall_stage"),
+          valueBoxOutput("directorate"))),
+
+    fluidRow(
+      box(title = 'Project Budget',
+          tabsetPanel(
+            tabPanel(title='Breakdown by Year',
+                     withSpinner(plotlyOutput('budget_plt', height=450))))),
+      box(
+        title = 'Projections',
+        withSpinner(plotOutput('budget_all', height = 490)))),
+
+    fluidRow(
+      column(
+        width = 12,
+        box(
+          title = 'Project Risks',
+          width=NULL,
+          dataTableOutput('proj_risk_tb')))),
+
+    fluidRow(
+      column(12,
+             box(title = "Project Issues",
+                 width = NULL,
+                 DT::dataTableOutput('proj_issue_tb')))),
+
+  fluidRow(
+    box(title = "Schedule",
+        withSpinner(timevisOutput('timevis_plot_individual'))))),
+
+tabItem(
+  tabName = "explanations",
+  fluidRow(uiOutput("explanations_header")),
+  
+  fluidRow(includeHTML("explanations.html"))))
+                 
+ui <- secure_app(
+
+  head_auth = tags$script(inactivity),
+
+  dashboardPagePlus(header       = header,
+                    sidebar      = sidebar,
+                    rightsidebar = rightsidebar,
+                    body         = body))
