@@ -1,71 +1,41 @@
 #!/usr/bin/env Rscript
-
-library(lubridate)
-library(rmarkdown)
-library(htmltools)
- 
-if (!require("timevis")) {
-  install.packages("timevis")
-}
-
-if (!require("webshot")) {
-  install.packages("webshot")
-}
-
-if (!require("exportwidget")) {
-  devtools::install_github("timelyportfolio/exportwidget")
-}
-
-library(webshot)
-library(timevis)
-library(exportwidget)
-
-
 #' TODOs:
 #' 
 #' - Remove for now the "Select a Directorate".
 #' - Stage 1, 2, 3, 4 should be labeled in X axis for Project Health and Current Stage
 #' - Differentiate between Stream / Stage in Individual Page 
 
-shinyServer(function(input, output,session) {
-  
-  result_auth <- secure_server(
-    check_credentials = check_credentials(credentials))
-  
-  output$res_auth <- renderPrint({
-    reactiveValuesToList(result_auth)
-  })
-  
-                                        # ========= Contact Button ----
-  observeEvent(
-    eventExpr = input$contact,
-    handlerExpr = {
-      showModal(modalDialog(
-        title='Contact Us',
-        HTML(paste(
-                                        # "If you have any questions regarding data source or data quality, please contact:",br(),
-                                        # "Sarah-Emily Carle",br(),
-                                        # "Management, Program Support",br(),
-                                        # "Business Informatics Division",br(),
-                                        # "RMOD, HFPB",br(),
-                                        # "sarah-emily.carle@canada.ca",br(),br(),
-          "If you have technical questions regarding the application, please contact:", br(),
-          br(),
-          "Jodi Qiao",br(),
-          "Jr Data Scientist",br(),
-          "Data Analytics and Business Solutions",br(),
-          "TBI, POD",br(),
-          "di.qiao@canada.ca; dqiao100@uottawa.ca"
-        )),
-        easyClose = T
-      ))
+shinyServer(
+  function(input, output, session) {
+    
+    output$res_auth <- renderPrint({reactiveValuesToList(result_auth)})
+    
+    result_auth <- secure_server(
+      check_credentials = check_credentials(credentials))
+ 
+    observeEvent(
+      eventExpr = input$contact,
+      handlerExpr = {
+        showModal(
+          modalDialog(title = "Contact",
+                      HTML(paste(
+                        "If you have technical questions regarding the application, please contact:",
+                        br(),
+                        br(),
+                        "Jodi Qiao",
+                        br(),
+                        "Jr Data Scientist",
+                        br(),
+                        "Data Analytics and Business Solutions",
+                        br(),
+                        "TBI, POD",
+                        br(),
+                        "di.qiao@canada.ca; dqiao100@uottawa.ca")),
+                      easyClose = T))
     })
-  
-  output$ip_tbl <- renderTable(
-    all_proj[, 1:2] %>%
-    mutate(IP = as.character(IP)))
-  
-  output$project_name <- renderUI({
+ 
+   
+  output$project_name <- renderText({
     
     name <- all_proj %>%
       filter(IP == input$selectip) %>%
@@ -73,32 +43,23 @@ shinyServer(function(input, output,session) {
     
     project_name <- paste0(input$selectip, ": ", name)
     
-    if (startsWith(project_name, "Cipher") |
-        startsWith(project_name, "Cyclops") |
-        startsWith(project_name, "Hummingbird") |
-        startsWith(project_name, "Kelpie"))
-    { project_name <- name }
+    project_names <- c("Cipher",
+                       "Cyclops",
+                       "Hummingbird",
+                       "Kelpie")
+    
+    if (any(startsWith(project_names, project_name))) {
+      project_name <- name
+    }
     
     h2(project_name)
     
   })
-  
-  ip_selected <- reactive({
-    
-    ip <- input$selectip
-    
-    if (input$selectdir == "All") {
-      ips <- all_proj$IP
-    } else {
-      ips <- all_proj$IP[all_proj$`Directorate` == input$selectdir]
-    }
-    
-    return(list(ip = ip, ips = ips))
-    
-  })
-  
-                                        # ========= End of Select IP Side Menu
-  
+ 
+   
+  ip_selected <- reactive({list(ip = input$selectip, ips = all_proj$IP)})
+ 
+   
   project_selected <- reactive({
     ip <- input$selectip
     names <- all_proj$`Project`[all_proj$IP == input$selectip]
@@ -562,7 +523,7 @@ shinyServer(function(input, output,session) {
   })
   
   
-  output$overall<-renderValueBox({
+  output$overall <- renderValueBox({
     status<-all_proj%>%
       filter(IP == ip_selected()$ip)%>%
       select(status,`Overall Project Health`)
@@ -584,8 +545,9 @@ shinyServer(function(input, output,session) {
   })
   
   output$directorate <- renderValueBox({
-    internal<-all_proj%>%
-      filter(IP ==input$selectip)%>%
+    
+    internal <- all_proj %>%
+      filter(IP == input$selectip) %>%
       pull(`Directorate`)
 
     valueBox(tags$p(internal, style = "font-size: 80%;"),
@@ -606,59 +568,27 @@ shinyServer(function(input, output,session) {
       color='light-blue')
   })
 
-  output$stage_1<-renderValueBox({
-    valueBox(
-      value    = nrow(stage_1),
-      subtitle = "Stage One",
-      color    = "aqua")
-  })
+  
+  #' Number of Projects in Each of Stage 1, 2, 3, 4
+  output$stage_1 <- reactive({nrow(stage_1)})
+  output$stage_2 <- reactive({nrow(stage_2)})
+  output$stage_3 <- reactive({nrow(stage_3)})
+  output$stage_4 <- reactive({nrow(stage_4)})
 
-  output$stage_2 <- renderValueBox({
-    valueBox(
-      value    = nrow(stage_2),
-      subtitle = "Stage Two",
-      color    = "yellow")
-  })
-
-  output$stage_3 <- renderValueBox({
-    valueBox(
-      value    = nrow(stage_3),
-      subtitle = "Stage Three",
-      color    = "orange")
-  })
-
-  output$stage_4 <- renderValueBox({
-    valueBox(
-      value    = nrow(stage_4),
-      subtitle = "Stage Four",
-      color    = "fuchsia")
-  })
-  
-  output$planning <- renderValueBox({
-    valueBox(
-      value    = nrow(planning),
-      subtitle = "Planning",
-      color    = "teal")
-  })
-  
-  output$testing <- renderValueBox({
-    valueBox(
-      value    = 1, #nrow(testing),
-      subtitle = "Testing",
-      color    = "olive")
-  })
-  
-  
-                                        # ========= End of ValueBoxes
-                                        # ========= Caption ----
+   
+  #' Number of Projects in Planning or Testing 
+  output$planning <- reactive({nrow(planning)})
+ 
+  #' nrow(testing)
+  output$testing <- reactive({1})
+ 
   
   output$caption <- renderText({
     text="*** tasks completed before 2020 are hidden in main plot ***"
   })
   
-                                        # ========= End of Caption
   
-  output$downloadData<-downloadHandler(
+  output$download_data<-downloadHandler(
     
     filename<-function(){
       paste('TBI Dashboard','xlsx',sep='.')
@@ -722,8 +652,8 @@ shinyServer(function(input, output,session) {
       img_name <- paste0(ip_selected()$ip,'.png')
       src2 <- normalizePath(img_name)
       
-                                        # temporarily switch to the temp dir, in case you do not have write
-                                        # permission to the current working directory
+      #' temporarily switch to the temp dir, in case you do not have write
+      #' permission to the current working directory
       owd <- setwd(tempdir())
       on.exit(setwd(owd))
       file.copy(src, 'report_individual.Rmd', overwrite = TRUE)
