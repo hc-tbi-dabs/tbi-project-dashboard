@@ -19,34 +19,96 @@ inactivity <- "
   idleTimer();"
 
 
-budget_plot<-function(ds){
+budget_plot <- function(ds) {
   
-  ds$total<-ds$Capital+ds$Non_Capital
+  ds$total <- ds$Capital + ds$Non_Capital
   
-  ds<-ds%>%
-    mutate(label=case_when(`Authority vs. Expenditures`=='Project Expenditures' ~ paste0('Expenditure:$',prettyNum(Non_Capital,big.mark=',')),
-                           `Authority vs. Expenditures`=='Project Authority' & Capital !=0 ~ paste0('Authority: $',prettyNum(total,big.mark=','),'\n',
-                                                                           'Non-Capital: $',prettyNum(Non_Capital,big.mark=',')),
-                           `Authority vs. Expenditures`=='Project Authority' & Capital ==0 ~ paste0('Authority: $',prettyNum(total,big.mark=','))))
+  ds <- ds %>%
+    mutate(
+      label = case_when(
+        
+        `Authority vs. Expenditures` == 'Project Expenditures' 
+        ~ paste0('Expenditure: $', prettyNum(Non_Capital, big.mark = ',')),
+        
+        `Authority vs. Expenditures` == 'Project Authority' & Capital != 0 
+        ~ paste0('Authority: $', prettyNum(total, big.mark = ','),
+                 '\n',
+                 'Non-Capital: $', prettyNum(Non_Capital, big.mark = ',')),
+        
+        `Authority vs. Expenditures` == 'Project Authority' & Capital == 0 
+        ~ paste0('Authority: $', prettyNum(total, big.mark = ','))))
   
-  
-  plot_ly(ds%>%filter(`Authority vs. Expenditures`=='Project Authority'),x=~year-0.2,y=~Capital,type='bar',name='Project Authority - Capital',
-          marker=list(color='rgb(252,205,201)'),
-          hoverinfo='text',
-          text=~paste('Capital: $',prettyNum(Capital,big.mark=','))) %>%
-    add_trace(y=~Non_Capital,name='Project Authority - Non-Capital',marker=list(color='rgb(248,118,109)'),
-              hoverinfo='text',
-              text=~ label)%>%
-    layout(barmode='stack',yaxis=list(title='Budget')) %>%
-    add_trace(data=ds%>%filter(`Authority vs. Expenditures`=='Project Expenditures'),x=~year+0.2,y=~Non_Capital,type='bar',name='Project Expenditure',
-              marker=list(color='rgb(0,191,196)'),
-              hoverinfo='text',
-              text=~label)%>%
-    layout(xaxis=list(title='Fiscal Year',
-                      ticktext=list("2016-17","2017-18","2018-19","2019-20","2020-21","2021-22","2022-23"),
-                      tickvals = list(2016, 2017, 2018, 2019, 2020,2021,2022),
-                      tickmode='array')) %>%
-    layout(legend=list(y=1,x=0.7))
+  plot_ly(
+    
+    ds %>% filter(`Authority vs. Expenditures` == 'Project Authority'),
+    
+    x = ~ year - 0.2,
+    
+    y = ~ Capital,
+    
+    type = 'bar',
+    
+    name = 'Project Authority - Capital',
+          
+    marker = list(color = 'rgb(252, 205, 201)'),
+
+    hoverinfo = 'text',
+    
+    text = ~ paste('Capital: $', prettyNum(Capital, big.mark = ','))) %>%
+
+    add_trace(
+      
+      y = ~ Non_Capital,
+      
+      name = 'Project Authority - Non-Capital',
+      
+      marker = list(color = 'rgb(248,118,109)'),
+      
+      hoverinfo = 'text',
+      
+      text = ~ label) %>%
+    
+    layout(barmode = 'stack',
+           yaxis = list(title = 'Budget')) %>%
+    
+    add_trace(
+      
+      data = ds %>%
+        filter(`Authority vs. Expenditures` == 'Project Expenditures'),
+      
+      x = ~ year + 0.2,
+      
+      y = ~ Non_Capital,
+     
+      type = 'bar',
+      
+      name = 'Project Expenditure',
+      
+      marker = list(color = 'rgb(0, 191, 196)'),
+      hoverinfo = 'text',
+      text = ~ label) %>%
+    
+    layout(
+      xaxis = list(
+        title = 'Fiscal Year',
+        ticktext = list("2016-17",
+                        "2017-18",
+                        "2018-19",
+                        "2019-20",
+                        "2020-21",
+                        "2021-22",
+                        "2022-23"),
+        tickvals = list(2016,
+                        2017,
+                        2018,
+                        2019,
+                        2020,
+                        2021,
+                        2022),
+        tickmode = 'array')) %>%
+    
+    layout(legend = list(y = 0, x = 10)) %>%
+    config(displayModeBar = F)
 }
 
 dollar_y <- function(x){
