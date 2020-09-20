@@ -6,6 +6,7 @@ library(shinydashboardPlus)
 library(timevis)
 library(webshot)
 library(exportwidget)
+library(scales)
 
 
 left_menu <- tagList(
@@ -121,80 +122,45 @@ body <- dashboardBody(
   tabItems(
     tabItem(
       tabName = "overview",
-      
-      box(
-        solidHeader = FALSE,
-        title = "Status summary",
-        background = NULL,
-        width = 12,
-        status = "danger",
-        footer = fluidRow(
-          column(
-            width = 6,
-            descriptionBlock(
-              number = "17%",
-              numberColor = "green",
-              numberIcon = "fa fa-caret-up",
-              header = "$35,210.43",
-              text = "TOTAL REVENUE",
-              rightBorder = TRUE,
-              marginBottom = FALSE
-            )
-          ),
-          
-          column(
-            width = 6,
-            descriptionBlock(
-              number = "18%",
-              numberColor = "red",
-              numberIcon = "fa fa-caret-down",
-              header = "1200",
-              text = "GOAL COMPLETION",
-              rightBorder = FALSE,
-              marginBottom = FALSE
-            )
-          )
-        )
-      ),
-      
+     
       boxPlus(
         title = "Nav Pills",
         status = "info",
         footer_padding = FALSE,
+        
         footer = navPills(
+          
           navPillsItem(
             active = TRUE,
             pillName = "Item 1",
             pillColor = "green",
             pillIcon = NULL,
-            pillText = "Some text here"
-          ),
+            pillText = "Some text here"),
+          
           navPillsItem(
             pillName = "Item 2",
             pillColor = "red",
             pillIcon = "fa fa-angle-down",
-            pillText = "10%"
-          )
-        )
-      ),
+            pillText = "10%"))),
       
       box(
         title = "Box with a green boxPad",
         status = "warning",
-        fluidRow(column(width = 6),
-                 column(
-                   width = 6,
-                   boxPad(
-                     color = "green",
-                     descriptionBlock(header = "8390",
-                                      text = "VISITS"),
-                     descriptionBlock(header = "30%",
-                                      text = "REFERRALS"),
-                     descriptionBlock(header = "70%",
-                                      text = "ORGANIC")
-                   )
-                 ))
-      ),
+        fluidRow(
+          column(width = 6),
+          column(
+            width = 6,
+            boxPad(
+              color = "green",
+              
+              descriptionBlock(header = "8390",
+                               text = "VISITS"),
+              
+              descriptionBlock(header = "30%",
+                               text = "REFERRALS"),
+              
+              descriptionBlock(header = "70%",
+                               text = "ORGANIC"))))),
       
       gradientBox(
         title         = "IT Projects",
@@ -249,10 +215,11 @@ body <- dashboardBody(
         title = "Tasks",
         valueBoxOutput(outputId = "delayed",   width = 6),
         valueBoxOutput(outputId = "completed", width = 6)),
+      
     
     uiOutput("overall_project_health"),
     
-    uiOutput("ui_output2"),
+    uiOutput("project_portfolio_budget"),
     
     fluidRow(
       box(
@@ -316,9 +283,8 @@ ui <- secure_app(
   head_auth = tags$script(inactivity),
   
   dashboardPagePlus(
+    collapse_sidebar = T,
     header       = header,
     sidebar      = sidebar,
     rightsidebar = rightsidebar,
-    body         = body
-  )
-)
+    body         = body))

@@ -80,47 +80,62 @@ shinyServer(
   })
   
   
-  output$budget_all <- renderPlot({
-    ds <- budget %>%
-      filter(IP == input$selectip) %>%
-      summarise(
-        `Approved Budget` = sum(`Approved Budget`, na.rm = T),
-        `Forecasted Total Expenditures` = sum(`Forecasted Total Expenditures`, na.rm = T),
-        `Expenditure to Date` = sum(`Expenditure to Date`, na.rm = T),
-        `Project Forecasted Expenditures 2020-21` = sum(`Variance / Remaining budget`, na.rm = T)) %>%
-      gather(cat)
-    budget_plot2(ds)
-  })
-
-  output$budget_all2 <- renderPlot({
-    ds <- budget %>%
-      filter(IP %in% ip_selected()$ips) %>%
-      left_join(all_proj%>%select(IP=IP)) %>%
-      summarise(
-        `Approved Budget`=sum(`Approved Budget`,na.rm=T),
-        `Forecasted Total Expenditures`=sum(`Forecasted Total Expenditures`,na.rm=T),
-        `Expenditure to Date`=sum(`Expenditure to Date`,na.rm=T),
-        `Project Forecasted Expenditures 2020-21`=sum(`Variance / Remaining budget`,na.rm=T))%>%
-      gather(cat, value)
+  df_budget_summary <- reactive({
     
-    budget_plot2(ds)
-  })
-  
-  output$budget_plt <- renderPlotly({
-    ds <- budget_yr %>%
-      filter(IP == input$selectip)
-    budget_plot(ds)
-  })
-  
-  output$budget_plt2<-renderPlotly({
-    ds <- budget_yr %>%
+    budget %>%
       filter(IP %in% ip_selected()$ips) %>%
-      group_by(Year,year,`Authority vs. Expenditures`) %>%
-      summarise(Capital = sum(Capital, na.rm = T),
-                Non_Capital = sum(Non_Capital, na.rm = T))
-    budget_plot(ds)
+      left_join(all_proj %>% select(IP = IP)) %>%
+      summarise(
+        `Approved Budget`                         = sum(`Approved Budget`, na.rm = T),
+        `Forecasted Total Expenditures`           = sum(`Forecasted Total Expenditures`, na.rm = T),
+        `Expenditure to Date`                     = sum(`Expenditure to Date`, na.rm = T),
+        `Project Forecasted Expenditures 2020-21` = sum(`Variance / Remaining budget`, na.rm = T))
+    
+  })
+ 
+   
+  amount_approved_budget <- reactive({
+    
+    .f <- dollar_format()
+    .f(df_budget_summary()[["Approved Budget"]])
+  
   })
   
+  amount_forcasted_total_expenditures <- reactive({
+    
+    .f <- dollar_format()
+    .f(df_budget_summary()[["Forcasted Total Expenditures"]])
+  
+  })
+ 
+  amount_expenditure_to_date <- reactive({
+    
+    .f <- dollar_format()
+    .f(df_budget_summary()[["Expenditure to Date"]])
+  
+  })
+  
+  amount_projected_forecasted_expenditures <- reactive({
+    
+    .f <- dollar_format()
+    .f(df_budget_summary()[["Project Forecasted Expenditures 2020-21"]])
+  
+  })
+  
+  output$break_down_by_year <-renderPlotly({
+    
+    df <- budget_yr %>%
+      filter(IP %in% ip_selected()$ips) %>%
+      group_by(Year, year, `Authority vs. Expenditures`) %>%
+      summarise(
+        Capital = sum(Capital, na.rm = T),
+        Non_Capital = sum(Non_Capital, na.rm = T))
+    
+    budget_plot(df)
+    
+  })
+ 
+   
   output$budget_tbl <- renderDataTable({
     ds <- budget_yr %>%
       filter(IP == input$selectip) %>%
@@ -387,8 +402,6 @@ shinyServer(
     
   })
   
-                                        # ========= End of Project Risk
-                                        # ========= Project Issue ----
   
   
   
@@ -417,7 +430,6 @@ shinyServer(
     
   })
   
-                                        # ========= End of Project Issue
   
   output$overall2 <- renderPlotly({
     #' IP Projects
@@ -461,6 +473,7 @@ shinyServer(
              yaxis = list(showgrid = F))
   })
 
+  
   output$overall_project_health <- renderUI({
     fluidRow(width = 12,
              box(title='IP Projects: Health',
@@ -469,61 +482,160 @@ shinyServer(
 
              box(title = "Innovation Projects: Health",
                  width = 5,
-                 withSpinner(plotlyOutput("overall3")))
-             )
+                 withSpinner(plotlyOutput("overall3"))))
   })
-                                        # ========= End of Overall Project Health
-  
-                                        # ========= UI Boxes for Overview ----
-  
-                                        # seems like for Overview
-  output$ui_output2<-renderUI({
+
+
+  output$project_portfolio_budget <- renderUI({
+    #' @comment: Valid colors are: red, yellow, aqua, blue, light-blue, green,
+    #' navy, teal, olive, lime, orange, fuchsia, purple, maroon, black.
+    
     fluidRow(
-                                        # box(title='Project Functionality',
-                                        #     tabsetPanel(id='tabs',
-                                        #                 tabPanel(title='Graph',
-                                        #                          withSpinner(plotOutput("function_plt",height=450)))
-                                        #     )),
-      box(title='Project Portfolio Budget',
-          tabsetPanel(
-            tabPanel(title='Breakdown by Year',
-                     withSpinner(plotlyOutput('budget_plt2',height=450))),
-            tabPanel(title='Table',
-                     DT::dataTableOutput('budget_tbl2', height=450)),
-            tabPanel(title='Projections',
-                     withSpinner(plotOutput('budget_all2',height=450))))
-          ),
-      box(title='Project Health and Current Stage',
-          withSpinner(plotlyOutput('overall_stage2',height=490)))
-    )
+      boxPlus(
+        width         = 12,
+        icon          = "fa fa-heart",
+        background    = NULL,
+        boxToolSize   = "md",
+        closable      = F,
+        collapsible = T,
+        footer        = "This is a test.",
+        title = "Project Portfolio Budget",
+       
+        fluidRow( 
+          width = NULL,
+          height = NULL,
+        boxPlus(
+          width  = 12,
+          title = "Breakdown by Year",
+          footer = "This is some extra info.",
+          status = NULL,
+          solidHeader = T,
+          background = NULL,
+          collapsible = T,
+          closable = F,
+          enable_label = FALSE,
+          label_text = NULL,
+          label_status = "primary",
+          enable_dropdown = FALSE,
+          dropdown_icon = "wrench",
+          dropdown_menu = NULL,
+          enable_sidebar = FALSE,
+          sidebar_content = NULL,
+          sidebar_title = NA_character_,
+          sidebar_width = 25,
+          sidebar_background = "#222d32",
+          sidebar_start_open = FALSE,
+          sidebar_icon = "cogs",
+          footer_padding = TRUE,
+          withSpinner(plotlyOutput("break_down_by_year")))),
+       
+        fluidRow( 
+        boxPlus(
+          title = "Projections",
+          solidHeader = T,
+          collapsible = T,
+          closable      = F,
+          background = NULL,
+          footer = "This is some info.",
+          datatable(df_budget_summary())),
+        
+        boxPlus(
+          solidHeader = FALSE,
+          title = "Projections",
+          background = NULL,
+          width = 12,
+          status = "danger",
+          footer = fluidRow(
+            column(
+              width = 6,
+              descriptionBlock(
+                header = amount_expenditure_to_date(), 
+                numberColor = "green", 
+                text = "Expenditures to Date", 
+                rightBorder = TRUE,
+                marginBottom = TRUE 
+              )
+            ),
+            column(
+              width = 6,
+              descriptionBlock(
+                number = amount_forcasted_total_expenditures(), 
+                numberColor = "green", 
+                numberIcon = "fa fa-caret-up",
+                header = "$35,210.43", 
+                text = "TOTAL REVENUE", 
+                rightBorder = F,
+                marginBottom = T
+              )
+            )),
+           fluidRow( 
+            column(
+              width = 6,
+              descriptionBlock(
+                number = amount_approved_budget(), 
+                numberColor = "green", 
+                numberIcon = "fa fa-caret-up",
+                header = "$35,210.43", 
+                text = "TOTAL REVENUE", 
+                rightBorder = T,
+                marginBottom = F
+              )
+            ),
+            column(
+              width = 6,
+              descriptionBlock(
+                number = amount_projected_forecasted_expenditures(),
+                numberColor = "red", 
+                numberIcon = "fa fa-caret-down",
+                header = "1200", 
+                text = "GOAL COMPLETION", 
+                rightBorder = F,
+                marginBottom = F
+              )
+            )
+          )
+        ),
+        
+        boxPlus(
+          width         = 12,
+          icon          = "fa fa-heart",
+          background    = NULL,
+          boxToolSize   = "md",
+          closable      = F,
+          collapsible   = T,
+          footer        = "This is a test.",
+          title = "Project Health and Current Stage",
+          datatable(summary_status_and_count()) 
+          
+          ))))
     
   })
   
   
-  
-  
-                                        # ========= End of UI Boxes
-                                        # ========= ValueBoxes for Individual ----
-  
-  output$overall_stage2<-renderPlotly({
+  summary_status_and_count <- reactive({
+    #' @todo: is this code necessary for anything?    
+    #' all_proj$IP2<-paste0(all_proj$IP,':\n',substr(all_proj$`Internal or External`,1,1))
+    #' 
+
     
-                                        # all_proj$IP2<-paste0(all_proj$IP,':\n',substr(all_proj$`Internal or External`,1,1))
+    .status <- function(col) {
+     col  
+    }
     
-    df<-all_proj%>%
-      filter(IP %in% ip_selected()$ips)%>%
-      group_by(stage,status)%>%
-      summarise(IP=paste(IP,collapse='\n'),count=n())
-    df$status<-factor(df$status,levels=c('On-Track','Caution','Delayed','Not yet started'))
+    .project_name_badges <- function(col) {
+      ..label <- function(x) dashboardLabel("Label 1", status = "info")
+      paste(col, collapse = '\n')
+    }
     
-    p<-stage_plot(df)
+    df <- all_proj %>%
+      filter(IP %in% ip_selected()$ips) %>%
+      group_by(stage, status) %>%
+      summarise(
+        IP     = .project_name_badges(IP),
+        count  = n(),
+        status = .status(status))
     
-    ggplotly(p,tooltip='none')%>%
-      config(displayModeBar = F) %>%
-      layout(margin = list(b = 40, l=30))
-                                        # g=ggplotGrob(p)
-                                        # g$layout$clip[g$layout$name == "panel"] = "off"
-                                        # grid.draw(g)
-  })
+    })
   
   
   output$overall <- renderValueBox({
