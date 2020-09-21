@@ -276,7 +276,9 @@ shinyServer(function(input, output,session) {
       group = df["IP"]
     )
     data_groups <- tibble(id=unique(df["IP"]), content=unique(df["IP"]))
-    timevis(data, groups=data_groups)
+    
+    options <- list(orientation='both')
+    timevis(data, groups=data_groups, options=options)
   })
     
 
