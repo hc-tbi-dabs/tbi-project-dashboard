@@ -294,3 +294,6 @@ stage_plot <- function(df) {
   
 }
 
+colorfulDashboardBadge <- function(text, ...) {
+  dashboardBadge(text, ...)
+}

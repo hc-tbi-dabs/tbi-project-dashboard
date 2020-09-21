@@ -534,69 +534,6 @@ shinyServer(function(input, output, session) {
              yaxis = list(showgrid = F))
   })
   
-  output$overall_project_health <- renderUI({
-    column(
-      width = 12,
-      br(),
-      
-      fluidRow(
-        width = 12,
-        boxPlus(
-        width = 4,
-          collapsible = T,
-          closable = F,
-          title = "IP Projects",
-          status = "success",
-          solidHeader = T,
-          "Can I write something here?",
-          footer = tagList(
-          dashboardLabel("On Track", status = "success"),
-          dashboardLabel("Caution", status = "warning"),
-          dashboardLabel("Delayed", status = "danger")
-        ),
-          withSpinner(plotlyOutput("ip_projects_health"))
-        ),
-        
-        boxPlus(
-        width = 4,
-          collapsible = T,
-          closable = F,
-          title = "Innovation Projects",
-          solidHeader = T,
-          status = "success",
-          "Can I write something here?",
-          footer = tagList(
-          dashboardLabel("On Track", status = "success"),
-          dashboardLabel("Caution", status = "warning"),
-          dashboardLabel("Delayed", status = "danger")
-        ),
-          withSpinner(plotlyOutput("innovation_projects_health"))
-        ),
-        
-        boxPlus(
-        width = 4,
-          collapsible = T,
-          closable = F,
-          title = "A Team Projects",
-          solidHeader = T,
-          status = "success",
-          "Can I write something here?",
-          footer = tagList(
-          dashboardLabel("On Track", status = "success"),
-          dashboardLabel("Caution", status = "warning"),
-          dashboardLabel("Delayed", status = "danger")
-        ),
-          withSpinner(plotlyOutput("a_team_projects_health"))
-        ),
-        
-   
-      ),
-      
-      br()
-      
-    )
-  })
-  
   
   output$project_portfolio_budget <- renderUI({
     #' @comment: Valid colors are: red, yellow, aqua, blue, light-blue, green,
@@ -831,7 +768,7 @@ shinyServer(function(input, output, session) {
       file.rename(out, file)
     }
   )
-
+  
   output$downloadreport_individual <- downloadHandler(
     filename = function() {
       paste0(ip_selected()$ip,
@@ -860,6 +797,5 @@ shinyServer(function(input, output, session) {
     }
     
   )
-
   
 })
