@@ -133,12 +133,15 @@ body <- dashboardBody(tabItems(
     
     column(
       width = 12,
+      
       br(),
+      
         boxProfile(
           title = "TBI Projects",
           subtitle = tagList(paste("Last updated:", data_date)),
-          src = "https://minutes.co/wp-content/uploads/2019/10/best-innovation-teams.jpg",
+          src = "https://icons.iconarchive.com/icons/graphicloads/medical-health/128/heart-beat-icon.png",
          
+      br(),
       
       boxPlus(
         width = 12,
@@ -148,72 +151,106 @@ body <- dashboardBody(tabItems(
           boxToolSize   = "md",
           closable      = F,
           collapsible   = T,
-          title = "Project Health and Current Stage",
+          title = "Project Status & Stages",
           footer = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
           fluidRow(
-              #' @todo: make interactivity work!
+              #' @todo: code should be repeated call to a function, not so much
+              #' copy and pasting...
               #' @todo: group by project type, IP, IT, Innovation
-              #' maybe want to have different tabs?
+              #' #todo: want to have different tabs?
             br(),
             box(
               title = "Stage 1",
               width = 3,
               background = "light-blue",
-              tagList(as.list(stage_1$IP))
+              #' @todo: please make the color reflect project health?!
+              #' I have started the function colorfulDashboardBadge, needs 
+              #' implementation.
+              tagList(
+                lapply(
+                  X = as.list(stage_1$IP),
+                  FUN = function(x) (colorfulDashboardBadge(x))))
             ),
             box(
               title = "Stage 2",
               width = 3,
               background = "purple",
-              tagList(as.list(stage_1$IP))
+              tagList(
+                lapply(
+                  X = as.list(stage_2$IP),
+                  FUN = function(x) (colorfulDashboardBadge(x))))
             ),
             box(
               title = "Stage 3",
               width = 3,
               background = "blue",
-              tagList(as.list(stage_1$IP))
+              tagList(
+                lapply(
+                  X = as.list(stage_3$IP),
+                  FUN = function(x) (colorfulDashboardBadge(x))))
             ),
             box(
               title = "Stage 4",
               width = 3,
               background = "navy",
-              tagList(as.list(stage_1$IP))
+              tagList(
+                lapply(
+                  X = as.list(stage_4$IP), 
+                  FUN = function(x) (colorfulDashboardBadge(x, color = "blue"))))
             ),
             box(
               title = "On Track",
               width = 3,
               background = "green",
-              tagList(as.list(on_track$IP))
+              tagList(
+                lapply(
+                  X = as.list(on_track$IP),
+                  FUN = function(x) (colorfulDashboardBadge(x, color = "yellow"))))
             ),
             box(
               width = 3,
               title = "Caution",
               background = "orange",
-              tagList(as.list(caution$IP))
+              tagList(
+                lapply(
+                  X = as.list(caution$IP),
+                  FUN = function(x) (colorfulDashboardBadge(x))))
             ),
             box(
               title = "Delayed",
               width = 3,
               background = "red",
-              tagList(as.list(delayed$IP))
+              tagList(
+                lapply(
+                  X = as.list(delayed$IP),
+                  FUN = function(x) (colorfulDashboardBadge(x))))
             ),
               box(
               title = "Planning",
               width = 3,
               background = "black",
-              tagList(as.list(planning$IP))
+              tagList(
+                lapply(
+                  X = as.list(planning$IP),
+                  FUN = function(x) (colorfulDashboardBadge(x))))
             ),
               box(
               title = "Testing",
               width = 3,
               background = "black",
-              tagList(as.list(testing$IP))
+              tagList(
+                lapply(
+                  X = as.list(testing$IP), 
+                  FUN = function(x) (colorfulDashboardBadge(x))))
             ),
             box(
               title = "Completed",
               width = 3,
               background = "black",
-              tagList(as.list(schedule_completed_project_names$IP))
+              tagList(
+                lapply(
+                  X = as.list(schedule_completed_project_names$IP),
+                  FUN = function(x) (colorfulDashboardBadge(x))))
             ),
           
           
@@ -226,30 +263,89 @@ body <- dashboardBody(tabItems(
       width = 12,
       tags$h1("Project Health"),
      
-      #' fluidRow(
-      #'   box(
-      #'     title = "Green Health",
-      #'     width = 3,
-      #'     background = "green",
-      #'     tagList(as.list(green$IP))
-      #'   ),
-      #'    box(
-      #'     title = "Yellow Health",
-      #'     width = 3,
-      #'     background = "yellow",
-      #'     tagList(as.list(yellow$IP))
-      #'   ),
-      #'    box(
-      #'     title = "Red Health",
-      #'     width = 3,
-      #'     background = "red",
-      #'     tagList(as.list(red$IP))
-      #'   )
-      #' ), 
-      tags$p(
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."
-      ),
-      
+      fluidRow(
+        box(
+          title = "Green Health",
+          width = 3,
+          background = "green",
+          tagList(as.list(green$IP))
+        ),
+         box(
+          title = "Yellow Health",
+          width = 3,
+          background = "yellow",
+          tagList(as.list(yellow$IP))
+        ),
+         box(
+          title = "Red Health",
+          width = 3,
+          background = "red",
+          tagList(as.list(red$IP))
+        )
+      ), 
+     tabBox(
+        title = "Project Health",
+        
+        tabPanel(
+          title = "Innovation Projects",
+          boxPlus(
+        width = 4,
+          collapsible = T,
+          closable = F,
+          title = "Innovation Projects",
+          solidHeader = T,
+          status = "success",
+          "Can I write something here?",
+          footer = tagList(
+          dashboardLabel("On Track", status = "success"),
+          dashboardLabel("Caution", status = "warning"),
+          dashboardLabel("Delayed", status = "danger")
+        ),
+          withSpinner(plotlyOutput("innovation_projects_health"))
+        )
+        ),
+        
+        tabPanel(
+          title = "A Team",
+           
+        boxPlus(
+        width = 4,
+          collapsible = T,
+          closable = F,
+          title = "A Team Projects",
+          solidHeader = T,
+          status = "success",
+          "Can I write something here?",
+          footer = tagList(
+          dashboardLabel("On Track", status = "success"),
+          dashboardLabel("Caution", status = "warning"),
+          dashboardLabel("Delayed", status = "danger")
+        ),
+          withSpinner(plotlyOutput("a_team_projects_health"))
+        )
+        
+        ),
+        
+        tabPanel(
+          title = "IP Projects",
+           boxPlus(
+        width = 4,
+          collapsible = T,
+          closable = F,
+          title = "IP Projects",
+          status = "success",
+          solidHeader = T,
+          "Can I write something here?",
+          footer = tagList(
+          dashboardLabel("On Track", status = "success"),
+          dashboardLabel("Caution", status = "warning"),
+          dashboardLabel("Delayed", status = "danger")
+        ),
+          withSpinner(plotlyOutput("ip_projects_health"))
+        )
+        
+        )
+        ),
       uiOutput("overall_project_health")),
     
     column(
