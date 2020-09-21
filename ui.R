@@ -49,8 +49,7 @@ left_menu <- tagList(
 )
 
 
-#' @todo: put the date somwhere.
-#' tagList(paste0('As of ', dat))
+
 
 
 header <- dashboardHeaderPlus(
@@ -134,119 +133,131 @@ body <- dashboardBody(tabItems(
     
     column(
       width = 12,
-      tags$h1("Project Status Indicators"),
-      tags$p(
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."
-      )
-    ),
-    
-    br(),
-    
-    column(
-      width = 12,
       br(),
-      boxPlus(
-        footer = "Footer",
-        width = 4,
-        status = "info",
         boxProfile(
-          title = "Innovation Projects",
-          subtitle = "Number of Innovation Projects in Various Stages.",
+          title = "TBI Projects",
+          subtitle = tagList(paste("Last updated:", data_date)),
           src = "https://minutes.co/wp-content/uploads/2019/10/best-innovation-teams.jpg",
-          
-          boxProfileItemList(
-            bordered = T,
-            
-            boxProfileItem(
+         
+      
+      boxPlus(
+        width = 12,
+          solidHeader = T,
+          status = "success",
+          background    = NULL,
+          boxToolSize   = "md",
+          closable      = F,
+          collapsible   = T,
+          title = "Project Health and Current Stage",
+          footer = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
+          fluidRow(
+              #' @todo: make interactivity work!
+              #' @todo: group by project type, IP, IT, Innovation
+              #' maybe want to have different tabs?
+            br(),
+            box(
               title = "Stage 1",
-              description = textOutput(outputId = "stage_1")
+              width = 3,
+              background = "light-blue",
+              tagList(as.list(stage_1$IP))
             ),
-            boxProfileItem(
+            box(
               title = "Stage 2",
-              description = textOutput(outputId = "stage_2")
+              width = 3,
+              background = "purple",
+              tagList(as.list(stage_1$IP))
             ),
-            
-            boxProfileItem(
+            box(
               title = "Stage 3",
-              description = textOutput(outputId = "stage_3")
+              width = 3,
+              background = "blue",
+              tagList(as.list(stage_1$IP))
             ),
-            
-            boxProfileItem(
+            box(
               title = "Stage 4",
-              description = textOutput(outputId = "stage_4")
-            )
-          )
-        )
-      ),
-      
-      
-      boxPlus(
-        width = 4,
-        status = "info",
-        boxProfile(
-          title = "Other Projects",
-          subtitle = "What Am I doing here?!?",
-          src = "https://minutes.co/wp-content/uploads/2019/10/best-innovation-teams.jpg",
-          footer = "Footer",
+              width = 3,
+              background = "navy",
+              tagList(as.list(stage_1$IP))
+            ),
+            box(
+              title = "On Track",
+              width = 3,
+              background = "green",
+              tagList(as.list(on_track$IP))
+            ),
+            box(
+              width = 3,
+              title = "Caution",
+              background = "orange",
+              tagList(as.list(caution$IP))
+            ),
+            box(
+              title = "Delayed",
+              width = 3,
+              background = "red",
+              tagList(as.list(delayed$IP))
+            ),
+              box(
+              title = "Planning",
+              width = 3,
+              background = "black",
+              tagList(as.list(planning$IP))
+            ),
+              box(
+              title = "Testing",
+              width = 3,
+              background = "black",
+              tagList(as.list(testing$IP))
+            ),
+            box(
+              title = "Completed",
+              width = 3,
+              background = "black",
+              tagList(as.list(schedule_completed_project_names$IP))
+            ),
           
-          boxProfileItemList(bordered = T,
-                             
-                             boxProfileItem(
-                               title = "Stage 1",
-                               description = "hi"
-                             ))
-        )
-      ),
-      
-      
-      
-      boxPlus(
-        width = 4,
-        status = "info",
-        boxProfile(
-          title = "Other Projects",
-          subtitle = "What Am I doing here?!?",
-          src = "https://minutes.co/wp-content/uploads/2019/10/best-innovation-teams.jpg",
-          footer = "Footer",
           
-          boxProfileItemList(
-            bordered = T,
-            boxProfileItem(
-              title = "Stage 1",
-              description = "hi"
-            ))
-        )
-      )
-      
-    ),
+          )),
+    )),
     
     br(),
     
     column(
       width = 12,
       tags$h1("Project Health"),
-      
+     
+      #' fluidRow(
+      #'   box(
+      #'     title = "Green Health",
+      #'     width = 3,
+      #'     background = "green",
+      #'     tagList(as.list(green$IP))
+      #'   ),
+      #'    box(
+      #'     title = "Yellow Health",
+      #'     width = 3,
+      #'     background = "yellow",
+      #'     tagList(as.list(yellow$IP))
+      #'   ),
+      #'    box(
+      #'     title = "Red Health",
+      #'     width = 3,
+      #'     background = "red",
+      #'     tagList(as.list(red$IP))
+      #'   )
+      #' ), 
       tags$p(
         "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."
       ),
       
-      
-    ),
-    
-    
-    column(
-      width = 12,
       uiOutput("overall_project_health")),
     
     column(
       width = 12,
-      tags$h1("Project Budget"),
+      tags$h1("Project Budget")
       
-      tags$p(
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."
-      )
+      
     ),
-    
     
     column(width = 12, uiOutput("project_portfolio_budget")),
     
@@ -260,13 +271,24 @@ body <- dashboardBody(tabItems(
     fluidRow(
       gradientBox(
         icon = "fa fa-calendar",
-        gradientColor = "teal",
+        gradientColor = "maroon",
         width = 12,
         title = "Fiscal Year Schedule",
         "Tasks completed before 2020 are hidden.",
         footer = withSpinner(timevis::timevisOutput("timevis_plot_all"))
       )
-    )
+    ),
+    #' @todo: need to remove logout button, these BR are a work-aroud.
+    br(),
+    br(),
+    br(),
+    br(),
+    br(),
+    br(),
+    br(),
+    br(),
+    br()
+    
   ),
   
   
@@ -303,11 +325,7 @@ body <- dashboardBody(tabItems(
     
     fluidRow(column(
       width = 12,
-      boxPlus(
-        title = "Project Budget",
-        footer = "Breakdown by Year",
-        withSpinner(plotlyOutput("budget_plt"))
-      ),
+           withSpinner(plotlyOutput("budget_plt")),
       
       boxPlus(
         title = "Projections",
@@ -363,7 +381,7 @@ ui <- secure_app(
   head_auth = tags$script(inactivity),
   
   dashboardPagePlus(
-    collapse_sidebar = F,
+    collapse_sidebar = T,
     header       = header,
     sidebar      = sidebar,
     rightsidebar = rightsidebar,

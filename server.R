@@ -534,7 +534,6 @@ shinyServer(function(input, output, session) {
              yaxis = list(showgrid = F))
   })
   
-  
   output$overall_project_health <- renderUI({
     column(
       width = 12,
@@ -543,10 +542,10 @@ shinyServer(function(input, output, session) {
       fluidRow(
         width = 12,
         boxPlus(
+        width = 4,
           collapsible = T,
           closable = F,
-          title = "IP Projects: Health",
-          width = 12,
+          title = "IP Projects",
           status = "success",
           solidHeader = T,
           "Can I write something here?",
@@ -556,16 +555,13 @@ shinyServer(function(input, output, session) {
           dashboardLabel("Delayed", status = "danger")
         ),
           withSpinner(plotlyOutput("ip_projects_health"))
-        )
-      ),
-      
-      fluidRow(
-        width = 12,
+        ),
+        
         boxPlus(
+        width = 4,
           collapsible = T,
           closable = F,
-          title = "Innovation Projects: Health",
-          width = 12,
+          title = "Innovation Projects",
           solidHeader = T,
           status = "success",
           "Can I write something here?",
@@ -575,17 +571,13 @@ shinyServer(function(input, output, session) {
           dashboardLabel("Delayed", status = "danger")
         ),
           withSpinner(plotlyOutput("innovation_projects_health"))
-        )
-      ),
-      
-       
-      fluidRow(
-        width = 12,
+        ),
+        
         boxPlus(
+        width = 4,
           collapsible = T,
           closable = F,
-          title = "A Team Projects: Health",
-          width = 12,
+          title = "A Team Projects",
           solidHeader = T,
           status = "success",
           "Can I write something here?",
@@ -595,117 +587,9 @@ shinyServer(function(input, output, session) {
           dashboardLabel("Delayed", status = "danger")
         ),
           withSpinner(plotlyOutput("a_team_projects_health"))
-        )
-      ),
-      
-      
-      fluidRow(
-        boxPlus(
-          width         = 12,
-          solidHeader = T,
-          status = "success",
-          background    = NULL,
-          boxToolSize   = "md",
-          closable      = F,
-          collapsible   = T,
-          footer        = "This is a test.",
-          title = "Project Health and Current Stage",
-          "Can I write something here?",
-          fluidRow(
-            column(
-              width = 6,
-              tags$h3("Stage"),
-              #' @todo: make interactivity work!
-              #' @todo: group by project type, IP, IT, Innovation
-              #' maybe want to have different tabs?
-           accordion(
-            accordionItem(
-              id = 1,
-              title = "Stage 1",
-              color = "danger",
-              collapsed = TRUE,
-              tagList(
-                tags$p("A05"),
-                tags$p("Cyclops"),
-                tags$p("704")
-              )
-            ),
-            accordionItem(
-              id = 2,
-              title = "Stage 2",
-              color = "warning",
-              collapsed = FALSE,
-              tagList(
-                tags$p("A05"),
-                tags$p("Cyclops"),
-                tags$p("704")
-              )
-            ),
-            accordionItem(
-              id = 3,
-              title = "Stage 3",
-              color = "info",
-              collapsed = FALSE,
-              tagList(
-                tags$p("A05"),
-                tags$p("Cyclops"),
-                tags$p("704")
-              )
-            ),
-            accordionItem(
-              id = 4,
-              title = "Stage 4",
-              color = "info",
-              collapsed = FALSE,
-              tagList(
-                tags$p("A05"),
-                tags$p("Cyclops"),
-                tags$p("704")
-              )
-            )
-          )   
-            ),
-            column(
-              width = 6,
-              tags$h3("Status"),
-           accordion(
-            accordionItem(
-              id = 1,
-              title = "On Time",
-              color = "danger",
-              collapsed = TRUE,
-              tagList(
-                tags$p("A05"),
-                tags$p("Cyclops"),
-                tags$p("704")
-              )
-            ),
-            accordionItem(
-              id = 2,
-              title = "Falling Behind",
-              color = "warning",
-              collapsed = FALSE,
-              tagList(
-                tags$p("A05"),
-                tags$p("Cyclops"),
-                tags$p("704")
-              )
-            ),
-            accordionItem(
-              id = 3,
-              title = "Delayed",
-              color = "info",
-              collapsed = FALSE,
-              tagList(
-                tags$p("A05"),
-                tags$p("Cyclops"),
-                tags$p("704")
-              )
-            )
-          )   
-            )
-          )
-          )
+        ),
+        
+   
       ),
       
       br()
@@ -717,108 +601,77 @@ shinyServer(function(input, output, session) {
   output$project_portfolio_budget <- renderUI({
     #' @comment: Valid colors are: red, yellow, aqua, blue, light-blue, green,
     #' navy, teal, olive, lime, orange, fuchsia, purple, maroon, black.
+
     
     fluidRow(
       boxPlus(
-        width         = 12,
-        closable      = F,
+        width       = 8,
+        closable    = F,
         collapsible = T,
         solidHeader = T,
         status = "info",
-        footer        = "",
         title = "Project Portfolio Budget",
+        tags$p(
+          "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."
+        ),
+        withSpinner(plotlyOutput("break_down_by_year")),
+        footer =
+          tagList(
+            dashboardLabel("Project Expenditure", status = "success"),
+            dashboardLabel("Project Authority: Non Capital", status = "warning"),
+            dashboardLabel("Project Authority: Capital", status = "danger")
+          )),
         
-        fluidRow(
-          width = NULL,
-          height = NULL,
-          
-          boxPlus(
-            width  = 12,
-            title = "Breakdown by Year",
-            status = "info",
-            background = NULL,
-            collapsible = T,
-            closable = F,
-            enable_label = FALSE,
-            label_text = NULL,
-            label_status = "primary",
-            enable_dropdown = FALSE,
-            dropdown_icon = "wrench",
-            dropdown_menu = NULL,
-            footer_padding = TRUE,
-            withSpinner(plotlyOutput("break_down_by_year"))
+        boxPlus(
+          solidHeader = T,
+          collapsible = T,
+          closable = F,
+          status = "info",
+          title = "Projections",
+          width = 4,
+          descriptionBlock(
+            header = "Expenditures",
+            text = "To Date",
+            number = amount_expenditure_to_date(),
+            numberIcon = "calendar-day",
+            numberColor = "green",
+            rightBorder = TRUE,
+            marginBottom = TRUE
           ),
           
-          boxPlus(
-            width = 12,
-            title = "Projections",
-            collapsible = T,
-            closable = F,
-            status = "danger",
-            
-            fluidRow(
-              column(
-                width = 6,
-                descriptionBlock(
-                  header = "Expenditures",
-                  text = "To Date",
-                  number = amount_expenditure_to_date(),
-                  numberIcon = "calendar-day",
-                  numberColor = "green",
-                  rightBorder = TRUE,
-                  marginBottom = TRUE
-                )
-              ),
-              
-              column(
-                width = 6,
-                descriptionBlock(
-                  header = "Forcasted",
-                  text = "Total Revenue",
-                  number = amount_forcasted_total_expenditures(),
-                  numberColor = "green",
-                  numberIcon = "snowman",
-                  rightBorder = F,
-                  marginBottom = T
-                )
-              )
-            ),
-            
-            fluidRow(
-              column(
-                width = 6,
-                descriptionBlock(
-                  header = "Approved",
-                  text = "Budget",
-                  number = amount_approved_budget(),
-                  numberColor = "green",
-                  numberIcon = "smile",
-                  rightBorder = T,
-                  marginBottom = F
-                )
-              ),
-              column(
-                width = 6,
-                descriptionBlock(
-                  header = "Projected",
-                  text = "Forecasted Expenditures",
-                  number = amount_projected_forecasted_expenditures(),
-                  numberColor = "red",
-                  numberIcon = "bolt",
-                  rightBorder = F,
-                  marginBottom = F
-                )
-              )
-            )
+          descriptionBlock(
+            header = "Forcasted",
+            text = "Total Revenue",
+            number = amount_forcasted_total_expenditures(),
+            numberColor = "green",
+            numberIcon = "snowman",
+            rightBorder = F,
+            marginBottom = T
+          ),
+          descriptionBlock(
+            header = "Approved",
+            text = "Budget",
+            number = amount_approved_budget(),
+            numberColor = "green",
+            numberIcon = "smile",
+            rightBorder = T,
+            marginBottom = F
+          ),
+          descriptionBlock(
+            header = "Projected",
+            text = "Forecasted Expenditures",
+            number = amount_projected_forecasted_expenditures(),
+            numberColor = "red",
+            numberIcon = "bolt",
+            rightBorder = F,
+            marginBottom = F
           )
-          
         )
       )
-    )
-    
+      
   })
-  
-  
+    
+    
   summary_status_and_count <- reactive({
     #' @todo: is this code necessary for anything?
     #' all_proj$IP2<-paste0(all_proj$IP,':\n',substr(all_proj$`Internal or External`,1,1))
@@ -978,7 +831,7 @@ shinyServer(function(input, output, session) {
       file.rename(out, file)
     }
   )
-  
+
   output$downloadreport_individual <- downloadHandler(
     filename = function() {
       paste0(ip_selected()$ip,
@@ -1007,5 +860,6 @@ shinyServer(function(input, output, session) {
     }
     
   )
+
   
 })
