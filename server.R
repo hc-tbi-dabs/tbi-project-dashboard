@@ -1,4 +1,5 @@
 #!/usr/bin/env Rscript
+
 #' TODOs:
 #'
 #' - Remove for now the "Select a Directorate".
@@ -12,27 +13,28 @@ shinyServer(function(input, output, session) {
   
   result_auth <- secure_server(check_credentials = check_credentials(credentials))
   
-  observeEvent(eventExpr = input$contact,
-               handlerExpr = {
-                 showModal(modalDialog(title = "Contact",
-                                       HTML(
-                                         paste(
-                                           "If you have technical questions regarding the application, please contact:",
-                                           br(),
-                                           br(),
-                                           "Jodi Qiao",
-                                           br(),
-                                           "Jr Data Scientist",
-                                           br(),
-                                           "Data Analytics and Business Solutions",
-                                           br(),
-                                           "TBI, POD",
-                                           br(),
-                                           "di.qiao@canada.ca; dqiao100@uottawa.ca"
-                                         )
-                                       ),
-                                       easyClose = T))
-               })
+  observeEvent(
+    eventExpr = input$contact,
+    handlerExpr = {
+      showModal(
+        modalDialog(
+          title = "Contact",
+          HTML(
+            paste(
+              "If you have technical questions regarding the application, please contact:",
+              br(),
+              br(),
+              "Jodi Qiao",
+              br(),
+              "Jr Data Scientist",
+              br(),
+              "Data Analytics and Business Solutions",
+              br(),
+              "TBI, POD",
+              br(),
+              "di.qiao@canada.ca; dqiao100@uottawa.ca")),
+          easyClose = T))
+      })
   
   
   output$project_name <- renderText({
@@ -46,7 +48,7 @@ shinyServer(function(input, output, session) {
     
     project_name <- all_proj %>%
       filter(IP == input$selectip) %>%
-      pull(`Project`)
+      pull(Project)
     
     if (any(startsWith(project_names, project_name))) {
       return(project_name)
@@ -57,10 +59,7 @@ shinyServer(function(input, output, session) {
   })
   
   
-  ip_selected <-
-    reactive({
-      list(ip = input$selectip, ips = all_proj$IP)
-    })
+  ip_selected <- reactive({ list(ip = input$selectip, ips = all_proj$IP) })
   
   
   project_selected <- reactive({
@@ -95,82 +94,69 @@ shinyServer(function(input, output, session) {
       )
     
   })
-  
-  
+
+ 
   amount_approved_budget <- reactive({
+    #' @todo: the following four expressions are like the same thing four
+    #' times, maybe they can be made into a single function somehow?
+    #' 
     .f <- dollar_format()
     .f(df_budget_summary()[["Approved Budget"]])
-    
   })
   
   amount_forcasted_total_expenditures <- reactive({
     .f <- dollar_format()
     .f(df_budget_summary()[["Forecasted Total Expenditures"]])
-    
   })
   
   amount_expenditure_to_date <- reactive({
     .f <- dollar_format()
     .f(df_budget_summary()[["Expenditure to Date"]])
-    
   })
   
   amount_projected_forecasted_expenditures <- reactive({
     .f <- dollar_format()
     .f(df_budget_summary()[["Project Forecasted Expenditures 2020-21"]])
-    
   })
   
   output$budget_plt <- renderPlotly({
-    ds <- budget_yr %>% filter(IP == input$selectip)
-    budget_plot(ds)
+    budget_yr %>% filter(IP == input$selectip) %>% budget_plot()
   })
   
+  
   output$break_down_by_year <- renderPlotly({
-    df <- budget_yr %>%
+    budget_yr %>%
       filter(IP %in% ip_selected()$ips) %>%
       group_by(Year, year, `Authority vs. Expenditures`) %>%
       summarise(
-        Capital = sum(Capital, na.rm = T),
-        Non_Capital = sum(Non_Capital, na.rm = T)
-      )
-    
-    budget_plot(df)
-    
+        Capital     = sum(Capital, na.rm = T),
+        Non_Capital = sum(Non_Capital, na.rm = T)) %>%
+      budget_plot()
   })
   
   output$budget_all <- renderPlot({
-    ds <- budget %>% filter(IP == input$selectip) %>%
+    budget %>% 
+      filter(IP == input$selectip) %>%
       summarise(
-        `Approved Budget` = sum(`Approved Budget`, na.rm = T),
-        `Forecasted Total Expenditures` = sum(`Forecasted Total Expenditures`, na.rm =
-                                                T),
-        `Expenditure to Date` = sum(`Expenditure to Date`, na.rm =
-                                      T),
-        `Project Forecasted Expenditures 2020-21` = sum(`Variance / Remaining budget`, na.rm =
-                                                          T)
-      ) %>%
-      gather(cat)
-    
-    budget_plot2(ds)
+        `Approved Budget`                         = sum(`Approved Budget`, na.rm = T),
+        `Forecasted Total Expenditures`           = sum(`Forecasted Total Expenditures`, na.rm = T),
+        `Expenditure to Date`                     = sum(`Expenditure to Date`, na.rm = T),
+        `Project Forecasted Expenditures 2020-21` = sum(`Variance / Remaining budget`, na.rm = T)) %>%
+      gather(cat) %>%
+      budget_plot2()
   })
   
   
   output$budget_tbl <- renderDataTable({
-    ds <- budget_yr %>%
+    budget_yr %>%
       filter(IP == input$selectip) %>%
       spread(`Authority vs. Expenditures`, Value) %>%
       select(-year) %>%
-      mutate_at(c(
-        'Capital',
-        'Non_Capital',
-        'Project Authority',
-        'Project Expenditures'
-      ),
-      dollar)
-    
+      mutate_at(c("Capital",
+                  "Non_Capital",
+                  "Project Authority",
+                  "Project Expenditures"), dollar) %>%
     datatable(
-      data = ds,
       options = list(
         searching = FALSE,
         pageLength = 5,
@@ -181,7 +167,7 @@ shinyServer(function(input, output, session) {
   })
   
   
-  output$budget_tbl2 <- DT::renderDataTable({
+  output$budget_tbl2 <- renderDataTable({
     ds <- budget_yr %>%
       filter(IP %in% ip_selected()$ips) %>%
       group_by(Year, year, `Authority vs. Expenditures`) %>%
@@ -212,7 +198,7 @@ shinyServer(function(input, output, session) {
   
   
   schedule_overview <- reactive({
-    #' TODO: This logic looks backwards.
+    #' @todo: This logic looks backwards.
     schedule <- schedule %>%
       filter(IP %in% ip_selected()$ips) %>%
       left_join(all_proj) %>%
@@ -226,7 +212,7 @@ shinyServer(function(input, output, session) {
   })
   
   no_completed_schedule_overview <- reactive({
-    #' TODO: This logic looks backwards.
+    #' @todo: This logic looks backwards.
     no_completed_schedule <- no_completed_schedule %>%
       filter(IP %in% ip_selected()$ips) %>%
       left_join(all_proj %>% select(IP = IP))
@@ -466,16 +452,16 @@ shinyServer(function(input, output, session) {
       need(nrow(proj_issue %>%
                   filter(
                     IP %in% ip_selected()$ips & !is.na(Issue)
-                  )) > 0, 'Data Not Available')
+                  )) > 0, "Data Not Available")
     })
     
     proj_issue %>%
       filter(IP %in% ip_selected()$ips & !is.na(Issue)) %>%
       count(Issue, sort = TRUE) %>%
       mutate(Issue = reorder(Issue, n)) %>%
-      ggplot(aes(x = Issue, y = n)) + geom_col(fill = '#1f77b4') +
+      ggplot(aes(x = Issue, y = n)) + geom_col(fill = "#1f77b4") +
       scale_y_continuous(breaks = c(0, 2, 4, 6, 8)) +
-      labs(x = '', y = '') +
+      labs(x = "", y = "") +
       geom_text(aes(label = n, hjust = -1)) +
       coord_flip() +
       theme_minimal() +
@@ -488,46 +474,61 @@ shinyServer(function(input, output, session) {
     
   })
   
-  
-  output$overall2 <- renderPlotly({
-    #' IP Projects
+ output$a_team_projects_health <- renderPlotly({
     
     status$IP2 <- paste0(status$IP)
     
     df <- status %>%
-      filter(grepl("\\d", IP)) %>%
-      filter(`Overall Project Health` != 'Blue') %>%
+      filter(grepl("^A\\d", IP)) %>%
+      filter(`Overall Project Health` != "Blue") %>%
       filter(IP %in% ip_selected()$ips) %>%
-      left_join(budget[, c('IP', 'Approved Budget')])
+      left_join(budget[, c("IP", "Approved Budget")])
     
-    df$status <-
-      factor(df$status, levels = c('On-Track', 'Caution', 'Delayed'))
+    df$status <- factor(df$status, levels = c("On-Track", "Caution", "Delayed"))
     
-    p <- status_plot(df, "IP Projects")
+    status_plot(df, "IP Projects") %>%
+    ggplotly(tooltip = "text") %>%
+      config(displayModeBar = F) %>%
+      layout(xaxis = list(showgrid = F),
+             yaxis = list(showgrid = F))
+  })
+   
+  output$ip_projects_health <- renderPlotly({
     
-    ggplotly(p, tooltip = 'text') %>%
+    status$IP2 <- paste0(status$IP)
+    
+    df <- status %>%
+      filter(grepl("^\\d", IP)) %>%
+      filter(`Overall Project Health` != "Blue") %>%
+      filter(IP %in% ip_selected()$ips) %>%
+      left_join(budget[, c("IP", "Approved Budget")])
+    
+    df$status <- factor(df$status, levels = c("On-Track", "Caution", "Delayed"))
+    
+    status_plot(df, "IP Projects") %>%
+    ggplotly(tooltip = "text") %>%
       config(displayModeBar = F) %>%
       layout(xaxis = list(showgrid = F),
              yaxis = list(showgrid = F))
   })
   
-  output$overall3 <- renderPlotly({
-    #' Innovation Projects
+  output$innovation_projects_health <- renderPlotly({
     
     status$IP2 <- paste0(status$IP)
     
     df <- status %>%
       filter(!grepl("\\d", IP)) %>%
-      filter(`Overall Project Health` != 'Blue') %>%
+      filter(!grepl("^A\\d", IP)) %>%
+      filter(`Overall Project Health` != "Blue") %>%
       filter(IP %in% ip_selected()$ips) %>%
-      left_join(budget[, c('IP', 'Approved Budget')])
+      left_join(budget[, c("IP", "Approved Budget")])
     
     df$status <-
-      factor(df$status, levels = c('On-Track', 'Caution', 'Delayed'))
+      factor(df$status, levels = c("On-Track", "Caution", "Delayed"))
     
     p <- status_plot(df, "Innovation Projects")
     
-    ggplotly(p, tooltip = 'text') %>%
+    ggplotly(p, tooltip = "text") %>%
       config(displayModeBar = F) %>%
       layout(xaxis = list(showgrid = F),
              yaxis = list(showgrid = F))
@@ -542,34 +543,61 @@ shinyServer(function(input, output, session) {
       fluidRow(
         width = 12,
         boxPlus(
-          title = 'IP Projects: Health',
+          collapsible = T,
+          closable = F,
+          title = "IP Projects: Health",
           width = 12,
           status = "success",
           solidHeader = T,
+          "Can I write something here?",
           footer = tagList(
           dashboardLabel("On Track", status = "success"),
           dashboardLabel("Caution", status = "warning"),
           dashboardLabel("Delayed", status = "danger")
         ),
-          withSpinner(plotlyOutput('overall2'))
+          withSpinner(plotlyOutput("ip_projects_health"))
         )
       ),
       
       fluidRow(
         width = 12,
         boxPlus(
+          collapsible = T,
+          closable = F,
           title = "Innovation Projects: Health",
           width = 12,
           solidHeader = T,
           status = "success",
+          "Can I write something here?",
           footer = tagList(
           dashboardLabel("On Track", status = "success"),
           dashboardLabel("Caution", status = "warning"),
           dashboardLabel("Delayed", status = "danger")
         ),
-          withSpinner(plotlyOutput("overall3"))
+          withSpinner(plotlyOutput("innovation_projects_health"))
         )
       ),
+      
+       
+      fluidRow(
+        width = 12,
+        boxPlus(
+          collapsible = T,
+          closable = F,
+          title = "A Team Projects: Health",
+          width = 12,
+          solidHeader = T,
+          status = "success",
+          "Can I write something here?",
+          footer = tagList(
+          dashboardLabel("On Track", status = "success"),
+          dashboardLabel("Caution", status = "warning"),
+          dashboardLabel("Delayed", status = "danger")
+        ),
+          withSpinner(plotlyOutput("a_team_projects_health"))
+        )
+      ),
+      
       
       fluidRow(
         boxPlus(
@@ -582,7 +610,7 @@ shinyServer(function(input, output, session) {
           collapsible   = T,
           footer        = "This is a test.",
           title = "Project Health and Current Stage",
-          #' datatable(summary_status_and_count()),
+          "Can I write something here?",
           fluidRow(
             column(
               width = 6,
@@ -825,7 +853,7 @@ shinyServer(function(input, output, session) {
     
     valueBox(
       tags$p(status$`Overall Project Health`, style = "font-size: 80%;"),
-      subtitle = 'Overall Project Health',
+      subtitle = "Overall Project Health",
       color = tolower(status$`Overall Project Health`),
       width = 3
     )
@@ -839,8 +867,8 @@ shinyServer(function(input, output, session) {
     
     valueBox(
       tags$p(status, style = "font-size: 80%;"),
-      subtitle = 'Project Stage',
-      color = 'purple',
+      subtitle = "Project Stage",
+      color = "purple",
       width = 3
     )
   })
@@ -852,8 +880,8 @@ shinyServer(function(input, output, session) {
     
     valueBox(
       tags$p(internal, style = "font-size: 80%;"),
-      subtitle = 'Directorate ',
-      color = 'maroon',
+      subtitle = "Directorate ",
+      color = "maroon",
       width = 3
     )
   })
@@ -861,16 +889,16 @@ shinyServer(function(input, output, session) {
   output$completed <- renderValueBox({
     valueBox(
       value = nrow(schedule_completed),
-      subtitle = 'Completed',
-      color = 'light-blue'
+      subtitle = "Completed",
+      color = "light-blue"
     )
   })
   
   output$delayed <- renderValueBox({
     valueBox(
       value = nrow(covid_delayed),
-      subtitle = 'Delayed',
-      color = 'light-blue'
+      subtitle = "Delayed",
+      color = "light-blue"
     )
   })
   
@@ -902,11 +930,11 @@ shinyServer(function(input, output, session) {
   
   
   output$download_data <- downloadHandler(filename <- function() {
-    paste('TBI Dashboard', 'xlsx', sep = '.')
+    paste("TBI Dashboard", "xlsx", sep = '.')
   },
   
   content <- function(file) {
-    file.copy('dattbi.xlsx', file)
+    file.copy("dattbi.xlsx", file)
   })
   
   output$downloadreport_overview <- downloadHandler(

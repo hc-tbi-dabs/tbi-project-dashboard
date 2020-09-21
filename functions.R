@@ -111,15 +111,15 @@ budget_plot <- function(ds) {
     config(displayModeBar = F)
 }
 
-dollar_y <- function(x){
-  paste0('$', round(x / 10 ^ 6, 1), 'M')
+my_dollar <- function(x){
+  .f <- dollar_format()
+  .f(x)
 }
 
 budget_plot2<-function(ds){
   
-  min<-ifelse(min(ds$value)<0,abs(min(ds$value))*-1.2,0)
-  max<-max(ds$value)*1.2
-  
+  min <- ifelse(min(ds$value)<0,abs(min(ds$value))*-1.2,0)
+  max <- max(ds$value)*1.2
     
   ds$col<-ifelse(ds$value>=0,'#1f77b4','#980008')
   
@@ -127,7 +127,7 @@ budget_plot2<-function(ds){
     scale_fill_manual(values=c('#1f77b4','#980008'))+
     guides(fill=FALSE)
   
-  p+scale_y_continuous(labels=dollar_y,limits=c(min,max))+
+  p+scale_y_continuous(labels=my_dollar,limits=c(min,max))+
     labs(y='Budget Amount')+
     geom_text(aes(label=dollar(value),vjust=ifelse(value>0,-1,1.5)),position = position_dodge(width = 1))+
     theme_minimal()+
@@ -245,14 +245,15 @@ is.sf_proj <- function(proj_name) {
   }
 }
 
-status_plot<- function(df, x_axis_label) {
+status_plot <- function(df, x_axis_label) {
  
-  y_max <- max(df[["Approved Budget"]])
-  y_upper_limit <- y_max + 0.2 * y_max
- 
-  cols <- c("On-Track" = "#00B050",
-            "Caution"  = "#FFC000",
-            "Delayed"  = "#C00000")
+  y_max         <- max(df[["Approved Budget"]])
+  y_upper_limit <- y_max + 0.1 * y_max #' add 10% whitespace to top.
+
+  #' Colors from: https://adminlte.io/themes/AdminLTE/pages/UI/general.html 
+  colors <- c("On-Track" = "#00a65a",
+              "Caution"  = "#f39c12",
+              "Delayed"  = "#f56954")
   
   label = ""
   
@@ -263,41 +264,45 @@ status_plot<- function(df, x_axis_label) {
           y = `Approved Budget`,
           size = `Approved Budget`,
           color = status,
-          text = dollar(`Approved Budget`))) +
-    scale_color_manual(values = cols) +
-    geom_point(alpha = 0.3) +
+          text = paste(
+            "Amount:", my_dollar(`Approved Budget`),
+            "<br>Full Project Name:", "Project Name?",
+            "<br>I got the PowerBI Blues!", "<br>Only Known Cure: R Shiny!"))) +
+    scale_color_manual(values = colors) +
+    geom_point(alpha = 0.5) +
     geom_text(aes(label = IP2), size = 4) +
     scale_size_continuous(
-      breaks = seq(from = y_max/6, to = y_max, length.out = 6), range=c(0, 36)) +
+      breaks = seq(from = 0, to = y_max, length.out = 3), range=c(7, 21)) +
     scale_y_continuous(
       limits = c(0, y_upper_limit),
-      breaks = seq(from = y_max/6, to = y_max, length.out = 6),
-      labels = dollar_y) +
+      breaks = seq(from = 0, to = y_max, length.out = 6),
+      labels = my_dollar) +
     theme_minimal() +
-    labs(x = x_axis_label) +
+    labs(x = "") +
+    labs(y = "") +
     annotate("text",
              x = length(unique(df$IP)),
              y = 17*10^6,
              label = label,
              size = 3) +
     theme(axis.text.x = element_blank(),
-          legend.position = 'none')
+          legend.position = "none")
 }
 
 stage_plot <- function(df) {
+   
+  colors <- c("On-Track"        = "#00a65a",
+              "Caution"         = "#f39c12",
+              "Delayed"         = "#f56954",
+              "Not yet started" = "#3c8dbc")
   
-  cols <- c("On-Track"        = "#00B050",
-            "Caution"         = "#FFC000",
-            "Delayed"         = "#C00000",
-            "Not yet started" = "#1f77b4")
-  
-  label = ""
+  label <- ""
   
   ggplot(
     data = df,
     aes(x = stage, y = count, group = status, fill = status)) +
     geom_bar(stat='identity',position='dodge',width=0.9,alpha=0.9)+
-    scale_fill_manual(values=cols)+
+    scale_fill_manual(values = colors)+
     scale_y_continuous(breaks=c(0,1,2,3,4,5))+
     geom_text(aes(y=count-0.5,label=IP),position=position_dodge(width=0.9),size=2.5)+
     annotate("text",x=length(unique(df$stage)),y=3,label=label,size=3,color='#494949')+
