@@ -228,7 +228,9 @@ body <- dashboardBody(tabItems(
       
       tags$p(
         "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."
-      )
+      ),
+      
+      
     ),
     
     
@@ -254,15 +256,15 @@ body <- dashboardBody(tabItems(
       
       tags$p(
         "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.")),
-    
+  
     fluidRow(
-      boxPlus(
-        status = "info",
-        solidHeader = T,
+      gradientBox(
+        icon = "fa fa-calendar",
+        gradientColor = "teal",
         width = 12,
         title = "Fiscal Year Schedule",
-        footer = textOutput("caption"),
-        withSpinner(timevis::timevisOutput("timevis_plot_all"))
+        "Tasks completed before 2020 are hidden.",
+        footer = withSpinner(timevis::timevisOutput("timevis_plot_all"))
       )
     )
   ),
@@ -307,8 +309,10 @@ body <- dashboardBody(tabItems(
         withSpinner(plotlyOutput("budget_plt"))
       ),
       
-      box(title = "Projections",
-          withSpinner(plotOutput("budget_all"))),
+      boxPlus(
+        title = "Projections",
+        footer = "Something.",
+        withSpinner(plotOutput("budget_all"))),
       
     )),
     
