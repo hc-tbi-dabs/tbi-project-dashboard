@@ -1,0 +1,12 @@
+name: TBI-Project-Dashboard-Experimental
+title: TBI-Project-Dashboard-Experimental
+username:
+account: bryanpaget
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 2849747
+bundleId: 3650384
+url: https://bryanpaget.shinyapps.io/TBI-Project-Dashboard-Experimental/
+when: 1600652287.60536
+asMultiple: FALSE
+asStatic: FALSE
