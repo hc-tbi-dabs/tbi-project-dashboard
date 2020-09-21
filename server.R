@@ -541,22 +541,32 @@ shinyServer(function(input, output, session) {
       
       fluidRow(
         width = 12,
-        box(
+        boxPlus(
           title = 'IP Projects: Health',
           width = 12,
           status = "success",
           solidHeader = T,
+          footer = tagList(
+          dashboardLabel("On Track", status = "success"),
+          dashboardLabel("Caution", status = "warning"),
+          dashboardLabel("Delayed", status = "danger")
+        ),
           withSpinner(plotlyOutput('overall2'))
         )
       ),
       
       fluidRow(
         width = 12,
-        box(
+        boxPlus(
           title = "Innovation Projects: Health",
           width = 12,
           solidHeader = T,
           status = "success",
+          footer = tagList(
+          dashboardLabel("On Track", status = "success"),
+          dashboardLabel("Caution", status = "warning"),
+          dashboardLabel("Delayed", status = "danger")
+        ),
           withSpinner(plotlyOutput("overall3"))
         )
       ),
@@ -572,8 +582,102 @@ shinyServer(function(input, output, session) {
           collapsible   = T,
           footer        = "This is a test.",
           title = "Project Health and Current Stage",
-          datatable(summary_status_and_count())
-        )
+          #' datatable(summary_status_and_count()),
+          fluidRow(
+            column(
+              width = 6,
+              tags$h3("Stage"),
+              #' @todo: make interactivity work!
+              #' @todo: group by project type, IP, IT, Innovation
+              #' maybe want to have different tabs?
+           accordion(
+            accordionItem(
+              id = 1,
+              title = "Stage 1",
+              color = "danger",
+              collapsed = TRUE,
+              tagList(
+                tags$p("A05"),
+                tags$p("Cyclops"),
+                tags$p("704")
+              )
+            ),
+            accordionItem(
+              id = 2,
+              title = "Stage 2",
+              color = "warning",
+              collapsed = FALSE,
+              tagList(
+                tags$p("A05"),
+                tags$p("Cyclops"),
+                tags$p("704")
+              )
+            ),
+            accordionItem(
+              id = 3,
+              title = "Stage 3",
+              color = "info",
+              collapsed = FALSE,
+              tagList(
+                tags$p("A05"),
+                tags$p("Cyclops"),
+                tags$p("704")
+              )
+            ),
+            accordionItem(
+              id = 4,
+              title = "Stage 4",
+              color = "info",
+              collapsed = FALSE,
+              tagList(
+                tags$p("A05"),
+                tags$p("Cyclops"),
+                tags$p("704")
+              )
+            )
+          )   
+            ),
+            column(
+              width = 6,
+              tags$h3("Status"),
+           accordion(
+            accordionItem(
+              id = 1,
+              title = "On Time",
+              color = "danger",
+              collapsed = TRUE,
+              tagList(
+                tags$p("A05"),
+                tags$p("Cyclops"),
+                tags$p("704")
+              )
+            ),
+            accordionItem(
+              id = 2,
+              title = "Falling Behind",
+              color = "warning",
+              collapsed = FALSE,
+              tagList(
+                tags$p("A05"),
+                tags$p("Cyclops"),
+                tags$p("704")
+              )
+            ),
+            accordionItem(
+              id = 3,
+              title = "Delayed",
+              color = "info",
+              collapsed = FALSE,
+              tagList(
+                tags$p("A05"),
+                tags$p("Cyclops"),
+                tags$p("704")
+              )
+            )
+          )   
+            )
+          )
+          )
       ),
       
       br()
@@ -794,11 +898,6 @@ shinyServer(function(input, output, session) {
   #' nrow(testing)
   output$testing <- reactive({
     1
-  })
-  
-  
-  output$caption <- renderText({
-    text = "*** tasks completed before 2020 are hidden in main plot ***"
   })
   
   
