@@ -39,55 +39,32 @@ budget_plot <- function(ds) {
         ~ paste0('Authority: $', prettyNum(total, big.mark = ','))))
   
   plot_ly(
-    
     ds %>% filter(`Authority vs. Expenditures` == 'Project Authority'),
-    
     x = ~ year - 0.2,
-    
     y = ~ Capital,
-    
-    type = 'bar',
-    
-    name = 'Project Authority - Capital',
-          
-    marker = list(color = 'rgb(252, 205, 201)'),
-
-    hoverinfo = 'text',
-    
-    text = ~ paste('Capital: $', prettyNum(Capital, big.mark = ','))) %>%
-
+    type = "bar",
+    name = "Project Authority - Capital",
+    marker = list(color = "rgb(221, 75, 57)"),
+    hoverinfo = "text",
+    text = ~ paste("Capital: $", prettyNum(Capital, big.mark = ","))) %>%
     add_trace(
-      
       y = ~ Non_Capital,
-      
-      name = 'Project Authority - Non-Capital',
-      
-      marker = list(color = 'rgb(248,118,109)'),
-      
-      hoverinfo = 'text',
-      
+      name = "Project Authority - Non-Capital",
+      marker = list(color = "rgb(243, 156, 18)"),
+      hoverinfo = "text",
       text = ~ label) %>%
-    
-    layout(barmode = 'stack',
-           yaxis = list(title = 'Budget')) %>%
-    
+    layout(barmode = "stack",
+           yaxis = list(title = "Budget")) %>%
     add_trace(
-      
       data = ds %>%
-        filter(`Authority vs. Expenditures` == 'Project Expenditures'),
-      
+        filter(`Authority vs. Expenditures` == "Project Expenditures"),
       x = ~ year + 0.2,
-      
       y = ~ Non_Capital,
-     
-      type = 'bar',
-      
-      name = 'Project Expenditure',
-      
-      marker = list(color = 'rgb(0, 191, 196)'),
-      hoverinfo = 'text',
+      type = "bar",
+      name = "Project Expenditure",
+      marker = list(color = "rgb(0, 166, 90)"),
+      hoverinfo = "text",
       text = ~ label) %>%
-    
     layout(
       xaxis = list(
         title = 'Fiscal Year',
@@ -105,10 +82,10 @@ budget_plot <- function(ds) {
                         2020,
                         2021,
                         2022),
-        tickmode = 'array')) %>%
-    
-    layout(legend = list(y = 0, x = 10)) %>%
-    config(displayModeBar = F)
+        tickmode = "array")) %>%
+    config(displayModeBar = F) %>%
+    layout(showlegend = FALSE) 
+  
 }
 
 my_dollar <- function(x){
@@ -272,7 +249,7 @@ status_plot <- function(df, x_axis_label) {
     geom_point(alpha = 0.5) +
     geom_text(aes(label = IP2), size = 4) +
     scale_size_continuous(
-      breaks = seq(from = 0, to = y_max, length.out = 3), range=c(7, 21)) +
+      breaks = seq(from = 0, to = y_max, length.out = 3), range=c(4, 12)) +
     scale_y_continuous(
       limits = c(0, y_upper_limit),
       breaks = seq(from = 0, to = y_max, length.out = 6),

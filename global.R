@@ -56,7 +56,7 @@ description <- description %>%
   filter(!(description$IP=="A01"))
 
 # date of which data is updated ----
-dat<-substring(file.info('dattbi.xlsx')$mtime,1,11)
+data_date <- substring(file.info("dattbi.xlsx")$mtime, 1, 11)
 
 
 # data cleaning removed all rows with any NA observations----
@@ -116,13 +116,37 @@ no_completed_schedule <- schedule[!grepl("completed", schedule$Schedule.Health.S
 
 # count completed, covid delayed ----
 
-schedule_completed <- schedule%>%filter(grepl('completed',Schedule.Health.Standard,ignore.case=T))
-covid_delayed <- schedule%>%filter(grepl('covid',Schedule.Health,ignore.case=T))
+schedule_completed <- schedule %>% 
+  filter(grepl("completed", Schedule.Health.Standard, ignore.case = T))
 
-# project stages counts ----
+schedule_completed_project_names <- schedule %>% 
+  filter(grepl("completed", Schedule.Health.Standard, ignore.case = T)) %>%
+  select("IP") %>%
+  unique()
 
-stage_1 <- status%>%filter(grepl('1',stage,ignore.case=T))
-stage_2 <- status%>%filter(grepl('2',stage,ignore.case=T))
-stage_3 <- status%>%filter(grepl('3',stage,ignore.case=T))
-stage_4 <- status%>%filter(grepl('4',stage,ignore.case=T))
-planning <- status%>%filter(grepl('planning',stage,ignore.case=T))
+covid_delayed <- schedule %>% 
+  filter(grepl("covid", Schedule.Health, ignore.case = T))
+
+covid_delayed_project_names <- schedule %>% 
+  filter(grepl("covid", Schedule.Health, ignore.case = T)) %>%
+  select("IP") %>%
+  unique()
+
+#' Project Stages
+stage_1  <- status %>% filter(grepl('1',        stage, ignore.case =T ))
+stage_2  <- status %>% filter(grepl('2',        stage, ignore.case =T ))
+stage_3  <- status %>% filter(grepl('3',        stage, ignore.case =T ))
+stage_4  <- status %>% filter(grepl('4',        stage, ignore.case =T ))
+
+planning <- status %>% filter(grepl("planning", stage, ignore.case = T))
+testing  <- status %>% filter(grepl("testing",  stage, ignore.case = T))
+
+#' Project Status
+caution  <- status %>% filter(grepl("caution",   status, ignore.case = T))
+on_track <- status %>% filter(grepl("On-Track",  status, ignore.case = T))
+delayed  <- status %>% filter(grepl("Delayed",   status, ignore.case = T))
+
+#' Project Health
+green  <- status %>% filter(grepl("Green",   `Overall Project Health`, ignore.case = T))
+yellow <- status %>% filter(grepl("Yellow",  `Overall Project Health`, ignore.case = T))
+red    <- status %>% filter(grepl("Red",     `Overall Project Health`, ignore.case = T))
