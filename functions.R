@@ -295,5 +295,7 @@ stage_plot <- function(df) {
 }
 
 colorfulDashboardBadge <- function(text, ...) {
+  #' @todo: add logic for choosing color based on project health or something
+  #' useful like that.
   dashboardBadge(text, ...)
 }
