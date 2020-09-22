@@ -7,6 +7,10 @@ library(timevis)
 library(webshot)
 library(scales)
 
+#' @todo: capitalists want to cut up your life and fight over who gets to own 
+#' the pieces.
+#' 
+#' Valid statuses are: primary, success, info, warning, danger, navy, teal, purple, orange, maroon, black.
 
 left_menu <- tagList(
   dropdownBlock(
@@ -130,7 +134,8 @@ rightsidebar <- rightSidebar(
 body <- dashboardBody(tabItems(
   tabItem(
     tabName = "overview",
-    
+  
+    fluidRow(   
     column(
       width = 12,
       
@@ -257,39 +262,38 @@ body <- dashboardBody(tabItems(
           )),
     )),
     
-    br(),
-    
     column(
       width = 12,
-      tags$h1("Project Health"),
+      br(),
+      tags$h2("Project Health"),
+      br(),
      
-      fluidRow(
+      
+     tabBox(
+       width = 12,
+        tabPanel(
+          title = "Overview",
+          fluidRow(
         box(
           title = "Green Health",
-          width = 3,
           background = "green",
           tagList(as.list(green$IP))
         ),
          box(
           title = "Yellow Health",
-          width = 3,
           background = "yellow",
           tagList(as.list(yellow$IP))
         ),
          box(
           title = "Red Health",
-          width = 3,
           background = "red",
           tagList(as.list(red$IP))
-        )
-      ), 
-     tabBox(
-        title = "Project Health",
-        
+        ))),
         tabPanel(
           title = "Innovation Projects",
-          boxPlus(
-        width = 4,
+          fluidRow(
+          box(
+            width = 12,
           collapsible = T,
           closable = F,
           title = "Innovation Projects",
@@ -303,13 +307,14 @@ body <- dashboardBody(tabItems(
         ),
           withSpinner(plotlyOutput("innovation_projects_health"))
         )
-        ),
+        )),
         
         tabPanel(
           title = "A Team",
-           
-        boxPlus(
-        width = 4,
+         
+          fluidRow(  
+        box(
+            width = 12,
           collapsible = T,
           closable = F,
           title = "A Team Projects",
@@ -324,12 +329,13 @@ body <- dashboardBody(tabItems(
           withSpinner(plotlyOutput("a_team_projects_health"))
         )
         
-        ),
+        )),
         
         tabPanel(
           title = "IP Projects",
-           boxPlus(
-        width = 4,
+          fluidRow(
+           box(
+            width = 12,
           collapsible = T,
           closable = F,
           title = "IP Projects",
@@ -346,36 +352,51 @@ body <- dashboardBody(tabItems(
         
         )
         ),
-      uiOutput("overall_project_health")),
-    
+      uiOutput("overall_project_health"))),
+   
+    br(), 
     column(
-      width = 12,
-      tags$h1("Project Budget")
-      
-      
+      width = 12, 
+    br(), 
+      tags$h2("Project Budget"),
+    br()
+    
     ),
+    br(), 
     
     column(width = 12, uiOutput("project_portfolio_budget")),
     
     column(
       width = 12,
       tags$h1("Scheduling"),
-      
-      tags$p(
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.")),
-  
-    fluidRow(
-      gradientBox(
-        icon = "fa fa-calendar",
-        gradientColor = "maroon",
+      br(), 
+      boxPlus(
+        status = "navy",
+        enable_dropdown = T,
+        dropdown_icon = "wrench",
+        dropdown_menu = dropdownItemList(
+          dropdownItem("Setting 1"),
+          dropdownItem("Setting 2"),
+          dropdownItem("Setting 3")
+        ),
+        collapsible = T,
+        closable = F,
         width = 12,
         title = "Fiscal Year Schedule",
-        "Tasks completed before 2020 are hidden.",
-        footer = withSpinner(timevis::timevisOutput("timevis_plot_all"))
+          footer = "Tasks completed before 2020 are hidden.",
+        tagList(
+            dateRangeInput(inputId = "slider-date", label = "Date Range", min = 0, max = 1, width = "80%")
+        ),
+        box(
+          solidHeader = T,
+          width = 12,
+        withSpinner(timevisOutput("timevis_plot_all")))
       )
-    ),
+    )
     #' @todo: need to remove logout button, these BR are a work-aroud.
-    br(),
+   
+  ),
+   br(),
     br(),
     br(),
     br(),

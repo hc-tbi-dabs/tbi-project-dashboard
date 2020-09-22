@@ -233,7 +233,7 @@ shinyServer(function(input, output, session) {
     #' @todo: group projects, timevis has grouping abilities.
     
     df <- schedule %>%
-      filter(year(Approved_finish_date) >= year(today()))
+      filter(as.duration(Approved_finish_date %--% today()) <= months(3))
     
     shiny::validate((
       need(
@@ -269,7 +269,9 @@ shinyServer(function(input, output, session) {
               df["Schedule.Health.Standard"])
       
     }
+    
     content <- apply(df, 1, makeContent)
+    
     data <- tibble(
       id      = 1:nrow(df),
       content = content,
@@ -277,9 +279,11 @@ shinyServer(function(input, output, session) {
       end     = rep(NA, nrow(df)),
       group = df["IP"]
     )
-    data_groups <-
-      tibble(id = unique(df["IP"]), content = unique(df["IP"]))
-    timevis(data, groups = data_groups)
+    
+    data_groups <- tibble(id = unique(df["IP"]), content = unique(df["IP"]))
+    
+    options <- list(orientation='both')
+    timevis(data, groups=data_groups, options=options) 
   })
   
   
