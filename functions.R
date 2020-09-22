@@ -297,5 +297,8 @@ stage_plot <- function(df) {
 colorfulDashboardBadge <- function(text, ...) {
   #' @todo: add logic for choosing color based on project health or something
   #' useful like that.
+  #' @todo: instead of text, accept a row of data and in the row we have cells 
+  #' with information pertaining to project status. This status information
+  #' will be used to color the badge and maybe add a sub-badge?!
   dashboardBadge(text, ...)
 }
