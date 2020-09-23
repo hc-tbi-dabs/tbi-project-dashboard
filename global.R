@@ -51,7 +51,7 @@ proj_issue  <- read_excel('dattbi.xlsx', 7)
 capital     <- read_excel('dattbi.xlsx', 8)
 
 
-#' removing IPA01 from descriptions, this is DABs and have no schedule, 
+#' removing IPA01 from descriptions, this is DABs and have no schedule,
 #' budget, risk or issues won't show in individual
 description <- description %>%
   filter(!(description$IP == "A01"))
@@ -108,27 +108,41 @@ no_completed_schedule <- schedule[!grepl("completed", schedule$Schedule.Health.S
 
 # count completed, covid delayed ----
 
-schedule_completed <- schedule %>% 
+schedule_completed <- schedule %>%
   filter(grepl("completed", Schedule.Health.Standard, ignore.case = T))
 
-schedule_completed_project_names <- schedule %>% 
+schedule_completed_project_names <- schedule %>%
   filter(grepl("completed", Schedule.Health.Standard, ignore.case = T)) %>%
   select("IP") %>%
   unique()
 
-covid_delayed <- schedule %>% 
+covid_delayed <- schedule %>%
   filter(grepl("covid", Schedule.Health, ignore.case = T))
 
-covid_delayed_project_names <- schedule %>% 
+covid_delayed_project_names <- schedule %>%
   filter(grepl("covid", Schedule.Health, ignore.case = T)) %>%
   select("IP") %>%
   unique()
 
 #' Project Stages
-stage_1  <- status %>% filter(grepl('1',        stage, ignore.case =T ))
-stage_2  <- status %>% filter(grepl('2',        stage, ignore.case =T ))
-stage_3  <- status %>% filter(grepl('3',        stage, ignore.case =T ))
-stage_4  <- status %>% filter(grepl('4',        stage, ignore.case =T ))
+#' only Innovation projects have stages 1, 2, 3 and 4.
+ipp_status <- status %>%
+  filter(!grepl("\\d", IP)) %>%
+  filter(!grepl("^A\\d", IP)) %>%
+  filter(`Overall Project Health` != "Blue")
+
+ipp_stage_1  <- ipp_status %>% filter(grepl('1',        stage, ignore.case =T ))
+ipp_stage_2  <- ipp_status %>% filter(grepl('2',        stage, ignore.case =T ))
+ipp_stage_3  <- ipp_status %>% filter(grepl('3',        stage, ignore.case =T ))
+ipp_stage_4  <- ipp_status %>% filter(grepl('4',        stage, ignore.case =T ))
+
+a_team_status <- status %>%
+  filter(grepl("^A\\d", IP))
+
+a_stage_1  <- a_team_status %>% filter(grepl('1',        stage, ignore.case =T ))
+a_stage_2  <- a_team_status %>% filter(grepl('2',        stage, ignore.case =T ))
+a_stage_3  <- a_team_status %>% filter(grepl('3',        stage, ignore.case =T ))
+a_stage_4  <- a_team_status %>% filter(grepl('4',        stage, ignore.case =T ))
 
 planning <- status %>% filter(grepl("planning", stage, ignore.case = T))
 testing  <- status %>% filter(grepl("testing",  stage, ignore.case = T))

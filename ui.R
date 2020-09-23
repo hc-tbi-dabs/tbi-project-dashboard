@@ -141,73 +141,32 @@ body <- dashboardBody(tabItems(
 
       boxPlus(
         width = 12,
-          solidHeader = T,
           status = "primary",
           background    = NULL,
           boxToolSize   = "md",
           closable      = F,
           collapsible   = T,
           title = "Progress",
+         footer = tagList(
+          dashboardLabel("Green Health", status = "success"),
+          dashboardLabel("Yellow Health", status = "warning"),
+          dashboardLabel("Red Health", status = "danger")
+        ),
           fluidRow(
               #' @todo: code should be repeated call to a function, not so much
               #' copy and pasting...
               #' @todo: group by project type, IP, IT, Innovation
               #' #todo: want to have different tabs?
+              #'
+
             box(
-              width = 3,
-              title = "Innovation Projects",
+              width = 2,
               status = "primary",
+              title = "All Projects",
               solidHeader = T,
-            box(
-              title = "Stage 1",
-              width = 12,
-              status = "primary",
-              #' @todo: please make the color reflect project health?!
-              #' I have started the function colorfulDashboardBadge, needs
-              #' implementation.
-              tagList(
-                apply(
-                  X = stage_1,
-                  MARGIN = 1,
-                  FUN = function(x) (colorfulDashboardBadge(x))))
-            ),
-            box(
-              title = "Stage 2",
-              width = 12,
-              status = "primary",
-              tagList(
-                apply(
-                  X = stage_2,
-                  MARGIN = 1,
-                  FUN = function(x) (colorfulDashboardBadge(x))))
-            ),
-            box(
-              title = "Stage 3",
-              width = 12,
-              status = "primary",
-              tagList(
-                apply(
-                  X = stage_3,
-                  MARGIN = 1,
-                  FUN = function(x) (colorfulDashboardBadge(x))))
-            ),
-            box(
-              title = "Stage 4",
-              status = "primary",
-              width = 12,
-              tagList(
-                apply(
-                  X = stage_4,
-                  MARGIN = 1,
-                  FUN = function(x) (colorfulDashboardBadge(x))))
-            )),
-            box(
-              width = 3,
-              status = "primary",
-              title = "IP Projects",
-              solidHeader = T,
-            box(
-              title = "On Track",
+            boxPad(
+              tags$h3("On Track"),
+              br(),
               width = 12,
               tagList(
                 apply(
@@ -215,42 +174,42 @@ body <- dashboardBody(tabItems(
                   MARGIN = 1,
                   FUN = function(x) (colorfulDashboardBadge(x))))
             ),
-            box(
-              width = 12,
-              title = "Caution",
+            boxPad(
+              tags$h3("Caution"),
+              br(),
               tagList(
                 apply(
                   X = caution,
                   MARGIN = 1,
                   FUN = function(x) (colorfulDashboardBadge(x))))
             ),
-            box(
-              title = "Delayed",
-              width = 12,
+            boxPad(
+              tags$h3("Delayed"),
+              br(),
               tagList(
                 apply(
                   X = delayed,
                   MARGIN = 1,
                   FUN = function(x) (colorfulDashboardBadge(x))))
-            )
-            )
-            ,
+            )),
+
             box(
-              width = 3,
-              title = "IP Projects",
+              width = 2,
+              title = "Innovation Projects",
               status = "primary",
               solidHeader = T,
-              box(
-              title = "Planning",
-              width = 12,
+
+              boxPad(
+              tags$h3("Planning"),
+              br(),
               tagList(
                 apply(
                   X = planning,
                   MARGIN = 1,
                   FUN = function(x) (colorfulDashboardBadge(x))))
             ),
-              box(
-              title = "Testing",
+              boxPad(
+              tags$h3("Testing"),
               width = 12,
               tagList(
                 apply(
@@ -258,6 +217,100 @@ body <- dashboardBody(tabItems(
                   MARGIN = 1,
                   FUN = function(x) (colorfulDashboardBadge(x))))
             )),
+
+
+            box(
+              width = 2,
+              title = "A Team Projects",
+              status = "primary",
+              solidHeader = T,
+            boxPad(
+              tags$h3("Stage 1"),
+              br(),
+              #' @todo: please make the color reflect project health?!
+              #' I have started the function colorfulDashboardBadge, needs
+              #' implementation.
+              tagList(
+                apply(
+                  X = a_stage_1,
+                  MARGIN = 1,
+                  FUN = function(x) (colorfulDashboardBadge(x))))
+            ),
+            boxPad(
+              tags$h3("Stage 2"),
+              br(),
+              tagList(
+                apply(
+                  X = a_stage_2,
+                  MARGIN = 1,
+                  FUN = function(x) (colorfulDashboardBadge(x))))
+            ),
+            boxPad(
+              tags$h3("Stage 3"),
+              br(),
+              tagList(
+                apply(
+                  X = a_stage_3,
+                  MARGIN = 1,
+                  FUN = function(x) (colorfulDashboardBadge(x))))
+            ),
+            boxPad(
+              tags$h3("Stage 4"),
+              br(),
+              tagList(
+                apply(
+                  X = a_stage_4,
+                  MARGIN = 1,
+                  FUN = function(x) (colorfulDashboardBadge(x))))
+            )),
+
+
+            box(
+              width = 2,
+              title = "IT Projects",
+              status = "primary",
+              solidHeader = T,
+            boxPad(
+              tags$h3("Stage 1"),
+              br(),
+              #' @todo: please make the color reflect project health?!
+              #' I have started the function colorfulDashboardBadge, needs
+              #' implementation.
+              tagList(
+                apply(
+                  X = ipp_stage_1,
+                  MARGIN = 1,
+                  FUN = function(x) (colorfulDashboardBadge(x))))
+            ),
+            boxPad(
+              tags$h3("Stage 2"),
+              br(),
+              tagList(
+                apply(
+                  X = ipp_stage_2,
+                  MARGIN = 1,
+                  FUN = function(x) (colorfulDashboardBadge(x))))
+            ),
+            boxPad(
+              tags$h3("Stage 3"),
+              br(),
+              tagList(
+                apply(
+                  X = ipp_stage_3,
+                  MARGIN = 1,
+                  FUN = function(x) (colorfulDashboardBadge(x))))
+            ),
+            boxPad(
+              tags$h3("Stage 4"),
+              br(),
+              tagList(
+                apply(
+                  X = ipp_stage_4,
+                  MARGIN = 1,
+                  FUN = function(x) (colorfulDashboardBadge(x))))
+            ))
+
+
 
           )),
     ),
@@ -271,7 +324,6 @@ body <- dashboardBody(tabItems(
           closable = F,
         title = "Balance",
           status = "success",
-          solidHeader = T,
           box(
             width = 4,
           collapsible = F,
@@ -303,15 +355,15 @@ body <- dashboardBody(tabItems(
           dashboardLabel("On Track", status = "success"),
           dashboardLabel("Caution", status = "warning"),
           dashboardLabel("Delayed", status = "danger")
-        )
-
-        ),
-
-      uiOutput("overall_project_health")),
+        ))),
 
     column(
       width = 12,
-    boxPlus(
+    box(
+      status = "info",
+       collapsible = T,
+       closable = F,
+       title = "Budget",
       width = 12,
       uiOutput("project_portfolio_budget"))),
 
@@ -427,13 +479,10 @@ body <- dashboardBody(tabItems(
   tabItem(
     tabName = "explanations",
 
-    column(width = 12,
-           fluidRow(uiOutput(
-             "explanations_header"
-           ))),
-
-    column(width = 12,
-           fluidRow(includeHTML(
+    fluidRow(width = 12,
+           column(
+             width = 12,
+             includeHTML(
              "explanations.html"
            )))
   )

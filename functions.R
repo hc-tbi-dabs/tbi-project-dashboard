@@ -44,13 +44,13 @@ budget_plot <- function(ds) {
     y = ~ Capital,
     type = "bar",
     name = "Project Authority - Capital",
-    marker = list(color = "rgb(221, 75, 57)"),
+    marker = list(color = "rgb(255, 133, 27)"),
     hoverinfo = "text",
     text = ~ paste("Capital: $", prettyNum(Capital, big.mark = ","))) %>%
     add_trace(
       y = ~ Non_Capital,
       name = "Project Authority - Non-Capital",
-      marker = list(color = "rgb(243, 156, 18)"),
+      marker = list(color = "rgb(57, 204, 204)"),
       hoverinfo = "text",
       text = ~ label) %>%
     layout(barmode = "stack",
@@ -62,7 +62,7 @@ budget_plot <- function(ds) {
       y = ~ Non_Capital,
       type = "bar",
       name = "Project Expenditure",
-      marker = list(color = "rgb(0, 166, 90)"),
+      marker = list(color = "rgb(96, 92, 168)"),
       hoverinfo = "text",
       text = ~ label) %>%
     layout(
@@ -243,7 +243,7 @@ status_plot <- function(df, x_axis_label) {
           color = status,
           text = paste(
             "Amount:", my_dollar(`Approved Budget`),
-            "<br>Full Project Name:", "Project Name?",
+            "<br>Full Project Name:", Project,
             "<br>I got the PowerBI Blues!", "<br>Only Known Cure: R Shiny!"))) +
     scale_color_manual(values = colors) +
     geom_point(alpha = 0.5) +
@@ -318,9 +318,9 @@ colorfulDashboardBadge <- function(record, ...) {
   ifelse(equals(nrow(record), 0), T, return("Input is Empty"))
   ifelse(equals(dim(record), 0), T, return("Input is Empty!"))
 
-  project_name <- record["Project"][[1]]
+  code_name <- ifelse(not(grepl("\\d", record["IP"])), "", record["IP"])
 
-  print(project_name)
+  project_name <- paste(code_name, substring(record["Project"][[1]], 1, 20))
 
   color_choices <- function(status) {
     .color_choices = list(
@@ -344,7 +344,6 @@ colorfulDashboardBadge <- function(record, ...) {
   #'          #' health_badge),
   #'
   #'
-  print(color_choices(health))
 
   dashboardBadge(
     project_name,
