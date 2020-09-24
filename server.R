@@ -546,7 +546,7 @@ shinyServer(function(input, output, session) {
 
     fluidRow(
       boxPlus(
-        width       = 8,
+        width       = 9,
         closable    = F,
         collapsible = T,
         solidHeader = T,
@@ -563,50 +563,35 @@ shinyServer(function(input, output, session) {
             dashboardBadge("Project Authority: Capital",     color = "orange")
           )),
 
-        boxPlus(
-          solidHeader = T,
-          collapsible = T,
-          closable = F,
-          status = "info",
-          title = "Projections",
-          width = 4,
-          descriptionBlock(
-            header = "Expenditures",
-            text = "To Date",
-            number = amount_expenditure_to_date(),
-            numberIcon = "calendar-day",
-            numberColor = "green",
-            rightBorder = TRUE,
-            marginBottom = TRUE
-          ),
+        column(
+          width = 3,
 
-          descriptionBlock(
-            header = "Forcasted",
-            text = "Total Revenue",
-            number = amount_forcasted_total_expenditures(),
-            numberColor = "green",
-            numberIcon = "snowman",
-            rightBorder = F,
-            marginBottom = T
-          ),
-          descriptionBlock(
-            header = "Approved",
-            text = "Budget",
-            number = amount_approved_budget(),
-            numberColor = "green",
-            numberIcon = "smile",
-            rightBorder = T,
-            marginBottom = F
-          ),
-          descriptionBlock(
-            header = "Projected",
-            text = "Forecasted Expenditures",
-            number = amount_projected_forecasted_expenditures(),
-            numberColor = "red",
-            numberIcon = "bolt",
-            rightBorder = F,
-            marginBottom = F
-          )
+          tags$h3("Budget Breakdown"),
+
+          br(),
+
+          valueBox(width = 12,
+                   value = amount_approved_budget(),
+                   subtitle = "Approved Budget",
+                   color = "aqua"),
+
+          valueBox(width = 12,
+                   value = amount_expenditure_to_date(),
+                   subtitle = "Expenditures to Date",
+                   color = "aqua"),
+
+          valueBox(
+            width = 12,
+            subtitle = "Forcasted Revenue",
+            value = amount_forcasted_total_expenditures(),
+            color = "aqua"),
+
+          valueBox(
+            width = 12,
+            subtitle = "Forecasted Expenditures",
+            value = amount_projected_forecasted_expenditures(),
+            color = "aqua"),
+
         )
       )
 
