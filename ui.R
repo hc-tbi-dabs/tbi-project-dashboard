@@ -151,7 +151,11 @@ body <- dashboardBody(tabItems(
           dashboardLabel("Green Health", status = "success"),
           dashboardLabel("Yellow Health", status = "warning"),
           dashboardLabel("Red Health", status = "danger")
+
+
         ),
+
+
           fluidRow(
               #' @todo: code should be repeated call to a function, not so much
               #' copy and pasting...
@@ -160,7 +164,7 @@ body <- dashboardBody(tabItems(
               #'
 
             box(
-              width = 2,
+              width = 3,
               status = "primary",
               title = "All Projects",
               solidHeader = T,
@@ -194,7 +198,7 @@ body <- dashboardBody(tabItems(
             )),
 
             box(
-              width = 2,
+              width = 3,
               title = "Innovation Projects",
               status = "primary",
               solidHeader = T,
@@ -220,7 +224,7 @@ body <- dashboardBody(tabItems(
 
 
             box(
-              width = 2,
+              width = 3,
               title = "A Team Projects",
               status = "primary",
               solidHeader = T,
@@ -266,7 +270,7 @@ body <- dashboardBody(tabItems(
 
 
             box(
-              width = 2,
+              width = 3,
               title = "IT Projects",
               status = "primary",
               solidHeader = T,
@@ -307,13 +311,12 @@ body <- dashboardBody(tabItems(
                 apply(
                   X = ipp_stage_4,
                   MARGIN = 1,
-                  FUN = function(x) (colorfulDashboardBadge(x))))
-            ))
+                  FUN = function(x) (colorfulDashboardBadge(x))))))))
 
 
+      ),
 
-          )),
-    ),
+
 
     column(
       width = 12,
