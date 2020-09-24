@@ -237,14 +237,15 @@ status_plot <- function(df, x_axis_label) {
   df %>%
     arrange(status) %>%
     ggplot(
-      aes(x = as.character(IP),
+      aes(x = substring(as.character(IP), 1, 4),
           y = `Approved Budget`,
           size = `Approved Budget`,
           color = status,
           text = paste(
-            "Amount:", my_dollar(`Approved Budget`),
-            "<br>Full Project Name:", Project,
-            "<br>I got the PowerBI Blues!", "<br>Only Known Cure: R Shiny!"))) +
+            "Directorate: ", directorate, "<br>",
+            "IP: ", IP, "<br>",
+            "Project: ", Project, "<br>",
+            "Amount:", my_dollar(`Approved Budget`)))) +
     scale_color_manual(values = colors) +
     geom_point(alpha = 0.5) +
     geom_text(aes(label = IP2), size = 4) +
