@@ -83,6 +83,10 @@ shinyServer(function(input, output, session) {
 
 
   df_budget_summary <- reactive({
+
+    print("Budget!")
+    print(budget)
+
     budget %>%
       filter(IP %in% ip_selected()$ips) %>%
       left_join(all_proj %>% select(IP = IP)) %>%
@@ -92,8 +96,49 @@ shinyServer(function(input, output, session) {
         `Expenditure to Date`                     = sum(`Expenditure to Date`, na.rm = T),
         `Project Forecasted Expenditures 2020-21` = sum(`Variance / Remaining budget`, na.rm = T)
       )
+  })
+
+
+  df_budget_summary_individual <- reactive({
+       budget %>%
+      filter(IP == input$selectip) %>%
+      left_join(all_proj %>% select(IP = IP)) %>%
+      summarise(
+        `Approved Budget`                         = sum(`Approved Budget`, na.rm = T),
+        `Forecasted Total Expenditures`           = sum(`Forecasted Total Expenditures`, na.rm = T),
+        `Expenditure to Date`                     = sum(`Expenditure to Date`, na.rm = T),
+        `Project Forecasted Expenditures 2020-21` = sum(`Variance / Remaining budget`, na.rm = T)
+      )
+
 
   })
+
+
+
+  amount_approved_budget_individual <- reactive({
+    #' @todo: the following four expressions are like the same thing four
+    #' times, maybe they can be made into a single function somehow?
+    #'
+    .f <- dollar_format()
+    .f(df_budget_summary_individual()[["Approved Budget"]])
+  })
+
+  amount_forcasted_total_expenditures_individual <- reactive({
+    .f <- dollar_format()
+    .f(df_budget_summary_individual()[["Forecasted Total Expenditures"]])
+  })
+
+  amount_expenditure_to_date_individual <- reactive({
+    .f <- dollar_format()
+    .f(df_budget_summary_individual()[["Expenditure to Date"]])
+  })
+
+  amount_project_forecasted_expenditures_individual <- reactive({
+    .f <- dollar_format()
+    .f(df_budget_summary_individual()[["Project Forecasted Expenditures 2020-21"]])
+  })
+
+
 
 
   amount_approved_budget <- reactive({
@@ -114,7 +159,7 @@ shinyServer(function(input, output, session) {
     .f(df_budget_summary()[["Expenditure to Date"]])
   })
 
-  amount_projected_forecasted_expenditures <- reactive({
+  amount_project_forecasted_expenditures <- reactive({
     .f <- dollar_format()
     .f(df_budget_summary()[["Project Forecasted Expenditures 2020-21"]])
   })
@@ -224,16 +269,17 @@ shinyServer(function(input, output, session) {
     return(no_completed_schedule)
   })
 
+
   output$timevis_plot_all <- timevis::renderTimevis({
     #' @description: plot all projects.
     #'
     #' @todo: Should have just one function for all and specific...
-    #' @todo: dates at bottom look wrong
     #' @todo: add colors
-    #' @todo: group projects, timevis has grouping abilities.
 
-    df <- schedule %>%
-      filter(as.duration(Approved_finish_date %--% today()) <= months(3))
+    df <- schedule
+    df["className"] <- lapply(X = df["IP"], function(x) (paste0("IP_", x)))
+
+    print(df["className"])
 
     shiny::validate((
       need(
@@ -277,8 +323,13 @@ shinyServer(function(input, output, session) {
       content = content,
       start   = format(df["Approved_finish_date"][[1]], "%Y-%m-%d"),
       end     = rep(NA, nrow(df)),
-      group = df["IP"]
-    )
+      group = df["IP"],
+      className = df["className"])
+
+
+    data %<>%
+      filter(start >= input$`main-page-date-slider`[1]) %>%
+      filter(start <= input$`main-page-date-slider`[2])
 
     data_groups <- tibble(id = unique(df["IP"]), content = unique(df["IP"]))
 
@@ -538,6 +589,40 @@ shinyServer(function(input, output, session) {
              yaxis = list(showgrid = F))
   })
 
+  output$project_portfolio_budget_individual <- renderUI({
+
+        box(
+          title = "Budget Breakdown",
+          status = "info",
+          solidHeader = T,
+          width = 4,
+
+          br(),
+
+          valueBox(width = 12,
+                   value = amount_approved_budget_individual(),
+                   subtitle = "Approved Budget",
+                   color = "aqua"),
+
+          valueBox(width = 12,
+                   value = amount_expenditure_to_date_individual(),
+                   subtitle = "Expenditures to Date",
+                   color = "aqua"),
+
+          valueBox(
+            width = 12,
+            subtitle = "Forcasted Revenue",
+            value = amount_forcasted_total_expenditures_individual(),
+            color = "aqua"),
+
+          valueBox(
+            width = 12,
+            subtitle = "Forecasted Expenditures",
+            value = amount_project_forecasted_expenditures_individual(),
+            color = "aqua"))
+  })
+
+
 
   output$project_portfolio_budget <- renderUI({
     #' @comment: Valid colors are: red, yellow, aqua, blue, light-blue, green,
@@ -545,16 +630,11 @@ shinyServer(function(input, output, session) {
 
 
     fluidRow(
-      boxPlus(
-        width       = 9,
-        closable    = F,
-        collapsible = T,
+      box(
+        width       = 8,
         solidHeader = T,
         status = "info",
         title = "Project Portfolio Budget",
-        tags$p(
-          "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."
-        ),
         withSpinner(plotlyOutput("break_down_by_year")),
         footer =
           tagList(
@@ -563,10 +643,11 @@ shinyServer(function(input, output, session) {
             dashboardBadge("Project Authority: Capital",     color = "orange")
           )),
 
-        column(
-          width = 3,
-
-          tags$h3("Budget Breakdown"),
+        box(
+          title = "Budget Breakdown",
+          status = "info",
+          solidHeader = T,
+          width = 4,
 
           br(),
 
@@ -589,7 +670,7 @@ shinyServer(function(input, output, session) {
           valueBox(
             width = 12,
             subtitle = "Forecasted Expenditures",
-            value = amount_projected_forecasted_expenditures(),
+            value = amount_project_forecasted_expenditures(),
             color = "aqua"),
 
         )

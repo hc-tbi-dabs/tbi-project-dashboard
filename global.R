@@ -1,4 +1,4 @@
-
+#
 # dependencies ----
 library(shiny)
 library(shinymanager)
@@ -33,6 +33,28 @@ library(timevis)
 source('functions.R')
 
 
+#' CSS Colors:
+#'
+#' white         	#FFFFFF 	rgb(255,255,255)
+#' snow 	        #FFFAFA 	rgb(255,250,250)
+#' honeydew     	#F0FFF0 	rgb(240,255,240)
+#' mintcream     	#F5FFFA 	rgb(245,255,250)
+#' azure 	        #F0FFFF 	rgb(240,255,255)
+#' aliceblue 	    #F0F8FF 	rgb(240,248,255)
+#' ghostwhite 	  #F8F8FF 	rgb(248,248,255)
+#' whitesmoke 	  #F5F5F5 	rgb(245,245,245)
+#' seashell 	    #FFF5EE 	rgb(255,245,238)
+#' beige 	        #F5F5DC 	rgb(245,245,220)
+#' oldlace 	      #FDF5E6 	rgb(253,245,230)
+#' floralwhite 	  #FFFAF0 	rgb(255,250,240)
+#' ivory 	        #FFFFF0 	rgb(255,255,240)
+#' antiquewhite 	#FAEBD7 	rgb(250,235,215)
+#' linen 	        #FAF0E6 	rgb(250,240,230)
+#' lavenderblush 	#FFF0F5 	rgb(255,240,245)
+#' mistyrose 	    #FFE4E1 	rgb(255,228,225)
+#'
+
+
 credentials <- data.frame(
   user             = c("dabs"),
   password         = c("TBI"),
@@ -58,7 +80,8 @@ description <- description %>%
 
 
 data_date <- substring(file.info("dattbi.xlsx")$mtime, 1, 11)
-
+min_date <- min(schedule$Approved_finish_date)
+max_date <- max(schedule$Approved_finish_date)
 
 #' Data cleaning:
 nona_description <- description %>% drop_na()
@@ -127,25 +150,75 @@ covid_delayed_project_names <- schedule %>%
 #' Project Stages
 #' only Innovation projects have stages 1, 2, 3 and 4.
 ipp_status <- status %>%
-  filter(!grepl("\\d", IP)) %>%
-  filter(!grepl("^A\\d", IP)) %>%
+  filter(grepl("^\\d", IP)) %>%
   filter(`Overall Project Health` != "Blue")
 
-ipp_stage_1  <- ipp_status %>% filter(grepl('1',        stage, ignore.case =T ))
-ipp_stage_2  <- ipp_status %>% filter(grepl('2',        stage, ignore.case =T ))
-ipp_stage_3  <- ipp_status %>% filter(grepl('3',        stage, ignore.case =T ))
-ipp_stage_4  <- ipp_status %>% filter(grepl('4',        stage, ignore.case =T ))
+ipp_stage_1  <- ipp_status %>%
+  filter(or(
+    grepl('1',          stage),
+    grepl("Initiation", stage, ignore.case = T)))
+
+ipp_stage_2  <- ipp_status %>%
+  filter(or(
+    grepl('2',        stage),
+    grepl("Planning", stage, ignore.case = T)))
+
+ipp_stage_3  <- ipp_status %>%
+  filter(or(
+    grepl('3',         stage),
+    grepl("Execution", stage, ignore.case = T)))
+
+ipp_stage_4  <- ipp_status %>%
+  filter(or(
+    grepl('4',       stage),
+    grepl("Closure", stage, ignore.case = T)))
 
 a_team_status <- status %>%
   filter(grepl("^A\\d", IP))
 
-a_stage_1  <- a_team_status %>% filter(grepl('1',        stage, ignore.case =T ))
-a_stage_2  <- a_team_status %>% filter(grepl('2',        stage, ignore.case =T ))
-a_stage_3  <- a_team_status %>% filter(grepl('3',        stage, ignore.case =T ))
-a_stage_4  <- a_team_status %>% filter(grepl('4',        stage, ignore.case =T ))
+a_stage_1  <- a_team_status %>%
+   filter(or(
+    grepl('1',          stage),
+    grepl("Initiation", stage, ignore.case = T)))
 
-planning <- status %>% filter(grepl("planning", stage, ignore.case = T))
-testing  <- status %>% filter(grepl("testing",  stage, ignore.case = T))
+a_stage_2  <- a_team_status %>%
+   filter(or(
+    grepl('2',        stage),
+    grepl("Planning", stage, ignore.case = T)))
+
+a_stage_3  <- a_team_status %>%
+   filter(or(
+    grepl('3',         stage),
+    grepl("Execution", stage, ignore.case = T)))
+
+a_stage_4  <- a_team_status %>%
+  filter(or(
+    grepl('4',       stage),
+    grepl("Closure", stage, ignore.case = T)))
+
+
+#' Stream 1
+stream_1_testing <- status %>%
+  filter(and(
+    grepl("Stream I$", Project, ignore.case = F),
+    grepl("testing",  stage, ignore.case = T)))
+
+stream_1_planning <- status %>%
+  filter(and(
+    grepl("Stream I$", Project, ignore.case = F),
+    grepl("planning",  stage, ignore.case = T)))
+
+#' Stream 2
+stream_2_testing  <- status %>%
+  filter(and(
+    grepl("Stream II$", Project, ignore.case = F),
+    grepl("testing",  stage, ignore.case = T)))
+
+stream_2_planning <- status %>%
+  filter(and(
+    grepl("Stream II$", Project, ignore.case = F),
+    grepl("planning",  stage, ignore.case = T)))
+
 
 #' Project Status
 caution  <- status %>% filter(grepl("caution",   status, ignore.case = T))

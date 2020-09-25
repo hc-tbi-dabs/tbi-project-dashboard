@@ -198,17 +198,21 @@ body <- dashboardBody(tabItems(
             )),
 
             box(
-              width = 3,
               title = "Innovation Projects",
               status = "primary",
               solidHeader = T,
-
+              width = 3,
+            box(
+              width = 12,
+              status = "primary",
+              solidHeader = T,
+              title = "Stream I",
               boxPad(
               tags$h3("Planning"),
               br(),
               tagList(
                 apply(
-                  X = planning,
+                  X = stream_1_planning,
                   MARGIN = 1,
                   FUN = function(x) (colorfulDashboardBadge(x))))
             ),
@@ -217,19 +221,43 @@ body <- dashboardBody(tabItems(
               width = 12,
               tagList(
                 apply(
-                  X = testing,
+                  X = stream_1_testing,
                   MARGIN = 1,
                   FUN = function(x) (colorfulDashboardBadge(x))))
             )),
 
+            box(
+              width = 12,
+              title = "Stream II",
+              status = "primary",
+              solidHeader = T,
+
+              boxPad(
+              tags$h3("Planning"),
+              br(),
+              tagList(
+                apply(
+                  X = stream_2_planning,
+                  MARGIN = 1,
+                  FUN = function(x) (colorfulDashboardBadge(x))))
+            ),
+              boxPad(
+              tags$h3("Testing"),
+              width = 12,
+              tagList(
+                apply(
+                  X = stream_2_testing,
+                  MARGIN = 1,
+                  FUN = function(x) (colorfulDashboardBadge(x))))
+            ))),
 
             box(
               width = 3,
-              title = "A Team Projects",
+              title = "Other IT Projects",
               status = "primary",
               solidHeader = T,
             boxPad(
-              tags$h3("Stage 1"),
+              tags$h3("Stage 1: Initiation"),
               br(),
               #' @todo: please make the color reflect project health?!
               #' I have started the function colorfulDashboardBadge, needs
@@ -241,7 +269,7 @@ body <- dashboardBody(tabItems(
                   FUN = function(x) (colorfulDashboardBadge(x))))
             ),
             boxPad(
-              tags$h3("Stage 2"),
+              tags$h3("Stage 2: Planning"),
               br(),
               tagList(
                 apply(
@@ -250,7 +278,7 @@ body <- dashboardBody(tabItems(
                   FUN = function(x) (colorfulDashboardBadge(x))))
             ),
             boxPad(
-              tags$h3("Stage 3"),
+              tags$h3("Stage 3: Execution"),
               br(),
               tagList(
                 apply(
@@ -259,7 +287,7 @@ body <- dashboardBody(tabItems(
                   FUN = function(x) (colorfulDashboardBadge(x))))
             ),
             boxPad(
-              tags$h3("Stage 4"),
+              tags$h3("Stage 4: Closure"),
               br(),
               tagList(
                 apply(
@@ -271,11 +299,11 @@ body <- dashboardBody(tabItems(
 
             box(
               width = 3,
-              title = "IT Projects",
+              title = "Investment Planning Projects",
               status = "primary",
               solidHeader = T,
             boxPad(
-              tags$h3("Stage 1"),
+              tags$h3("Stage 1: Initiation"),
               br(),
               #' @todo: please make the color reflect project health?!
               #' I have started the function colorfulDashboardBadge, needs
@@ -287,7 +315,7 @@ body <- dashboardBody(tabItems(
                   FUN = function(x) (colorfulDashboardBadge(x))))
             ),
             boxPad(
-              tags$h3("Stage 2"),
+              tags$h3("Stage 2: Planning"),
               br(),
               tagList(
                 apply(
@@ -296,7 +324,7 @@ body <- dashboardBody(tabItems(
                   FUN = function(x) (colorfulDashboardBadge(x))))
             ),
             boxPad(
-              tags$h3("Stage 3"),
+              tags$h3("Stage 3: Execution"),
               br(),
               tagList(
                 apply(
@@ -305,19 +333,13 @@ body <- dashboardBody(tabItems(
                   FUN = function(x) (colorfulDashboardBadge(x))))
             ),
             boxPad(
-              tags$h3("Stage 4"),
+              tags$h3("Stage 4: Closure"),
               br(),
               tagList(
                 apply(
                   X = ipp_stage_4,
                   MARGIN = 1,
-                  FUN = function(x) (colorfulDashboardBadge(x))))))))
-
-
-      ),
-
-
-
+                  FUN = function(x) (colorfulDashboardBadge(x))))))))),
     column(
       width = 12,
 
@@ -340,7 +362,7 @@ body <- dashboardBody(tabItems(
             width = 4,
           collapsible = F,
           closable = F,
-          title = "A Team Projects",
+          title = "Other IT Projects",
           solidHeader = T,
           status = "success",
           withSpinner(plotlyOutput("a_team_projects_health"))),
@@ -349,7 +371,7 @@ body <- dashboardBody(tabItems(
             width = 4,
           collapsible = F,
           closable = F,
-          title = "IP Projects",
+          title = "Investment Planning Projects",
           status = "success",
           solidHeader = T,
 
@@ -357,8 +379,7 @@ body <- dashboardBody(tabItems(
         footer = tagList(
           dashboardLabel("On Track", status = "success"),
           dashboardLabel("Caution", status = "warning"),
-          dashboardLabel("Delayed", status = "danger")
-        ))),
+          dashboardLabel("Delayed", status = "danger")))),
 
     column(
       width = 12,
@@ -372,25 +393,26 @@ body <- dashboardBody(tabItems(
 
     column(
       width = 12,
-      tags$h1("Scheduling"),
-      br(),
       boxPlus(
         status = "navy",
-        enable_dropdown = T,
-        dropdown_icon = "wrench",
-        dropdown_menu = dropdownItemList(
-          dropdownItem("Setting 1"),
-          dropdownItem("Setting 2"),
-          dropdownItem("Setting 3")
-        ),
         collapsible = T,
         closable = F,
         width = 12,
         title = "Fiscal Year Schedule",
-          footer = "Tasks completed before 2020 are hidden.",
-        tagList(
-            dateRangeInput(inputId = "slider-date", label = "Date Range", min = 0, max = 1, width = "80%")
-        ),
+        footer = "Tasks completed before 2020 are hidden.",
+        boxPlus(
+          status = "navy",
+          width = 4,
+          closable = F,
+          collapsed = F,
+          collapsible = F,
+          dateRangeInput(
+            start = max_date - months(3),
+            end = max_date,
+            inputId = "main-page-date-slider",
+            label = "Date Range",
+            min = min_date,
+            max = max_date)),
         box(
           solidHeader = T,
           width = 12,
@@ -425,15 +447,11 @@ body <- dashboardBody(tabItems(
         choices = ip
       ),
 
-      widgetUserBox(
+      box(
         title = textOutput("project_name"),
-        subtitle = "Something useful",
-        type = 2,
-        color = "teal",
-        src = "https://upload.wikimedia.org/wikipedia/commons/d/d8/Crystal_Project_Package_games_board.png",
-        boxToolSize = "xs",
+        status = "info",
         width = 12,
-        footer = tagList(
+        tagList(
           valueBoxOutput("overall"),
           valueBoxOutput("overall_stage"),
           valueBoxOutput("directorate")
@@ -441,16 +459,17 @@ body <- dashboardBody(tabItems(
       )
     ),
 
-    fluidRow(column(
+    column(
       width = 12,
-           withSpinner(plotlyOutput("budget_plt")),
-
-      boxPlus(
-        title = "Projections",
-        footer = "Something.",
-        withSpinner(plotOutput("budget_all"))),
-
-    )),
+      fluidRow(
+        width = 12,
+        box(
+          title = "Project Budget",
+          status = "info",
+          solidHeader = T,
+          width = 9,
+        withSpinner(plotlyOutput("budget_plt"))),
+        uiOutput("project_portfolio_budget_individual"))),
 
     fluidRow(column(
       width = 12,
@@ -472,7 +491,8 @@ body <- dashboardBody(tabItems(
 
     fluidRow(column(
       width = 12,
-      box(title = "Schedule",
+      box(width = 12,
+          title = "Schedule",
           withSpinner(
             timevisOutput("timevis_plot_individual")
           ))
@@ -500,6 +520,40 @@ ui <- secure_app(
     header       = header,
     sidebar      = sidebar,
     rightsidebar = rightsidebar,
-    body         = body
+    body         = body,
+    tags$head(
+      tags$style(HTML("
+                        .IP_A03         { background-color: azure 	         }
+                        .IP_A04         { background-color: aliceblue 	     }
+                        .IP_A05         { background-color: ghostwhite 	    }
+                        .IP_A06         { background-color: whitesmoke 	    }
+                        .IP_628         { background-color: seashell 	      }
+                        .IP_710         { background-color: beige 	         }
+                        .IP_704         { background-color: oldlace 	       }
+                        .IP_705         { background-color: floralwhite 	   }
+                        .IP_Kelpie      { background-color: ivory 	         }
+                        .IP_IP000       { background-color: antiquewhite    }
+                        .IP_Cyclops     { background-color: linen 	         }
+                        .IP_Hummingbird { background-color: lavenderblush   }
+                        .IP_Cipher      { background-color: mistyrose 	     }
+                      ")))
   )
 )
+
+#' white         	#FFFFFF 	rgb(255,255,255)
+#' snow 	        #FFFAFA 	rgb(255,250,250)
+#' honeydew     	#F0FFF0 	rgb(240,255,240)
+#' mintcream     	#F5FFFA 	rgb(245,255,250)
+#' azure 	        #F0FFFF 	rgb(240,255,255)
+#' aliceblue 	    #F0F8FF 	rgb(240,248,255)
+#' ghostwhite 	  #F8F8FF 	rgb(248,248,255)
+#' whitesmoke 	  #F5F5F5 	rgb(245,245,245)
+#' seashell 	    #FFF5EE 	rgb(255,245,238)
+#' beige 	        #F5F5DC 	rgb(245,245,220)
+#' oldlace 	      #FDF5E6 	rgb(253,245,230)
+#' floralwhite 	  #FFFAF0 	rgb(255,250,240)
+#' ivory 	        #FFFFF0 	rgb(255,255,240)
+#' antiquewhite 	#FAEBD7 	rgb(250,235,215)
+#' linen 	        #FAF0E6 	rgb(250,240,230)
+#' lavenderblush 	#FFF0F5 	rgb(255,240,245)
+#' mistyrose 	    #FFE4E1 	rgb(255,228,225)
