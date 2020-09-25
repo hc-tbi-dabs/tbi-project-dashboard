@@ -248,9 +248,9 @@ status_plot <- function(df, x_axis_label) {
             "Amount:", my_dollar(`Approved Budget`)))) +
     scale_color_manual(values = colors) +
     geom_point(alpha = 0.5) +
-    geom_text(aes(label = IP2), size = 4) +
+    geom_text(aes(label = substring(IP, 1, 3)), size = 4) +
     scale_size_continuous(
-      breaks = seq(from = 0, to = y_max, length.out = 3), range=c(4, 12)) +
+      breaks = seq(from = 0, to = y_max, length.out = 8), range=c(8, 16)) +
     scale_y_continuous(
       limits = c(0, y_upper_limit),
       breaks = seq(from = 0, to = y_max, length.out = 6),
@@ -321,7 +321,7 @@ colorfulDashboardBadge <- function(record, ...) {
 
   code_name <- ifelse(not(grepl("\\d", record["IP"])), "", record["IP"])
 
-  project_name <- paste(code_name, substring(record["Project"][[1]], 1, 20))
+  project_name <- paste(code_name, substring(record["Project"][[1]], 1, 32))
 
   color_choices <- function(status) {
     .color_choices = list(
@@ -469,7 +469,7 @@ colorfulStatusBoard <- function(data) {
 
             box(
               width = 3,
-              title = "A Team Projects",
+              title = "Other IT Projects",
               status = "primary",
               solidHeader = T,
             boxPad(
