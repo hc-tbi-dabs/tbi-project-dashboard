@@ -523,14 +523,18 @@ ui <- secure_app(
     body         = body,
     tags$head(
       tags$style(HTML("
-                        .IP_A03         { background-color: azure 	         }
-                        .IP_A04         { background-color: aliceblue 	     }
-                        .IP_A05         { background-color: ghostwhite 	    }
-                        .IP_A06         { background-color: whitesmoke 	    }
-                        .IP_628         { background-color: seashell 	      }
-                        .IP_710         { background-color: beige 	         }
-                        .IP_704         { background-color: oldlace 	       }
-                        .IP_705         { background-color: floralwhite 	   }
+                        .IP_A03         { background-color: white           }
+                        .IP_A04         { background-color: snow 	          }
+                        .IP_A05         { background-color: honeydew        }
+                        .IP_A06         { background-color: mintcream       }
+                        .IP_628         { background-color: azure 	         }
+                        .IP_701         { background-color: aliceblue 	     }
+                        .IP_704         { background-color: ghostwhite 	    }
+                        .IP_705         { background-color: whitesmoke 	    }
+                        .IP_710         { background-color: seashell 	      }
+                        .IP_809         { background-color: beige 	         }
+                        .IP_810         { background-color: oldlace 	       }
+                        .IP_811         { background-color: floralwhite 	   }
                         .IP_Kelpie      { background-color: ivory 	         }
                         .IP_IP000       { background-color: antiquewhite    }
                         .IP_Cyclops     { background-color: linen 	         }
@@ -557,3 +561,5 @@ ui <- secure_app(
 #' linen 	        #FAF0E6 	rgb(250,240,230)
 #' lavenderblush 	#FFF0F5 	rgb(255,240,245)
 #' mistyrose 	    #FFE4E1 	rgb(255,228,225)
+
+
