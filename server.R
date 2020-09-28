@@ -123,7 +123,7 @@ shinyServer(function(input, output, session) {
     .f(df_budget_summary_individual()[["Approved Budget"]])
   })
 
-  amount_forcasted_total_expenditures_individual <- reactive({
+  amount_forecasted_total_expenditures_individual <- reactive({
     .f <- dollar_format()
     .f(df_budget_summary_individual()[["Forecasted Total Expenditures"]])
   })
@@ -149,7 +149,7 @@ shinyServer(function(input, output, session) {
     .f(df_budget_summary()[["Approved Budget"]])
   })
 
-  amount_forcasted_total_expenditures <- reactive({
+  amount_forecasted_total_expenditures <- reactive({
     .f <- dollar_format()
     .f(df_budget_summary()[["Forecasted Total Expenditures"]])
   })
@@ -166,6 +166,13 @@ shinyServer(function(input, output, session) {
 
   output$budget_plt <- renderPlotly({
     budget_yr %>% filter(IP == input$selectip) %>% budget_plot()
+  })
+
+
+  output$individual_project_description <- renderText({
+    text <- status %>% filter(IP == input$selectip) %>%
+      select(`Project Objectives`)
+    text[[1]]
   })
 
 
@@ -298,6 +305,11 @@ shinyServer(function(input, output, session) {
       "There is no information on Schedule.Health"
     )))
 
+    .health <- function(text) {
+
+    }
+
+
     makeContent <- function(df) {
       #' @description: Take the information found in the dataframe, and use it
       #' to make colorful stuff inside the timevis boxes.
@@ -307,12 +319,17 @@ shinyServer(function(input, output, session) {
       #' This is just an example code I copied, it won't work, it's just to
       #' get you started:
       #'
-      sprintf("<table><tbody>
-        <tr><td>%s<br>%s</td></tr>
-        </tbody></table>",
+      sprintf("
+      <table>
+        <tbody>
+          <tr><td>%s</td></tr>
+          <tr><td>%s</td></tr>
+          <tr><td>%s</td></tr>
+        </tbody>
+      </table>",
               df["Directorate"],
               df["Major.Milestone"],
-              df["Schedule.Health.Standard"])
+              df["Schedule.Health"])
 
     }
 
@@ -321,7 +338,7 @@ shinyServer(function(input, output, session) {
     data <- tibble(
       id      = 1:nrow(df),
       content = content,
-      start   = format(df["Approved_finish_date"][[1]], "%Y-%m-%d"),
+      start   = format(df["Actual_date"][[1]], "%Y-%m-%d"),
       end     = rep(NA, nrow(df)),
       group = df["IP"],
       className = df["className"])
@@ -600,24 +617,24 @@ shinyServer(function(input, output, session) {
           br(),
 
           valueBox(width = 12,
-                   value = amount_approved_budget_individual(),
                    subtitle = "Approved Budget",
+                   value = amount_approved_budget_individual(),
                    color = "aqua"),
 
           valueBox(width = 12,
-                   value = amount_expenditure_to_date_individual(),
                    subtitle = "Expenditures to Date",
+                   value = amount_expenditure_to_date_individual(),
                    color = "aqua"),
 
           valueBox(
             width = 12,
-            subtitle = "Forcasted Revenue",
-            value = amount_forcasted_total_expenditures_individual(),
+            subtitle = "Forecasted Total Expenditure",
+            value = amount_forecasted_total_expenditures_individual(),
             color = "aqua"),
 
           valueBox(
             width = 12,
-            subtitle = "Forecasted Expenditures",
+            subtitle = "Project Forecasted Expenditures",
             value = amount_project_forecasted_expenditures_individual(),
             color = "aqua"))
   })
@@ -652,24 +669,24 @@ shinyServer(function(input, output, session) {
           br(),
 
           valueBox(width = 12,
-                   value = amount_approved_budget(),
                    subtitle = "Approved Budget",
+                   value = amount_approved_budget(),
                    color = "aqua"),
 
           valueBox(width = 12,
-                   value = amount_expenditure_to_date(),
                    subtitle = "Expenditures to Date",
+                   value = amount_expenditure_to_date(),
                    color = "aqua"),
 
           valueBox(
             width = 12,
-            subtitle = "Forcasted Revenue",
-            value = amount_forcasted_total_expenditures(),
+            subtitle = "Forecasted Total Expenditures",
+            value = amount_forecasted_total_expenditures(),
             color = "aqua"),
 
           valueBox(
             width = 12,
-            subtitle = "Forecasted Expenditures",
+            subtitle = "Project Forecasted Expenditures",
             value = amount_project_forecasted_expenditures(),
             color = "aqua"),
 
