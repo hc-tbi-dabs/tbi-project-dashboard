@@ -198,27 +198,16 @@ a_stage_4  <- a_team_status %>%
 
 
 #' Stream 1
-stream_1_testing <- status %>%
-  filter(and(
-    grepl("Stream I$", Project, ignore.case = F),
-    grepl("testing",  stage, ignore.case = T)))
-
-stream_1_planning <- status %>%
-  filter(and(
+stream_1 <- status %>%
+  filter(or(
     grepl("Stream I$", Project, ignore.case = F),
     grepl("planning",  stage, ignore.case = T)))
 
 #' Stream 2
-stream_2_testing  <- status %>%
-  filter(and(
+stream_2 <- status %>%
+  filter(or(
     grepl("Stream II$", Project, ignore.case = F),
     grepl("testing",  stage, ignore.case = T)))
-
-stream_2_planning <- status %>%
-  filter(and(
-    grepl("Stream II$", Project, ignore.case = F),
-    grepl("planning",  stage, ignore.case = T)))
-
 
 #' Project Status
 caution  <- status %>% filter(grepl("caution",   status, ignore.case = T))

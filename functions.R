@@ -321,7 +321,10 @@ colorfulDashboardBadge <- function(record, ...) {
 
   code_name <- ifelse(not(grepl("\\d", record["IP"])), "", record["IP"])
 
-  project_name <- paste(code_name, substring(record["Project"][[1]], 1, 32))
+  ifelse(
+    stri_length(record["Project"][[1]]) > 24,
+    project_name <- paste0(code_name, " ", substring(record["Project"][[1]], 1, 24), "..."),
+    project_name <- paste(code_name, record["Project"][[1]]))
 
   color_choices <- function(status) {
     .color_choices = list(
@@ -337,6 +340,10 @@ colorfulDashboardBadge <- function(record, ...) {
   status <- record["status"][[1]]
   health <- record["Overall Project Health"][[1]]
 
+
+  print("info to work with:")
+  print(record)
+
   status_badge <- dashboardBadge(status, color = color_choices(status))
   #' health_badge <- dashboardBadge(health, color = color_choices(health))
 
@@ -349,214 +356,4 @@ colorfulDashboardBadge <- function(record, ...) {
   dashboardBadge(
     project_name,
     color = color_choices(health), ...)
-}
-
-colorfulStatusBoard <- function(data) {
-  #' @description: Box with a subbox for all projects and a subbox for each
-  #' project type. Projects groups include IT Projects, Innovation Projects
-  #' and Projects with an IP code starting with an A.
-  #' @data: status data pertaining to project health and progress.
-
-  .data <- list()
-
-  #' Project Stages
-  #' only Innovation projects have stages 1, 2, 3 and 4.
-  ipp_status <- data %>%
-    filter(!grepl("\\d", IP)) %>%
-    filter(!grepl("^A\\d", IP)) %>%
-    filter(`Overall Project Health` != "Blue")
-
-  a_team_status <- data %>%
-    filter(grepl("^A\\d", IP))
-
-
-  .data$`Stage 1` <- ipp_status %>% filter(grepl('1',  stage, ignore.case =T ))
-  .data$`Stage 2` <- ipp_status %>% filter(grepl('2',  stage, ignore.case =T ))
-  .data$`Stage 3`  <- ipp_status %>% filter(grepl('3',  stage, ignore.case =T ))
-  .data$`Stage 4`  <- ipp_status %>% filter(grepl('4',  stage, ignore.case =T ))
-
-  .data$a_stage_1  <- a_team_status %>% filter(grepl('1', stage, ignore.case =T ))
-  .data$a_stage_2  <- a_team_status %>% filter(grepl('2', stage, ignore.case =T ))
-  .data$a_stage_3  <- a_team_status %>% filter(grepl('3', stage, ignore.case =T ))
-  .data$a_stage_4  <- a_team_status %>% filter(grepl('4', stage, ignore.case =T ))
-
-  .data$innovation_planning <- data %>% filter(grepl("planning",   stage, ignore.case = T))
-  .data$innovation_testing  <- data %>% filter(grepl("testing",    stage, ignore.case = T))
-
-  #' Project Status
-  .data$caution  <- status %>% filter(grepl("caution",   status, ignore.case = T))
-  .data$on_track <- status %>% filter(grepl("On-Track",  status, ignore.case = T))
-  .data$delayed  <- status %>% filter(grepl("Delayed",   status, ignore.case = T))
-
-  #' Project Health
-  .data$green  <- status %>% filter(grepl("Green",   `Overall Project Health`, ignore.case = T))
-  .data$yellow <- status %>% filter(grepl("Yellow",  `Overall Project Health`, ignore.case = T))
-  .data$red    <- status %>% filter(grepl("Red",     `Overall Project Health`, ignore.case = T))
-
-  boxPlus(
-    width = 12,
-    status = "primary",
-    background    = NULL,
-    closable      = F,
-    collapsible   = T,
-    title = "Progress",
-    footer = tagList(
-      dashboardLabel("Green Health",  status = "success"),
-      dashboardLabel("Yellow Health", status = "warning"),
-      dashboardLabel("Red Health",    status = "danger")),
-
-    fluidRow(
-      box(
-        width = 3,
-        status = "primary",
-        title = "All Projects",
-        solidHeader = T,
-
-        boxPad(
-          tags$h3("On Track"),
-          br(),
-              width = 12,
-              tagList(
-                apply(
-                  X = on_track,
-                  MARGIN = 1,
-                  FUN = function(x) (colorfulDashboardBadge(x))))
-            ),
-            boxPad(
-              tags$h3("Caution"),
-              br(),
-              tagList(
-                apply(
-                  X = caution,
-                  MARGIN = 1,
-                  FUN = function(x) (colorfulDashboardBadge(x))))
-            ),
-            boxPad(
-              tags$h3("Delayed"),
-              br(),
-              tagList(
-                apply(
-                  X = delayed,
-                  MARGIN = 1,
-                  FUN = function(x) (colorfulDashboardBadge(x))))
-            )),
-
-            box(
-              width = 3,
-              title = "Innovation Projects",
-              status = "primary",
-              solidHeader = T,
-
-              boxPad(
-              tags$h3("Planning"),
-              br(),
-              tagList(
-                apply(
-                  X = planning,
-                  MARGIN = 1,
-                  FUN = function(x) (colorfulDashboardBadge(x))))
-            ),
-              boxPad(
-              tags$h3("Testing"),
-              width = 12,
-              tagList(
-                apply(
-                  X = testing,
-                  MARGIN = 1,
-                  FUN = function(x) (colorfulDashboardBadge(x))))
-            )),
-
-
-            box(
-              width = 3,
-              title = "Other IT Projects",
-              status = "primary",
-              solidHeader = T,
-            boxPad(
-              tags$h3("Stage 1"),
-              br(),
-              #' @todo: please make the color reflect project health?!
-              #' I have started the function colorfulDashboardBadge, needs
-              #' implementation.
-              tagList(
-                apply(
-                  X = a_stage_1,
-                  MARGIN = 1,
-                  FUN = function(x) (colorfulDashboardBadge(x))))
-            ),
-            boxPad(
-              tags$h3("Stage 2"),
-              br(),
-              tagList(
-                apply(
-                  X = a_stage_2,
-                  MARGIN = 1,
-                  FUN = function(x) (colorfulDashboardBadge(x))))
-            ),
-            boxPad(
-              tags$h3("Stage 3"),
-              br(),
-              tagList(
-                apply(
-                  X = a_stage_3,
-                  MARGIN = 1,
-                  FUN = function(x) (colorfulDashboardBadge(x))))
-            ),
-            boxPad(
-              tags$h3("Stage 4"),
-              br(),
-              tagList(
-                apply(
-                  X = a_stage_4,
-                  MARGIN = 1,
-                  FUN = function(x) (colorfulDashboardBadge(x))))
-            )),
-
-
-            box(
-              width = 3,
-              title = "IT Projects",
-              status = "primary",
-              solidHeader = T,
-            boxPad(
-              tags$h3("Stage 1"),
-              br(),
-              #' @todo: please make the color reflect project health?!
-              #' I have started the function colorfulDashboardBadge, needs
-              #' implementation.
-              tagList(
-                apply(
-                  X = ipp_stage_1,
-                  MARGIN = 1,
-                  FUN = function(x) (colorfulDashboardBadge(x))))
-            ),
-            boxPad(
-              tags$h3("Stage 2"),
-              br(),
-              tagList(
-                apply(
-                  X = ipp_stage_2,
-                  MARGIN = 1,
-                  FUN = function(x) (colorfulDashboardBadge(x))))
-            ),
-            boxPad(
-              tags$h3("Stage 3"),
-              br(),
-              tagList(
-                apply(
-                  X = ipp_stage_3,
-                  MARGIN = 1,
-                  FUN = function(x) (colorfulDashboardBadge(x))))
-            ),
-            boxPad(
-              tags$h3("Stage 4"),
-              br(),
-              tagList(
-                apply(
-                  X = ipp_stage_4,
-                  MARGIN = 1,
-                  FUN = function(x) (colorfulDashboardBadge(x))))))))
-
-
-
 }

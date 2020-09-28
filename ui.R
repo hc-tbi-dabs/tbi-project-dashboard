@@ -6,6 +6,8 @@ library(shinydashboardPlus)
 library(timevis)
 library(webshot)
 library(scales)
+library(shinythemes)
+library(dashboardthemes)
 
 #' @todo: capitalists want to cut up your life and fight over who gets to own
 #' the pieces.
@@ -131,7 +133,8 @@ rightsidebar <- rightSidebar(
 )
 
 
-body <- dashboardBody(tabItems(
+body <- dashboardBody(
+  tabItems(
   tabItem(
     tabName = "overview",
 
@@ -156,145 +159,96 @@ body <- dashboardBody(tabItems(
         ),
 
 
-          fluidRow(
               #' @todo: code should be repeated call to a function, not so much
               #' copy and pasting...
-              #' @todo: group by project type, IP, IT, Innovation
-              #' #todo: want to have different tabs?
-              #'
 
             box(
               width = 3,
               status = "primary",
               title = "All Projects",
               solidHeader = T,
-            boxPad(
-              tags$h3("On Track"),
-              br(),
-              width = 12,
+              tags$h4("On Track"),
               tagList(
                 apply(
                   X = on_track,
                   MARGIN = 1,
-                  FUN = function(x) (colorfulDashboardBadge(x))))
-            ),
-            boxPad(
-              tags$h3("Caution"),
+                  FUN = function(x) (colorfulDashboardBadge(x)))),
               br(),
+              br(),
+              tags$h4("Caution"),
               tagList(
                 apply(
                   X = caution,
                   MARGIN = 1,
-                  FUN = function(x) (colorfulDashboardBadge(x))))
-            ),
-            boxPad(
-              tags$h3("Delayed"),
+                  FUN = function(x) (colorfulDashboardBadge(x)))),
               br(),
+              br(),
+              tags$h4("Delayed"),
               tagList(
                 apply(
                   X = delayed,
                   MARGIN = 1,
-                  FUN = function(x) (colorfulDashboardBadge(x))))
-            )),
+                  FUN = function(x) (colorfulDashboardBadge(x)))
+              )),
 
             box(
-              title = "Innovation Projects",
-              status = "primary",
-              solidHeader = T,
               width = 3,
-            box(
-              width = 12,
-              status = "primary",
               solidHeader = T,
-              title = "Stream I",
-              boxPad(
-              tags$h3("Planning"),
-              br(),
+              status = "primary",
+              title = "Innovation Projects",
+              tags$h4("Stream I (Planning)"),
               tagList(
                 apply(
-                  X = stream_1_planning,
+                  X = stream_1,
                   MARGIN = 1,
-                  FUN = function(x) (colorfulDashboardBadge(x))))
+                  FUN = function(x) (colorfulDashboardBadge(x)))
             ),
-              boxPad(
-              tags$h3("Testing"),
-              width = 12,
+              br(),
+              br(),
+              tags$h4("Stream II (Testing)"),
               tagList(
                 apply(
-                  X = stream_1_testing,
+                  X = stream_2,
                   MARGIN = 1,
-                  FUN = function(x) (colorfulDashboardBadge(x))))
+                  FUN = function(x) (colorfulDashboardBadge(x)))
             )),
-
-            box(
-              width = 12,
-              title = "Stream II",
-              status = "primary",
-              solidHeader = T,
-
-              boxPad(
-              tags$h3("Planning"),
-              br(),
-              tagList(
-                apply(
-                  X = stream_2_planning,
-                  MARGIN = 1,
-                  FUN = function(x) (colorfulDashboardBadge(x))))
-            ),
-              boxPad(
-              tags$h3("Testing"),
-              width = 12,
-              tagList(
-                apply(
-                  X = stream_2_testing,
-                  MARGIN = 1,
-                  FUN = function(x) (colorfulDashboardBadge(x))))
-            ))),
 
             box(
               width = 3,
               title = "Other IT Projects",
               status = "primary",
               solidHeader = T,
-            boxPad(
-              tags$h3("Stage 1: Initiation"),
-              br(),
-              #' @todo: please make the color reflect project health?!
-              #' I have started the function colorfulDashboardBadge, needs
-              #' implementation.
+              tags$h4("Stage 1: Initiation"),
               tagList(
                 apply(
                   X = a_stage_1,
                   MARGIN = 1,
-                  FUN = function(x) (colorfulDashboardBadge(x))))
-            ),
-            boxPad(
-              tags$h3("Stage 2: Planning"),
+                  FUN = function(x) (colorfulDashboardBadge(x)))),
               br(),
+              br(),
+              tags$h4("Stage 2: Planning"),
               tagList(
                 apply(
                   X = a_stage_2,
                   MARGIN = 1,
-                  FUN = function(x) (colorfulDashboardBadge(x))))
-            ),
-            boxPad(
-              tags$h3("Stage 3: Execution"),
+                  FUN = function(x) (colorfulDashboardBadge(x)))),
               br(),
+              br(),
+              tags$h4("Stage 3: Execution"),
               tagList(
                 apply(
                   X = a_stage_3,
                   MARGIN = 1,
-                  FUN = function(x) (colorfulDashboardBadge(x))))
-            ),
-            boxPad(
-              tags$h3("Stage 4: Closure"),
+                  FUN = function(x) (colorfulDashboardBadge(x)))),
               br(),
+              br(),
+              tags$h4("Stage 4: Closure"),
               tagList(
                 apply(
                   X = a_stage_4,
                   MARGIN = 1,
                   FUN = function(x) (colorfulDashboardBadge(x))))
-            )),
+            ),
 
 
             box(
@@ -302,9 +256,7 @@ body <- dashboardBody(tabItems(
               title = "Investment Planning Projects",
               status = "primary",
               solidHeader = T,
-            boxPad(
-              tags$h3("Stage 1: Initiation"),
-              br(),
+              tags$h4("Stage 1: Initiation"),
               #' @todo: please make the color reflect project health?!
               #' I have started the function colorfulDashboardBadge, needs
               #' implementation.
@@ -312,34 +264,31 @@ body <- dashboardBody(tabItems(
                 apply(
                   X = ipp_stage_1,
                   MARGIN = 1,
-                  FUN = function(x) (colorfulDashboardBadge(x))))
-            ),
-            boxPad(
-              tags$h3("Stage 2: Planning"),
+                  FUN = function(x) (colorfulDashboardBadge(x)))),
               br(),
+              br(),
+              tags$h4("Stage 2: Planning"),
               tagList(
                 apply(
                   X = ipp_stage_2,
                   MARGIN = 1,
-                  FUN = function(x) (colorfulDashboardBadge(x))))
-            ),
-            boxPad(
-              tags$h3("Stage 3: Execution"),
+                  FUN = function(x) (colorfulDashboardBadge(x)))),
               br(),
+              br(),
+              tags$h4("Stage 3: Execution"),
               tagList(
                 apply(
                   X = ipp_stage_3,
                   MARGIN = 1,
-                  FUN = function(x) (colorfulDashboardBadge(x))))
-            ),
-            boxPad(
-              tags$h3("Stage 4: Closure"),
+                  FUN = function(x) (colorfulDashboardBadge(x)))),
               br(),
+              br(),
+              tags$h4("Stage 4: Closure"),
               tagList(
                 apply(
                   X = ipp_stage_4,
                   MARGIN = 1,
-                  FUN = function(x) (colorfulDashboardBadge(x))))))))),
+                  FUN = function(x) (colorfulDashboardBadge(x))))))),
     column(
       width = 12,
 
@@ -441,52 +390,74 @@ body <- dashboardBody(tabItems(
     column(
       width = 12,
 
-      selectInput(
-        inputId = "selectip",
-        label   = "Select an IP project",
-        choices = ip
-      ),
 
       box(
         title = textOutput("project_name"),
         status = "info",
         width = 12,
-        tagList(
+        solidHeader = T,
+
+        box(
+            solidHeader = T,
+            status = "info",
+            width = 4,
+          selectInput(
+            inputId = "selectip",
+            label   = "Select a Project:",
+            choices = ip)),
+          box(
+           width = 8,
+           status = "info",
+           textOutput("individual_project_description")),
+
+        box(
+            solidHeader = F,
+            title = "Status",
+            status = "info",
+          width = 12,
           valueBoxOutput("overall"),
           valueBoxOutput("overall_stage"),
-          valueBoxOutput("directorate")
-        )
-      )
-    ),
+          valueBoxOutput("directorate"))
+
+    )),
 
     column(
       width = 12,
       fluidRow(
         width = 12,
         box(
+          width = 12,
+          title = "Budget",
+          status = "info",
+          solidHeader = F,
+        boxPlus(
           title = "Project Budget",
           status = "info",
           solidHeader = T,
-          width = 9,
-        withSpinner(plotlyOutput("budget_plt"))),
-        uiOutput("project_portfolio_budget_individual"))),
+          width = 8,
+        withSpinner(plotlyOutput("budget_plt")),
+        footer =
+          tagList(
+            dashboardBadge("Project Expenditure",            color = "purple"),
+            dashboardBadge("Project Authority: Non Capital", color = "teal"),
+            dashboardBadge("Project Authority: Capital",     color = "orange")
+          )),
+        uiOutput("project_portfolio_budget_individual")))),
 
-    fluidRow(column(
+    column(
       width = 12,
       box(
         title = "Project Risks",
         width = NULL,
         dataTableOutput("proj_risk_tb")
-      )
     )),
 
-    fluidRow(column(
+    column(
       width = 12,
       box(
         title = "Project Issues",
         width = NULL,
         dataTableOutput("proj_issue_tb")
-      )
     )),
 
     fluidRow(column(
