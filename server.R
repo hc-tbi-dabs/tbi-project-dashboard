@@ -276,19 +276,39 @@ shinyServer(function(input, output, session) {
 
   output$timevis_plot_all <- timevis::renderTimevis({
 
-    df <- schedule
-
-    .className <- function(row) {
-
-      delayed <- ifelse(
-        is.na(row["timeliness"]),
-        "notcompleted",
-        ifelse(row["timeliness"] < 0, "late", "ontime"))
-
-      completed <- ifelse(is.na(row["Actual_date"]), "notcompleted", "completed")
-
-      paste(paste0("ip_", row["IP"]), completed, delayed, sep = "_")
+    if (input$`show-completed`) {
+     df <- schedule
+    } else {
+     df <- schedule %>%
+       filter(not(grepl("completed", Schedule.Health, ignore.case = T)))
     }
+
+    .lateness <- function(row) {
+      #' @description: how late, 1, 2, 3, 4 etc... months
+      ifelse(is.na(row["days-delayed"]),
+             "not-completed",
+             ifelse(row["days-delayed"] > 0, "late", "on-time"))
+
+
+      #' look at Schedule.Health.Standard, get the number of months forecasted.
+      #' color code based on number of months.
+    }
+
+    .completeness <- function(row) {
+      #' @description: is the project complete or not?
+      #'
+      #' if has an actual date, then complete.
+      #'
+      ifelse(grepl("completed", row["Schedule.Health"], ignore.case = T),
+             "completed",
+             "notcompleted")
+    }
+
+    df["days-delayed"] <- df["Actual_date"] - df["Approved_finish_date"]
+    df["lateness"] <- apply(df, 1, .lateness)
+    df["completeness"] <- apply(df, 1, .completeness)
+
+    .className <- function(row) { paste0("ip_", row["IP"]) }
 
     .timevis_date <- function(row) {
       ifelse(is.na(row["Actual_date"]),
@@ -299,37 +319,30 @@ shinyServer(function(input, output, session) {
     .makeContent <- function(row) {
 
       sprintf("
-      <table>
-        <tbody>
-          <tr>
-              <td><span class='ip'>         %s</span></td>
-              <td><span class='project'>    %s</span></td>
-              <td><span class='directorate'>%s</span></td>
-          </tr>
-          <tr>
-              <td><span class='approved_date'>%s</span></td>
-              <td><span class='actual_date'>  %s</span></td>
-          </tr>
-          <tr>
-              <td><span class='milestone'>%s</span></td>
-              <td><span class='health'>%s</span></td>
-              <td><span class='classname'>%s</span></td>
-          </tr>
-        </tbody>
-      </table>",
-              row["IP"],
+              <div class='%s'>
+                  <div class='%s'>
+                      <div style='padding: 4px'>
+                          <span> %s </span> &nbsp;
+                          <span> (%s) </span>
+                          <br>
+                          <span style='font-weight: bold'> %s </span>
+                          <br>
+                          <span> Approved Finish Date: %s </span> &nbsp;
+                          <span> Actual Date: %s </span>
+                      </div>
+                  </div>
+              </div>",
+              row["completeness"],
+              row["lateness"],
               row["Project"],
               row["Directorate"],
 
-              row["Actual_date"],
-              row["Approved_finish_date"],
-
               gsub(x = row["Major.Milestone"], pattern = ".*:\\s*", replacement = ""),
-              row["Schedule.Health"],
-              row["className"])
+
+              row["Approved_finish_date"],
+              row["Actual_date"])
     }
 
-    df["timeliness"] <- df["Approved_finish_date"] - df["Actual_date"]
     df["className"] <- apply(X = df, MARGIN = 1, FUN = .className)
     df["timevis_date"] <- apply(X = df, MARGIN = 1, FUN = .timevis_date)
 
@@ -637,11 +650,13 @@ shinyServer(function(input, output, session) {
             value = amount_forecasted_total_expenditures_individual(),
             color = "aqua"),
 
-          valueBox(
-            width = 12,
-            subtitle = "Project Forecasted Expenditures",
-            value = amount_project_forecasted_expenditures_individual(),
-            color = "aqua"))
+         #  valueBox(
+         #    width = 12,
+         #    subtitle = "Project Forecasted Expenditures",
+         #    value = amount_project_forecasted_expenditures_individual(),
+         #    color = "aqua")
+
+          )
   })
 
 
@@ -689,11 +704,11 @@ shinyServer(function(input, output, session) {
             value = amount_forecasted_total_expenditures(),
             color = "aqua"),
 
-          valueBox(
-            width = 12,
-            subtitle = "Project Forecasted Expenditures",
-            value = amount_project_forecasted_expenditures(),
-            color = "aqua"),
+          # valueBox(
+          #   width = 12,
+          #   subtitle = "Project Forecasted Expenditures",
+          #   value = amount_project_forecasted_expenditures(),
+          #   color = "aqua"),
 
         )
       )

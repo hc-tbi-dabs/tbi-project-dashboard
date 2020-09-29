@@ -218,3 +218,8 @@ delayed  <- status %>% filter(grepl("Delayed",   status, ignore.case = T))
 green  <- status %>% filter(grepl("Green",   `Overall Project Health`, ignore.case = T))
 yellow <- status %>% filter(grepl("Yellow",  `Overall Project Health`, ignore.case = T))
 red    <- status %>% filter(grepl("Red",     `Overall Project Health`, ignore.case = T))
+
+schedule %<>%
+  mutate(
+    Forecasted_Months_delayed = gsub(pattern = "[A-Z a-z \\s]+", x = Schedule.Health.Standard, replacement = ""),
+    Actual_Months_delayed     = gsub(pattern = "[A-Z a-z \\s]+", x = Schedule.Health, replacement = ""))

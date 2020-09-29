@@ -351,17 +351,25 @@ body <- dashboardBody(
         footer = "Tasks completed before 2020 are hidden.",
         boxPlus(
           status = "navy",
-          width = 4,
           closable = F,
           collapsed = F,
           collapsible = F,
           dateRangeInput(
-            start = max_date - months(3),
+            start = min_date,
             end = max_date,
             inputId = "main-page-date-slider",
             label = "Date Range",
             min = min_date,
             max = max_date)),
+          boxPlus(
+            title = "Filters:",
+          status = "navy",
+          closable = F,
+          collapsed = F,
+          collapsible = F,
+          checkboxInput("show-completed", label = "Show Completed", value = F),
+          checkboxInput("show-late",      label = "Show Late", value = F),
+          checkboxInput("show-ontime",    label = "Show On Time", value = F)),
         box(
           solidHeader = T,
           width = 12,
@@ -494,49 +502,27 @@ ui <- secure_app(
     body         = body,
     tags$head(
       tags$style(HTML("
-                        .ip_A03         { background-color: white           }
-                        .ip_A04         { background-color: snow 	          }
-                        .ip_A05         { background-color: honeydew        }
-                        .ip_A06         { background-color: mintcream       }
-                        .ip_628         { background-color: azure 	         }
-                        .ip_701         { background-color: aliceblue 	     }
-                        .ip_704         { background-color: ghostwhite 	    }
-                        .ip_705         { background-color: whitesmoke 	    }
-                        .ip_710         { background-color: seashell 	      }
-                        .ip_809         { background-color: beige 	         }
-                        .ip_810         { background-color: oldlace 	       }
-                        .ip_811         { background-color: floralwhite 	   }
-                        .ip_Kelpie      { background-color: ivory 	         }
-                        .ip_IP000       { background-color: antiquewhite    }
-                        .ip_Cyclops     { background-color: linen 	         }
-                        .ip_Hummingbird { background-color: lavenderblush   }
-                        .ip_Cipher      { background-color: mistyrose 	     }
-                        .directorate    { background-color: purple           }
+                        .late {
+                         background-color: rgba(255, 0, 0, 0.1);
+                         border: 2px solid rgba(255, 0, 0, 1);
+                         border-radius: 3px;
+                         margin: -7px -7px -7px -7px;
+                         }
 
+                        .completed * {
+                          color: rgba(0, 0, 0, 0.3);
+                        }
 
-                        .ip_Cyclops_completed_late { background-color: linen 	         }
+                        .completed .late {
+                         background-color: rgba(0, 0, 0, 0.1);
+                         border: 2px solid rgba(128, 128, 128, 0.5);
+                        }
+
+                        .on-track {
+
+                        }
 
 
                       ")))
   )
 )
-
-#' white         	#FFFFFF 	rgb(255,255,255)
-#' snow 	        #FFFAFA 	rgb(255,250,250)
-#' honeydew     	#F0FFF0 	rgb(240,255,240)
-#' mintcream     	#F5FFFA 	rgb(245,255,250)
-#' azure 	        #F0FFFF 	rgb(240,255,255)
-#' aliceblue 	    #F0F8FF 	rgb(240,248,255)
-#' ghostwhite 	  #F8F8FF 	rgb(248,248,255)
-#' whitesmoke 	  #F5F5F5 	rgb(245,245,245)
-#' seashell 	    #FFF5EE 	rgb(255,245,238)
-#' beige 	        #F5F5DC 	rgb(245,245,220)
-#' oldlace 	      #FDF5E6 	rgb(253,245,230)
-#' floralwhite 	  #FFFAF0 	rgb(255,250,240)
-#' ivory 	        #FFFFF0 	rgb(255,255,240)
-#' antiquewhite 	#FAEBD7 	rgb(250,235,215)
-#' linen 	        #FAF0E6 	rgb(250,240,230)
-#' lavenderblush 	#FFF0F5 	rgb(255,240,245)
-#' mistyrose 	    #FFE4E1 	rgb(255,228,225)
-
-
