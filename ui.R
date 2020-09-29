@@ -494,23 +494,29 @@ ui <- secure_app(
     body         = body,
     tags$head(
       tags$style(HTML("
-                        .IP_A03         { background-color: white           }
-                        .IP_A04         { background-color: snow 	          }
-                        .IP_A05         { background-color: honeydew        }
-                        .IP_A06         { background-color: mintcream       }
-                        .IP_628         { background-color: azure 	         }
-                        .IP_701         { background-color: aliceblue 	     }
-                        .IP_704         { background-color: ghostwhite 	    }
-                        .IP_705         { background-color: whitesmoke 	    }
-                        .IP_710         { background-color: seashell 	      }
-                        .IP_809         { background-color: beige 	         }
-                        .IP_810         { background-color: oldlace 	       }
-                        .IP_811         { background-color: floralwhite 	   }
-                        .IP_Kelpie      { background-color: ivory 	         }
-                        .IP_IP000       { background-color: antiquewhite    }
-                        .IP_Cyclops     { background-color: linen 	         }
-                        .IP_Hummingbird { background-color: lavenderblush   }
-                        .IP_Cipher      { background-color: mistyrose 	     }
+                        .ip_A03         { background-color: white           }
+                        .ip_A04         { background-color: snow 	          }
+                        .ip_A05         { background-color: honeydew        }
+                        .ip_A06         { background-color: mintcream       }
+                        .ip_628         { background-color: azure 	         }
+                        .ip_701         { background-color: aliceblue 	     }
+                        .ip_704         { background-color: ghostwhite 	    }
+                        .ip_705         { background-color: whitesmoke 	    }
+                        .ip_710         { background-color: seashell 	      }
+                        .ip_809         { background-color: beige 	         }
+                        .ip_810         { background-color: oldlace 	       }
+                        .ip_811         { background-color: floralwhite 	   }
+                        .ip_Kelpie      { background-color: ivory 	         }
+                        .ip_IP000       { background-color: antiquewhite    }
+                        .ip_Cyclops     { background-color: linen 	         }
+                        .ip_Hummingbird { background-color: lavenderblush   }
+                        .ip_Cipher      { background-color: mistyrose 	     }
+                        .directorate    { background-color: purple           }
+
+
+                        .ip_Cyclops_completed_late { background-color: linen 	         }
+
+
                       ")))
   )
 )
