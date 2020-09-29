@@ -84,9 +84,6 @@ shinyServer(function(input, output, session) {
 
   df_budget_summary <- reactive({
 
-    print("Budget!")
-    print(budget)
-
     budget %>%
       filter(IP %in% ip_selected()$ips) %>%
       left_join(all_proj %>% select(IP = IP)) %>%
@@ -278,71 +275,79 @@ shinyServer(function(input, output, session) {
 
 
   output$timevis_plot_all <- timevis::renderTimevis({
-    #' @description: plot all projects.
-    #'
-    #' @todo: Should have just one function for all and specific...
-    #' @todo: add colors
 
     df <- schedule
-    df["className"] <- lapply(X = df["IP"], function(x) (paste0("IP_", x)))
 
-    print(df["className"])
+    .className <- function(row) {
 
-    shiny::validate((
-      need(
-        any(!is.na(df$Approved_finish_date)),
-        "There is no information on Approved_finish_date"
-      )
-    ))
+      delayed <- ifelse(
+        is.na(row["timeliness"]),
+        "notcompleted",
+        ifelse(row["timeliness"] < 0, "late", "ontime"))
 
-    shiny::validate((need(
-      any(!is.na(df$Actual_date)),
-      "There is no information on Actual_date"
-    )))
+      completed <- ifelse(is.na(row["Actual_date"]), "notcompleted", "completed")
 
-    shiny::validate((need(
-      any(!is.na(df$Schedule.Health.Standard)),
-      "There is no information on Schedule.Health"
-    )))
-
-    .health <- function(text) {
-
+      paste(paste0("ip_", row["IP"]), completed, delayed, sep = "_")
     }
 
+    .timevis_date <- function(row) {
+      ifelse(is.na(row["Actual_date"]),
+             row["Approved_finish_date"][[1]],
+             row["Actual_date"][[1]])
+    }
 
-    makeContent <- function(df) {
-      #' @description: Take the information found in the dataframe, and use it
-      #' to make colorful stuff inside the timevis boxes.
+    .makeContent <- function(row) {
 
-      status <- NA
-
-      #' This is just an example code I copied, it won't work, it's just to
-      #' get you started:
-      #'
       sprintf("
       <table>
         <tbody>
-          <tr><td>%s</td></tr>
-          <tr><td>%s</td></tr>
-          <tr><td>%s</td></tr>
+          <tr>
+              <td><span class='ip'>         %s</span></td>
+              <td><span class='project'>    %s</span></td>
+              <td><span class='directorate'>%s</span></td>
+          </tr>
+          <tr>
+              <td><span class='approved_date'>%s</span></td>
+              <td><span class='actual_date'>  %s</span></td>
+          </tr>
+          <tr>
+              <td><span class='milestone'>%s</span></td>
+              <td><span class='health'>%s</span></td>
+              <td><span class='classname'>%s</span></td>
+          </tr>
         </tbody>
       </table>",
-              df["Directorate"],
-              df["Major.Milestone"],
-              df["Schedule.Health"])
+              row["IP"],
+              row["Project"],
+              row["Directorate"],
 
+              row["Actual_date"],
+              row["Approved_finish_date"],
+
+              gsub(x = row["Major.Milestone"], pattern = ".*:\\s*", replacement = ""),
+              row["Schedule.Health"],
+              row["className"])
     }
 
-    content <- apply(df, 1, makeContent)
+    df["timeliness"] <- df["Approved_finish_date"] - df["Actual_date"]
+    df["className"] <- apply(X = df, MARGIN = 1, FUN = .className)
+    df["timevis_date"] <- apply(X = df, MARGIN = 1, FUN = .timevis_date)
+
+    print("Class Name")
+    print(df["className"])
+
+    content <- apply(df, 1, .makeContent)
+
+    print(df["timevis_date"])
+    print(df["Approved_finish_date"])
 
     data <- tibble(
       id      = 1:nrow(df),
       content = content,
-      start   = format(df["Actual_date"][[1]], "%Y-%m-%d"),
+      start   = df["timevis_date"][[1]],
       end     = rep(NA, nrow(df)),
       group = df["IP"],
       className = df["className"])
-
 
     data %<>%
       filter(start >= input$`main-page-date-slider`[1]) %>%

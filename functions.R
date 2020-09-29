@@ -340,10 +340,6 @@ colorfulDashboardBadge <- function(record, ...) {
   status <- record["status"][[1]]
   health <- record["Overall Project Health"][[1]]
 
-
-  print("info to work with:")
-  print(record)
-
   status_badge <- dashboardBadge(status, color = color_choices(status))
   #' health_badge <- dashboardBadge(health, color = color_choices(health))
 
