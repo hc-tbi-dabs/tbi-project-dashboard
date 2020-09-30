@@ -191,27 +191,47 @@ body <- dashboardBody(
                   FUN = function(x) (colorfulDashboardBadge(x)))
               )),
 
+
             box(
               width = 3,
-              solidHeader = T,
+              title = "Investment Planning Projects",
               status = "primary",
-              title = "Innovation Projects",
-              tags$h4("Stream I (Planning)"),
+              solidHeader = T,
+              tags$h4("Stage 1: Initiation"),
+              #' @todo: please make the color reflect project health?!
+              #' I have started the function colorfulDashboardBadge, needs
+              #' implementation.
               tagList(
                 apply(
-                  X = stream_1,
+                  X = ipp_stage_1,
                   MARGIN = 1,
-                  FUN = function(x) (colorfulDashboardBadge(x)))
-            ),
+                  FUN = function(x) (colorfulDashboardBadge(x)))),
               br(),
               br(),
-              tags$h4("Stream II (Testing)"),
+              tags$h4("Stage 2: Planning"),
               tagList(
                 apply(
-                  X = stream_2,
+                  X = ipp_stage_2,
                   MARGIN = 1,
-                  FUN = function(x) (colorfulDashboardBadge(x)))
-            )),
+                  FUN = function(x) (colorfulDashboardBadge(x)))),
+              br(),
+              br(),
+              tags$h4("Stage 3: Execution"),
+              tagList(
+                apply(
+                  X = ipp_stage_3,
+                  MARGIN = 1,
+                  FUN = function(x) (colorfulDashboardBadge(x)))),
+              br(),
+              br(),
+              tags$h4("Stage 4: Closure"),
+              tagList(
+                apply(
+                  X = ipp_stage_4,
+                  MARGIN = 1,
+                  FUN = function(x) (colorfulDashboardBadge(x))))),
+
+
 
             box(
               width = 3,
@@ -251,44 +271,31 @@ body <- dashboardBody(
             ),
 
 
-            box(
+        box(
               width = 3,
-              title = "Investment Planning Projects",
-              status = "primary",
               solidHeader = T,
-              tags$h4("Stage 1: Initiation"),
-              #' @todo: please make the color reflect project health?!
-              #' I have started the function colorfulDashboardBadge, needs
-              #' implementation.
+              status = "primary",
+              title = "Innovation Projects",
+              tags$h4("Stream I (Planning)"),
               tagList(
                 apply(
-                  X = ipp_stage_1,
+                  X = stream_1,
                   MARGIN = 1,
-                  FUN = function(x) (colorfulDashboardBadge(x)))),
+                  FUN = function(x) (colorfulDashboardBadge(x)))
+            ),
               br(),
               br(),
-              tags$h4("Stage 2: Planning"),
+              tags$h4("Stream II (Testing)"),
               tagList(
                 apply(
-                  X = ipp_stage_2,
+                  X = stream_2,
                   MARGIN = 1,
-                  FUN = function(x) (colorfulDashboardBadge(x)))),
-              br(),
-              br(),
-              tags$h4("Stage 3: Execution"),
-              tagList(
-                apply(
-                  X = ipp_stage_3,
-                  MARGIN = 1,
-                  FUN = function(x) (colorfulDashboardBadge(x)))),
-              br(),
-              br(),
-              tags$h4("Stage 4: Closure"),
-              tagList(
-                apply(
-                  X = ipp_stage_4,
-                  MARGIN = 1,
-                  FUN = function(x) (colorfulDashboardBadge(x))))))),
+                  FUN = function(x) (colorfulDashboardBadge(x)))
+            ))
+
+
+
+        )),
     column(
       width = 12,
 
@@ -298,23 +305,7 @@ body <- dashboardBody(
           closable = F,
         title = "Balance",
           status = "success",
-          box(
-            width = 4,
-          collapsible = F,
-          closable = F,
-          title = "Innovation Projects",
-          solidHeader = T,
-          status = "success",
-         withSpinner(plotlyOutput("innovation_projects_health"))),
 
-        box(
-            width = 4,
-          collapsible = F,
-          closable = F,
-          title = "Other IT Projects",
-          solidHeader = T,
-          status = "success",
-          withSpinner(plotlyOutput("a_team_projects_health"))),
 
            box(
             width = 4,
@@ -323,8 +314,27 @@ body <- dashboardBody(
           title = "Investment Planning Projects",
           status = "success",
           solidHeader = T,
-
           withSpinner(plotlyOutput("ip_projects_health"))),
+
+       box(
+            width = 4,
+          collapsible = F,
+          closable = F,
+          title = "Other IT Projects",
+          solidHeader = T,
+          status = "success",
+          withSpinner(plotlyOutput("a_team_projects_health"))),
+
+        box(
+            width = 4,
+          collapsible = F,
+          closable = F,
+          title = "Innovation Projects",
+          solidHeader = T,
+          status = "success",
+         withSpinner(plotlyOutput("innovation_projects_health"))),
+
+
         footer = tagList(
           dashboardLabel("On Track", status = "success"),
           dashboardLabel("Caution", status = "warning"),
@@ -354,13 +364,21 @@ body <- dashboardBody(
           closable = F,
           collapsed = F,
           collapsible = F,
+
           dateRangeInput(
             start = min_date,
             end = max_date,
             inputId = "main-page-date-slider",
             label = "Date Range",
             min = min_date,
-            max = max_date)),
+            max = max_date),
+
+          actionButton("go","Go"),
+          actionButton("undo","Undo"),
+          actionButton("reset","Reset")
+
+          ),
+
           boxPlus(
             title = "Filters:",
           status = "navy",
@@ -495,6 +513,7 @@ ui <- secure_app(
   head_auth = tags$script(inactivity),
 
   dashboardPagePlus(
+    useShinyjs(),
     collapse_sidebar = T,
     header       = header,
     sidebar      = sidebar,
@@ -502,26 +521,37 @@ ui <- secure_app(
     body         = body,
     tags$head(
       tags$style(HTML("
-                        .late {
+                        .within-3-months {
+                           background-color: rgba(0, 255, 0, 0.1);
+                           border: 2px solid rgba(0, 255, 0, 1);
+                           border-radius: 3px;
+                           margin: -7px -7px -7px -7px;
+                         }
+
+                         .completed {
+                           background-color: rgba(0, 0, 0, 0.5);
+                           border: 2px solid rgba(0, 0, 0, 0.5);
+                           border-radius: 3px;
+                           margin: -7px -7px -7px -7px;
+                         }
+
+                        .completed * {
+                         color: rgba(0, 0, 0, 0.3);
+                        }
+
+                        .within-3-to-6-months {
+                         background-color: rgba(255, 255, 0, 0.1);
+                         border: 2px solid rgba(255, 255, 0, 1);
+                         border-radius: 3px;
+                         margin: -7px -7px -7px -7px;
+                        }
+
+                        .more-than-6-months {
                          background-color: rgba(255, 0, 0, 0.1);
                          border: 2px solid rgba(255, 0, 0, 1);
                          border-radius: 3px;
                          margin: -7px -7px -7px -7px;
-                         }
-
-                        .completed * {
-                          color: rgba(0, 0, 0, 0.3);
                         }
-
-                        .completed .late {
-                         background-color: rgba(0, 0, 0, 0.1);
-                         border: 2px solid rgba(128, 128, 128, 0.5);
-                        }
-
-                        .on-track {
-
-                        }
-
 
                       ")))
   )
