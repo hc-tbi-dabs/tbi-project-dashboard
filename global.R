@@ -177,17 +177,17 @@ a_team_status <- status %>%
   filter(grepl("^A\\d", IP))
 
 a_stage_1  <- a_team_status %>%
-   filter(or(
+  filter(or(
     grepl('1',          stage),
     grepl("Initiation", stage, ignore.case = T)))
 
 a_stage_2  <- a_team_status %>%
-   filter(or(
+  filter(or(
     grepl('2',        stage),
     grepl("Planning", stage, ignore.case = T)))
 
 a_stage_3  <- a_team_status %>%
-   filter(or(
+  filter(or(
     grepl('3',         stage),
     grepl("Execution", stage, ignore.case = T)))
 
@@ -219,7 +219,61 @@ green  <- status %>% filter(grepl("Green",   `Overall Project Health`, ignore.ca
 yellow <- status %>% filter(grepl("Yellow",  `Overall Project Health`, ignore.case = T))
 red    <- status %>% filter(grepl("Red",     `Overall Project Health`, ignore.case = T))
 
+health <- function(completed, computed_delay_in_months, forecasted_months_delayed, actual_months_delayed) {
+  #' @description: project health string as a function of the above data.
+  #' @todo: ask managers to enter data correctly. This is a simple function and
+  #' I don't want to write a function that takes all kinds of exceptions into consideration.
+  #' Good data practices go a long way.
+
+  #' TODO: This is makes a tag for each project, indicating how late... but we may not need this.
+  #' delay <- ifelse(completed,
+  #'
+  #'                 ifelse(computed_delay_in_months > 0,
+  #'
+  #'                        paste("late", computed_delay_in_months, sep = "-"),
+  #'
+  #'                        ifelse(computed_delay_in_months < 0,
+  #'                               paste("early", -1 * computed_delay_in_months, sep = "-"),
+  #'                               paste("ontime", computed_delay_in_months, sep = "-"))),
+  #'
+  #'
+  #'                 ifelse(is.na(forecasted_months_delayed),
+  #'
+  #'                        ifelse(is.na(actual_months_delayed), 0, actual_months_delayed),
+  #'
+  #'                        forecasted_months_delayed)
+  #' )
+
+  delay <- ifelse(completed,
+
+                  computed_delay_in_months,
+
+                  ifelse(is.na(forecasted_months_delayed),
+
+                         ifelse(is.na(actual_months_delayed), 0, actual_months_delayed),
+
+                         forecasted_months_delayed)
+  )
+
+  #' @todo: paste(completed, delay, sep = "-")
+
+  ifelse(completed,
+         "completed",
+         ifelse(0 < delay & delay <= 3,
+                "within-3-months",
+                ifelse(3 < delay & delay <= 6,
+                       "within-3-to-6-months",
+                       "more-than-6-months")))
+}
+
 schedule %<>%
   mutate(
-    Forecasted_Months_delayed = gsub(pattern = "[A-Z a-z \\s]+", x = Schedule.Health.Standard, replacement = ""),
-    Actual_Months_delayed     = gsub(pattern = "[A-Z a-z \\s]+", x = Schedule.Health, replacement = ""))
+    Completed                                          = grepl(pattern = "completed", x = Schedule.Health.Standard, ignore.case = T),
+    Computed_Delay_in_Days                             = Actual_date - Approved_finish_date,
+    Computed_Delay_in_Months                           = as.integer((Actual_date - Approved_finish_date)/30),
+    Schedule.Health.Standard_Forecasted_Months_delayed = gsub(pattern = "[A-Z a-z ,.() \\s]+", x = Schedule.Health.Standard, replacement = "") %>% as.integer(),
+    Schedule.Health.Actual_Months_delayed              = gsub(pattern = "[A-Z a-z ,.() \\s]+", x = Schedule.Health, replacement = "") %>% as.integer(),
+    Health                                             = health(Completed,
+                                                                Computed_Delay_in_Months,
+                                                                Schedule.Health.Standard_Forecasted_Months_delayed,
+                                                                Schedule.Health.Actual_Months_delayed))

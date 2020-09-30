@@ -280,33 +280,8 @@ shinyServer(function(input, output, session) {
      df <- schedule
     } else {
      df <- schedule %>%
-       filter(not(grepl("completed", Schedule.Health, ignore.case = T)))
+       filter(not(grepl("completed", Health, ignore.case = T)))
     }
-
-    .lateness <- function(row) {
-      #' @description: how late, 1, 2, 3, 4 etc... months
-      ifelse(is.na(row["days-delayed"]),
-             "not-completed",
-             ifelse(row["days-delayed"] > 0, "late", "on-time"))
-
-
-      #' look at Schedule.Health.Standard, get the number of months forecasted.
-      #' color code based on number of months.
-    }
-
-    .completeness <- function(row) {
-      #' @description: is the project complete or not?
-      #'
-      #' if has an actual date, then complete.
-      #'
-      ifelse(grepl("completed", row["Schedule.Health"], ignore.case = T),
-             "completed",
-             "notcompleted")
-    }
-
-    df["days-delayed"] <- df["Actual_date"] - df["Approved_finish_date"]
-    df["lateness"] <- apply(df, 1, .lateness)
-    df["completeness"] <- apply(df, 1, .completeness)
 
     .className <- function(row) { paste0("ip_", row["IP"]) }
 
@@ -320,20 +295,18 @@ shinyServer(function(input, output, session) {
 
       sprintf("
               <div class='%s'>
-                  <div class='%s'>
-                      <div style='padding: 4px'>
-                          <span> %s </span> &nbsp;
-                          <span> (%s) </span>
-                          <br>
-                          <span style='font-weight: bold'> %s </span>
-                          <br>
-                          <span> Approved Finish Date: %s </span> &nbsp;
-                          <span> Actual Date: %s </span>
-                      </div>
+                  <div style='padding: 4px'>
+                      <span> %s </span> &nbsp;
+                      <span> (%s) </span>
+                      <br>
+                      <span style='font-weight: bold'> %s </span>
+                      <br>
+                      <span> Approved Finish Date: %s </span> &nbsp;
+                      <span> Actual Date: %s </span>
                   </div>
               </div>",
-              row["completeness"],
-              row["lateness"],
+
+              row["Health"],
               row["Project"],
               row["Directorate"],
 
@@ -361,6 +334,38 @@ shinyServer(function(input, output, session) {
       end     = rep(NA, nrow(df)),
       group = df["IP"],
       className = df["className"])
+
+
+    observeEvent(
+      eventExpr = input$reset,
+      handlerExpr = {
+        updateDateRangeInput(
+          session,
+          "date",
+          start = Sys.Date()-10,
+          end = Sys.Date()-5
+        )
+      })
+
+
+    observeEvent(
+      eventExpr = input$reset,
+      handlerExpr = {
+        reset("main-page-date-slider")
+      })
+
+
+    observeEvent( input$go, {
+      # Empties the text input
+      orginal_start <- ""
+      original_end  <- ""
+
+      updateTextInput(
+        session,
+        "text",
+        value = "")
+    })
+
 
     data %<>%
       filter(start >= input$`main-page-date-slider`[1]) %>%
