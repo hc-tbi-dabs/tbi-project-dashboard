@@ -1,13 +1,3 @@
-library(lubridate)
-library(rmarkdown)
-library(htmltools)
-library(shinydashboard)
-library(shinydashboardPlus)
-library(timevis)
-library(webshot)
-library(scales)
-library(shinythemes)
-library(dashboardthemes)
 
 #' @todo: capitalists want to cut up your life and fight over who gets to own
 #' the pieces.
@@ -373,21 +363,22 @@ body <- dashboardBody(
             min = min_date,
             max = max_date),
 
-          actionButton("go","Go"),
-          actionButton("undo","Undo"),
-          actionButton("reset","Reset")
+          actionButton("timevis-reset-button", "Reset")
 
           ),
 
           boxPlus(
-            title = "Filters:",
           status = "navy",
           closable = F,
           collapsed = F,
           collapsible = F,
-          checkboxInput("show-completed", label = "Show Completed", value = F),
-          checkboxInput("show-late",      label = "Show Late", value = F),
-          checkboxInput("show-ontime",    label = "Show On Time", value = F)),
+          radioButtons("timevis-data-filters",
+                             "Data Filters to Apply:",
+                             choices = c("Default",
+                                         "Only Late",
+                                         "Only Finished",
+                                         "Only On time"))
+          ),
         box(
           solidHeader = T,
           width = 12,
