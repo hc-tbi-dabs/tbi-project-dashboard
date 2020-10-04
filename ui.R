@@ -139,14 +139,11 @@ body <- dashboardBody(
           boxToolSize   = "md",
           closable      = F,
           collapsible   = T,
-          title = "Progress",
+          title = "Health Status",
          footer = tagList(
           dashboardLabel("Green Health", status = "success"),
           dashboardLabel("Yellow Health", status = "warning"),
-          dashboardLabel("Red Health", status = "danger")
-
-
-        ),
+          dashboardLabel("Red Health", status = "danger")),
 
 
               #' @todo: code should be repeated call to a function, not so much
@@ -293,21 +290,18 @@ body <- dashboardBody(
         width = 12,
           collapsible = T,
           closable = F,
-        title = "Balance",
+        title = "Budget Status",
           status = "success",
-
-
-           box(
-            width = 4,
+        box(
+          width = 4,
           collapsible = F,
           closable = F,
           title = "Investment Planning Projects",
           status = "success",
           solidHeader = T,
           withSpinner(plotlyOutput("ip_projects_health"))),
-
-       box(
-            width = 4,
+        box(
+          width = 4,
           collapsible = F,
           closable = F,
           title = "Other IT Projects",
@@ -336,7 +330,7 @@ body <- dashboardBody(
       status = "info",
        collapsible = T,
        closable = F,
-       title = "Budget",
+       title = "Budget Details",
       width = 12,
       uiOutput("project_portfolio_budget"))),
 
