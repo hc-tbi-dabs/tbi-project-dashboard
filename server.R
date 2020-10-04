@@ -60,8 +60,8 @@ shinyServer(function(input, output, session) {
 
 
   ip_selected <- reactive({
-      list(ip = input$selectip, ips = all_proj$IP)
-    })
+    list(ip = input$selectip, ips = all_proj$IP)
+  })
 
 
   project_selected <- reactive({
@@ -72,7 +72,8 @@ shinyServer(function(input, output, session) {
 
   report_title <- reactive({
     ip <- input$selectip
-    project_title <- project_selected()$names[project_selected()$ip == ip]
+    project_title <-
+      project_selected()$names[project_selected()$ip == ip]
     ifelse(not(equals(ip, project_title)), paste(ip, project_title), ip)
   })
 
@@ -165,8 +166,10 @@ shinyServer(function(input, output, session) {
     budget_yr %>%
       filter(IP %in% ip_selected()$ips) %>%
       group_by(Year, year, `Authority vs. Expenditures`) %>%
-      summarise(Capital     = sum(Capital, na.rm = T),
-                Non_Capital = sum(Non_Capital, na.rm = T)) %>%
+      summarise(
+        Capital     = sum(Capital, na.rm = T),
+        Non_Capital = sum(Non_Capital, na.rm = T)
+      ) %>%
       budget_plot()
   })
 
@@ -178,7 +181,8 @@ shinyServer(function(input, output, session) {
         `Approved Budget`                         = sum(`Approved Budget`, na.rm = T),
         `Forecasted Total Expenditures`           = sum(`Forecasted Total Expenditures`, na.rm = T),
         `Expenditure to Date`                     = sum(`Expenditure to Date`, na.rm = T),
-        `Project Forecasted Expenditures 2020-21` = sum(`Variance / Remaining budget`, na.rm = T)) %>%
+        `Project Forecasted Expenditures 2020-21` = sum(`Variance / Remaining budget`, na.rm = T)
+      ) %>%
       gather(cat) %>%
       budget_plot2()
   })
@@ -257,45 +261,92 @@ shinyServer(function(input, output, session) {
 
 
   output$timevis_plot_all <- timevis::renderTimevis({
-
     filters <- list(
-      "Default"       = c("within-3-months", "within-3-to-6-months", "more-than-6-months"),
-      "Only Late"     = c("within-3-to-6-months", "more-than-6-months"),
-      "Only Finished" = c("completed"),
-      "Only On time"  = c("within-3-months")
-   )
+      "default"    = c(
+        "incomplete-within-3-months",
+        "incomplete-within-3-to-6-months",
+        "incomplete-more-than-6-months"
+      ),
+      "late"       = c(
+        "incomplete-within-3-to-6-months",
+        "incomplete-more-than-6-months"
+      ),
+      "completed"   = c(
+        "completed-within-3-months",
+        "completed-within-3-to-6-months",
+        "completed-more-than-6-months"
+      ),
+      "ontime"      = c("incomplete-within-3-months"),
+      "all"         = c(
+        "incomplete-within-3-months",
+        "incomplete-3-to-6-months",
+        "incomplete-more-than-6-months",
+        "completed-within-3-months",
+        "completed-3-to-6-months",
+        "completed-more-than-6-months"
+      )
+    )
 
-    filter_list <- filters[[input$`timevis-data-filters`]]
+    df <- schedule %>%
+      filter(Health %in% filters[[input$timevis_data_radio]])
 
-    print(filter_list)
+    observeEvent(input$`main-page-date-slider`, {
+      setWindow(
+        id = "timevis_plot_all",
+        start = input$`main-page-date-slider`[1] %>% as_date(),
+        end = input$`main-page-date-slider`[2] %>% as_date()
+      )
+    })
 
-    df <- schedule %>% filter(Health %in% filter_list)
+    observeEvent(input$timevis_fit, {
+      fitWindow("timevis_plot_all")
+    })
+
+    observeEvent(input$timevis_year, {
+      setWindow(
+        id = "timevis_plot_all",
+        start = today() - years(1),
+        end = today() + months(1)
+      )
+    })
+
+    observeEvent(input$timevis_quarter, {
+      setWindow(
+        id = "timevis_plot_all",
+        start = today() - months(3),
+        end = today() + months(1)
+      )
+    })
+
+    observeEvent(input$timevis_center, {
+      centerTime("timevis_plot_all", today())
+    })
 
     .className <- function(row) {
       paste0("ip_", row["IP"])
     }
 
     .timevis_date <- function(row) {
-      ifelse(is.na(row["Actual_date"]),
-             row["Approved_finish_date"][[1]],
-             row["Actual_date"][[1]])
+      ifelse(not(is.na(row["Actual_date"])),
+             row["Actual_date"][[1]],
+             ifelse(not(is.na(row["Expected_completion_date"])),
+                    row["Expected_completion_date"][[1]],
+                    row["Approved_finish_date"][[1]]))
     }
 
     .makeContent <- function(row) {
       sprintf(
         "
-              <div class='%s'>
-                  <div style='padding: 4px'>
-                      <span> %s </span> &nbsp;
-                      <span> (%s) </span>
-                      <br>
-                      <span style='font-weight: bold'> %s </span>
-                      <br>
-                      <span> Approved Finish Date: %s </span> &nbsp;
-                      <span> Actual Date: %s </span>
-                  </div>
-              </div>",
-
+        <div class='%s'>
+          <div style='padding: 4px'>
+            <span> %s </span> &nbsp;
+            <span> (%s) </span>
+            <br>
+            <span style='font-weight: bold'> %s </span>
+            <br>
+          </div>
+        </div>
+        ",
         row["Health"],
         row["Project"],
         row["Directorate"],
@@ -304,10 +355,7 @@ shinyServer(function(input, output, session) {
           x = row["Major.Milestone"],
           pattern = ".*:\\s*",
           replacement = ""
-        ),
-
-        row["Approved_finish_date"],
-        row["Actual_date"]
+        )
       )
     }
 
@@ -321,35 +369,20 @@ shinyServer(function(input, output, session) {
 
     content <- apply(df, 1, .makeContent)
 
-    data_for_timevis <- df %>%
-      filter(timevis_date >= input$`main-page-date-slider`[1]) %>%
-      filter(timevis_date <= input$`main-page-date-slider`[2])
-
     data <- tibble(
-      id      = 1:nrow(data_for_timevis),
+      id      = 1:nrow(df),
       content = content,
-      start   = data_for_timevis["timevis_date"][[1]],
-      end     = rep(NA, nrow(data_for_timevis)),
-      group = data_for_timevis["IP"],
-      className = data_for_timevis["className"]
+      start   = df["timevis_date"][[1]],
+      end     = rep(NA, nrow(df)),
+      group = df["IP"],
+      className = df["className"]
     )
 
-    observeEvent(
-      eventExpr = input$`timevis-reset-button`,
-      handlerExpr = {
-        updateDateRangeInput(
-          session = session,
-          inputId = "main-page-date-slider",
-          start = min_date,
-          end = max_date
-          )
-        })
+    data_groups <-
+      tibble(id = unique(df["IP"]), content = unique(df["IP"]))
 
-
-    data_groups <- tibble(id = unique(df["IP"]), content = unique(df["IP"]))
-
-    options <- list(orientation = 'both')
-    timevis(data, groups = data_groups, options = options)
+    options <- list(orientation = "both")
+    timevis(data, groups = data_groups, options = options) %>% centerTime(today()) %>% fitWindow()
   })
 
 
@@ -391,6 +424,7 @@ shinyServer(function(input, output, session) {
       filter(!is.na(Approved_finish_date)) %>%
       filter(if (Schedule.Health.Standard == "completed") {
         Actual_date >= as.IDate(paste0(as.character(year(now(
+
         ))), "-01-01"))
       })
 
