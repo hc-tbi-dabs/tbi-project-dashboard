@@ -343,41 +343,44 @@ body <- dashboardBody(
         width = 12,
         title = "Fiscal Year Schedule",
         footer = "Tasks completed before 2020 are hidden.",
-        boxPlus(
-          status = "navy",
-          closable = F,
-          collapsed = F,
-          collapsible = F,
+        box(
+          title = "Filters by project status:",
+          width = 3,
+        radioButtons("timevis_data_radio",
+                     label = "",
+                     choices = list("Default view" = "default",
+                                    "Only late" = "late",
+                                    "Only on time" = "ontime",
+                                    "Only completed" = "completed",
+                                    "Show everything" = "all"),
+                     selected = "default")),
 
+        box(
+          title = "Filter by date:",
+          width = 3,
+        actionButton("timevis_quarter", "Only this quarter"),
+        actionButton("timevis_year", "Only this year")),
+        box(
+          width = 3,
+          title = "Custom date range:",
           dateRangeInput(
             start = min_date,
             end = max_date,
             inputId = "main-page-date-slider",
-            label = "Date Range",
+            label = "",
             min = min_date,
-            max = max_date),
-
-          actionButton("timevis-reset-button", "Reset")
-
-          ),
-
-          boxPlus(
-          status = "navy",
-          closable = F,
-          collapsed = F,
-          collapsible = F,
-          radioButtons("timevis-data-filters",
-                             "Data Filters to Apply:",
-                             choices = c("Default",
-                                         "Only Late",
-                                         "Only Finished",
-                                         "Only On time"))
-          ),
+            max = max_date)
+        ),
         box(
-          solidHeader = T,
-          width = 12,
-        withSpinner(timevisOutput("timevis_plot_all")))
-      )
+          title = "Adjust view:",
+          width = 3,
+        actionButton("timevis_center", "Center around today"),
+        actionButton("timevis_fit", "Fit all")
+        ),
+        br(),
+        br(),
+        box(width = 12,
+            withSpinner(timevisOutput("timevis_plot_all"))))
     )
     #' @todo: need to remove logout button, these BR are a work-aroud.
 
@@ -506,32 +509,56 @@ ui <- secure_app(
     body         = body,
     tags$head(
       tags$style(HTML("
-                        .within-3-months {
+                        .incomplete-within-3-months {
                            background-color: rgba(0, 255, 0, 0.1);
                            border: 2px solid rgba(0, 255, 0, 1);
                            border-radius: 3px;
                            margin: -7px -7px -7px -7px;
                          }
 
-                         .completed {
+                         .completed-within-3-months {
                            background-color: rgba(0, 0, 0, 0.5);
                            border: 2px solid rgba(0, 0, 0, 0.5);
                            border-radius: 3px;
                            margin: -7px -7px -7px -7px;
                          }
 
-                        .completed * {
+                        .completed-within-3-months * {
                          color: rgba(0, 0, 0, 0.3);
                         }
 
-                        .within-3-to-6-months {
+
+                         .completed-within-3-to-6-months {
+                           background-color: rgba(0, 0, 0, 0.5);
+                           border: 2px solid rgba(0, 0, 0, 0.5);
+                           border-radius: 3px;
+                           margin: -7px -7px -7px -7px;
+                         }
+
+                         .completed-within-3-to-6-months * {
+                         color: rgba(0, 0, 0, 0.3);
+                        }
+
+                         .completed-more-than-6-months {
+                           background-color: rgba(0, 0, 0, 0.5);
+                           border: 2px solid rgba(0, 0, 0, 0.5);
+                           border-radius: 3px;
+                           margin: -7px -7px -7px -7px;
+                         }
+
+
+                        .completed-more-than-6-months * {
+                         color: rgba(0, 0, 0, 0.3);
+                        }
+
+                        .incomplete-within-3-to-6-months {
                          background-color: rgba(255, 255, 0, 0.1);
                          border: 2px solid rgba(255, 255, 0, 1);
                          border-radius: 3px;
                          margin: -7px -7px -7px -7px;
                         }
 
-                        .more-than-6-months {
+                        .incomplete-more-than-6-months {
                          background-color: rgba(255, 0, 0, 0.1);
                          border: 2px solid rgba(255, 0, 0, 1);
                          border-radius: 3px;

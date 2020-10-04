@@ -230,22 +230,60 @@ green  <- status %>% filter(grepl("Green",   `Overall Project Health`, ignore.ca
 yellow <- status %>% filter(grepl("Yellow",  `Overall Project Health`, ignore.case = T))
 red    <- status %>% filter(grepl("Red",     `Overall Project Health`, ignore.case = T))
 
-health <- function(health_status) {
+completed <- function(completion_date) {
+  not(is.na(completion_date))
+}
+
+late <- function(completed, approved_finish_date, actual_date) {
+  ifelse(completed, approved_finish_date - actual_date, NA)
+}
+
+far_out <- function(completed, projection) {
+  ifelse(completed, NA, as.numeric(projection))
+}
+
+expected_completion_date <- function(completed, approved_finish_date, projection) {
   ifelse(
-    equals(health_status, "completed"),
-    "completed",
+    is.na(projection),
+    NA,
     ifelse(
-      equals(health_status, "3"),
-      "within-3-months",
-      ifelse(
-        equals(health_status, "3 to 6"),
-        "within-3-to-6-months",
-        ifelse(equals(health_status, "6"),
-               "more-than-6-months",
-               "error")
-      )
+      not(completed),
+      approved_finish_date + months(as.integer(projection)),
+      NA
     )
+  ) %>% as_date()
+}
+
+
+label <- function(indicator, months) {
+
+  ifelse(
+    months <= 3,
+    paste(indicator, "within-3-months", sep = "-"),
+    ifelse(
+      3 < months & months < 6,
+      paste(indicator, "within-3-to-6-months", sep = "-"),
+      ifelse(
+        months>= 6,
+        paste(indicator, "more-than-6-months", sep = "-"),
+        NA)
+    )
+  )
+
+}
+
+
+health_label <- function(late, far_out) {
+  ifelse(
+    is.na(late),
+    label("incomplete", far_out),
+    label("completed", late)
   )
 }
 
-schedule %<>% mutate(Health = health(Schedule.Health.Standard))
+
+schedule %<>% mutate(Completed = completed(Actual_date),
+                     Late = late(Completed, Approved_finish_date, Actual_date),
+                     Far_out = far_out(Completed, Schedule.Health.Standard),
+                     Expected_completion_date = expected_completion_date(Completed, Approved_finish_date, Far_out),
+                     Health = health_label(Late, Far_out))
