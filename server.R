@@ -339,18 +339,11 @@ shinyServer(function(input, output, session) {
         "
         <div class='%s'>
           <div style='padding: 4px'>
-            <span> %s </span> &nbsp;
-            <span> (%s) </span>
-            <br>
             <span style='font-weight: bold'> %s </span>
-            <br>
           </div>
         </div>
         ",
         row["Health"],
-        row["Project"],
-        row["Directorate"],
-
         gsub(
           x = row["Major.Milestone"],
           pattern = ".*:\\s*",
@@ -378,11 +371,28 @@ shinyServer(function(input, output, session) {
       className = df["className"]
     )
 
-    data_groups <-
-      tibble(id = unique(df["IP"]), content = unique(df["IP"]))
+    df %<>%
+      mutate(
+       IP_grouping_name = paste(
+         Directorate,
+         IP,
+         Project,
+         sep = " > "
+       ))
+
+    print(df["IP_grouping_name"])
+
+    data_groups <- tibble(
+      id = unique(df["IP"]),
+      content = unique(df["IP_grouping_name"]))
 
     options <- list(orientation = "both")
-    timevis(data, groups = data_groups, options = options) %>% centerTime(today()) %>% fitWindow()
+
+    timevis(data = data,
+            groups = data_groups,
+            options = options) %>%
+      centerTime(today()) %>%
+      fitWindow()
   })
 
 
