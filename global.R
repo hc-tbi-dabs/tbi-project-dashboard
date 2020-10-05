@@ -29,6 +29,17 @@ library(processx)
 library(rsconnect)
 library(webshot)
 library(timevis)
+library(lubridate)
+library(rmarkdown)
+library(htmltools)
+library(shinydashboard)
+library(shinydashboardPlus)
+library(timevis)
+library(webshot)
+library(scales)
+library(shinythemes)
+library(dashboardthemes)
+
 
 source('functions.R')
 
@@ -219,61 +230,60 @@ green  <- status %>% filter(grepl("Green",   `Overall Project Health`, ignore.ca
 yellow <- status %>% filter(grepl("Yellow",  `Overall Project Health`, ignore.case = T))
 red    <- status %>% filter(grepl("Red",     `Overall Project Health`, ignore.case = T))
 
-health <- function(completed, computed_delay_in_months, forecasted_months_delayed, actual_months_delayed) {
-  #' @description: project health string as a function of the above data.
-  #' @todo: ask managers to enter data correctly. This is a simple function and
-  #' I don't want to write a function that takes all kinds of exceptions into consideration.
-  #' Good data practices go a long way.
-
-  #' TODO: This is makes a tag for each project, indicating how late... but we may not need this.
-  #' delay <- ifelse(completed,
-  #'
-  #'                 ifelse(computed_delay_in_months > 0,
-  #'
-  #'                        paste("late", computed_delay_in_months, sep = "-"),
-  #'
-  #'                        ifelse(computed_delay_in_months < 0,
-  #'                               paste("early", -1 * computed_delay_in_months, sep = "-"),
-  #'                               paste("ontime", computed_delay_in_months, sep = "-"))),
-  #'
-  #'
-  #'                 ifelse(is.na(forecasted_months_delayed),
-  #'
-  #'                        ifelse(is.na(actual_months_delayed), 0, actual_months_delayed),
-  #'
-  #'                        forecasted_months_delayed)
-  #' )
-
-  delay <- ifelse(completed,
-
-                  computed_delay_in_months,
-
-                  ifelse(is.na(forecasted_months_delayed),
-
-                         ifelse(is.na(actual_months_delayed), 0, actual_months_delayed),
-
-                         forecasted_months_delayed)
-  )
-
-  #' @todo: paste(completed, delay, sep = "-")
-
-  ifelse(completed,
-         "completed",
-         ifelse(0 < delay & delay <= 3,
-                "within-3-months",
-                ifelse(3 < delay & delay <= 6,
-                       "within-3-to-6-months",
-                       "more-than-6-months")))
+completed <- function(completion_date) {
+  not(is.na(completion_date))
 }
 
-schedule %<>%
-  mutate(
-    Completed                                          = grepl(pattern = "completed", x = Schedule.Health.Standard, ignore.case = T),
-    Computed_Delay_in_Days                             = Actual_date - Approved_finish_date,
-    Computed_Delay_in_Months                           = as.integer((Actual_date - Approved_finish_date)/30),
-    Schedule.Health.Standard_Forecasted_Months_delayed = gsub(pattern = "[A-Z a-z ,.() \\s]+", x = Schedule.Health.Standard, replacement = "") %>% as.integer(),
-    Schedule.Health.Actual_Months_delayed              = gsub(pattern = "[A-Z a-z ,.() \\s]+", x = Schedule.Health, replacement = "") %>% as.integer(),
-    Health                                             = health(Completed,
-                                                                Computed_Delay_in_Months,
-                                                                Schedule.Health.Standard_Forecasted_Months_delayed,
-                                                                Schedule.Health.Actual_Months_delayed))
+late <- function(completed, approved_finish_date, actual_date) {
+  ifelse(completed, approved_finish_date - actual_date, NA)
+}
+
+far_out <- function(completed, projection) {
+  ifelse(completed, NA, as.numeric(projection))
+}
+
+expected_completion_date <- function(completed, approved_finish_date, projection) {
+  ifelse(
+    is.na(projection),
+    NA,
+    ifelse(
+      not(completed),
+      approved_finish_date + months(as.integer(projection)),
+      NA
+    )
+  ) %>% as_date()
+}
+
+
+label <- function(indicator, months) {
+
+  ifelse(
+    months <= 3,
+    paste(indicator, "within-3-months", sep = "-"),
+    ifelse(
+      3 < months & months < 6,
+      paste(indicator, "within-3-to-6-months", sep = "-"),
+      ifelse(
+        months>= 6,
+        paste(indicator, "more-than-6-months", sep = "-"),
+        NA)
+    )
+  )
+
+}
+
+
+health_label <- function(late, far_out) {
+  ifelse(
+    is.na(late),
+    label("incomplete", far_out),
+    label("completed", late)
+  )
+}
+
+
+schedule %<>% mutate(Completed = completed(Actual_date),
+                     Late = late(Completed, Approved_finish_date, Actual_date),
+                     Far_out = far_out(Completed, Schedule.Health.Standard),
+                     Expected_completion_date = expected_completion_date(Completed, Approved_finish_date, Far_out),
+                     Health = health_label(Late, Far_out))

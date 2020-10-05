@@ -11,30 +11,30 @@ shinyServer(function(input, output, session) {
     reactiveValuesToList(result_auth)
   })
 
-  result_auth <- secure_server(check_credentials = check_credentials(credentials))
+  result_auth <-
+    secure_server(check_credentials = check_credentials(credentials))
 
-  observeEvent(
-    eventExpr = input$contact,
-    handlerExpr = {
-      showModal(
-        modalDialog(
-          title = "Contact",
-          HTML(
-            paste(
-              "If you have technical questions regarding the application, please contact:",
-              br(),
-              br(),
-              "Jodi Qiao",
-              br(),
-              "Jr Data Scientist",
-              br(),
-              "Data Analytics and Business Solutions",
-              br(),
-              "TBI, POD",
-              br(),
-              "di.qiao@canada.ca; dqiao100@uottawa.ca")),
-          easyClose = T))
-      })
+  observeEvent(eventExpr = input$contact,
+               handlerExpr = {
+                 showModal(modalDialog(title = "Contact",
+                                       HTML(
+                                         paste(
+                                           "If you have technical questions regarding the application, please contact:",
+                                           br(),
+                                           br(),
+                                           "Jodi Qiao",
+                                           br(),
+                                           "Jr Data Scientist",
+                                           br(),
+                                           "Data Analytics and Business Solutions",
+                                           br(),
+                                           "TBI, POD",
+                                           br(),
+                                           "di.qiao@canada.ca; dqiao100@uottawa.ca"
+                                         )
+                                       ),
+                                       easyClose = T))
+               })
 
 
   output$project_name <- renderText({
@@ -59,7 +59,9 @@ shinyServer(function(input, output, session) {
   })
 
 
-  ip_selected <- reactive({ list(ip = input$selectip, ips = all_proj$IP) })
+  ip_selected <- reactive({
+    list(ip = input$selectip, ips = all_proj$IP)
+  })
 
 
   project_selected <- reactive({
@@ -72,18 +74,11 @@ shinyServer(function(input, output, session) {
     ip <- input$selectip
     project_title <-
       project_selected()$names[project_selected()$ip == ip]
-
-    if (ip != project_title) {
-      report_title <- paste(ip, project_title)
-    } else {
-      report_title <- ip
-    }
-    return(report_title)
+    ifelse(not(equals(ip, project_title)), paste(ip, project_title), ip)
   })
 
 
   df_budget_summary <- reactive({
-
     budget %>%
       filter(IP %in% ip_selected()$ips) %>%
       left_join(all_proj %>% select(IP = IP)) %>%
@@ -97,7 +92,7 @@ shinyServer(function(input, output, session) {
 
 
   df_budget_summary_individual <- reactive({
-       budget %>%
+    budget %>%
       filter(IP == input$selectip) %>%
       left_join(all_proj %>% select(IP = IP)) %>%
       summarise(
@@ -106,10 +101,7 @@ shinyServer(function(input, output, session) {
         `Expenditure to Date`                     = sum(`Expenditure to Date`, na.rm = T),
         `Project Forecasted Expenditures 2020-21` = sum(`Variance / Remaining budget`, na.rm = T)
       )
-
-
   })
-
 
 
   amount_approved_budget_individual <- reactive({
@@ -134,9 +126,6 @@ shinyServer(function(input, output, session) {
     .f <- dollar_format()
     .f(df_budget_summary_individual()[["Project Forecasted Expenditures 2020-21"]])
   })
-
-
-
 
   amount_approved_budget <- reactive({
     #' @todo: the following four expressions are like the same thing four
@@ -167,9 +156,9 @@ shinyServer(function(input, output, session) {
 
 
   output$individual_project_description <- renderText({
-    text <- status %>% filter(IP == input$selectip) %>%
-      select(`Project Objectives`)
-    text[[1]]
+    status %>%
+      filter(IP == input$selectip) %>%
+      select(`Project Objectives`)[[1]]
   })
 
 
@@ -179,9 +168,11 @@ shinyServer(function(input, output, session) {
       group_by(Year, year, `Authority vs. Expenditures`) %>%
       summarise(
         Capital     = sum(Capital, na.rm = T),
-        Non_Capital = sum(Non_Capital, na.rm = T)) %>%
+        Non_Capital = sum(Non_Capital, na.rm = T)
+      ) %>%
       budget_plot()
   })
+
 
   output$budget_all <- renderPlot({
     budget %>%
@@ -190,7 +181,8 @@ shinyServer(function(input, output, session) {
         `Approved Budget`                         = sum(`Approved Budget`, na.rm = T),
         `Forecasted Total Expenditures`           = sum(`Forecasted Total Expenditures`, na.rm = T),
         `Expenditure to Date`                     = sum(`Expenditure to Date`, na.rm = T),
-        `Project Forecasted Expenditures 2020-21` = sum(`Variance / Remaining budget`, na.rm = T)) %>%
+        `Project Forecasted Expenditures 2020-21` = sum(`Variance / Remaining budget`, na.rm = T)
+      ) %>%
       gather(cat) %>%
       budget_plot2()
   })
@@ -201,18 +193,19 @@ shinyServer(function(input, output, session) {
       filter(IP == input$selectip) %>%
       spread(`Authority vs. Expenditures`, Value) %>%
       select(-year) %>%
-      mutate_at(c("Capital",
-                  "Non_Capital",
-                  "Project Authority",
-                  "Project Expenditures"), dollar) %>%
-    datatable(
-      options = list(
+      mutate_at(c(
+        "Capital",
+        "Non_Capital",
+        "Project Authority",
+        "Project Expenditures"
+      ),
+      dollar) %>%
+      datatable(options = list(
         searching = FALSE,
         pageLength = 5,
         lengthMenu = c(5, 10, 15, 20),
         scrollX = T
-      )
-    )
+      ))
   })
 
 
@@ -227,13 +220,6 @@ shinyServer(function(input, output, session) {
       ) %>%
       mutate_at(c('capital', 'non_capital', 'value'), dollar)
 
-    # left_join(all_proj%>%select(IP=IP,internal_external=`Internal or External`))%>%
-    # group_by(var,Year,internal_external)%>%
-    # summarise(value=sum(value,na.rm=T))%>%
-    # mutate(value=dollar(value))%>%
-    # spread(var,value)
-
-    # Jodi added this scrollbar to the table that is too long
     datatable(
       data = ds,
       options = list(
@@ -275,57 +261,113 @@ shinyServer(function(input, output, session) {
 
 
   output$timevis_plot_all <- timevis::renderTimevis({
+    filters <- list(
+      "default"    = c(
+        "incomplete-within-3-months",
+        "incomplete-within-3-to-6-months",
+        "incomplete-more-than-6-months"
+      ),
+      "late"       = c(
+        "incomplete-within-3-to-6-months",
+        "incomplete-more-than-6-months"
+      ),
+      "completed"   = c(
+        "completed-within-3-months",
+        "completed-within-3-to-6-months",
+        "completed-more-than-6-months"
+      ),
+      "ontime"      = c("incomplete-within-3-months"),
+      "all"         = c(
+        "incomplete-within-3-months",
+        "incomplete-3-to-6-months",
+        "incomplete-more-than-6-months",
+        "completed-within-3-months",
+        "completed-3-to-6-months",
+        "completed-more-than-6-months"
+      )
+    )
 
-    if (input$`show-completed`) {
-     df <- schedule
-    } else {
-     df <- schedule %>%
-       filter(not(grepl("completed", Health, ignore.case = T)))
+    df <- schedule %>%
+      filter(Health %in% filters[[input$timevis_data_radio]])
+
+    observeEvent(input$`main-page-date-slider`, {
+      setWindow(
+        id = "timevis_plot_all",
+        start = input$`main-page-date-slider`[1] %>% as_date(),
+        end = input$`main-page-date-slider`[2] %>% as_date()
+      )
+    })
+
+    observeEvent(input$timevis_fit, {
+      fitWindow("timevis_plot_all")
+    })
+
+    observeEvent(input$timevis_year, {
+      setWindow(
+        id = "timevis_plot_all",
+        start = today() - years(1),
+        end = today() + months(1)
+      )
+    })
+
+    observeEvent(input$timevis_quarter, {
+      setWindow(
+        id = "timevis_plot_all",
+        start = today() - months(3),
+        end = today() + months(1)
+      )
+    })
+
+    observeEvent(input$timevis_center, {
+      centerTime("timevis_plot_all", today())
+    })
+
+    .className <- function(row) {
+      paste0("ip_", row["IP"])
     }
 
-    .className <- function(row) { paste0("ip_", row["IP"]) }
-
     .timevis_date <- function(row) {
-      ifelse(is.na(row["Actual_date"]),
-             row["Approved_finish_date"][[1]],
-             row["Actual_date"][[1]])
+      ifelse(not(is.na(row["Actual_date"])),
+             row["Actual_date"][[1]],
+             ifelse(not(is.na(row["Expected_completion_date"])),
+                    row["Expected_completion_date"][[1]],
+                    row["Approved_finish_date"][[1]]))
     }
 
     .makeContent <- function(row) {
+      sprintf(
+        "
+        <div class='%s'>
+          <div style='padding: 4px'>
+            <span> %s </span> &nbsp;
+            <span> (%s) </span>
+            <br>
+            <span style='font-weight: bold'> %s </span>
+            <br>
+          </div>
+        </div>
+        ",
+        row["Health"],
+        row["Project"],
+        row["Directorate"],
 
-      sprintf("
-              <div class='%s'>
-                  <div style='padding: 4px'>
-                      <span> %s </span> &nbsp;
-                      <span> (%s) </span>
-                      <br>
-                      <span style='font-weight: bold'> %s </span>
-                      <br>
-                      <span> Approved Finish Date: %s </span> &nbsp;
-                      <span> Actual Date: %s </span>
-                  </div>
-              </div>",
-
-              row["Health"],
-              row["Project"],
-              row["Directorate"],
-
-              gsub(x = row["Major.Milestone"], pattern = ".*:\\s*", replacement = ""),
-
-              row["Approved_finish_date"],
-              row["Actual_date"])
+        gsub(
+          x = row["Major.Milestone"],
+          pattern = ".*:\\s*",
+          replacement = ""
+        )
+      )
     }
 
-    df["className"] <- apply(X = df, MARGIN = 1, FUN = .className)
-    df["timevis_date"] <- apply(X = df, MARGIN = 1, FUN = .timevis_date)
+    df["className"] <- apply(X = df,
+                             MARGIN = 1,
+                             FUN = .className)
 
-    print("Class Name")
-    print(df["className"])
+    df["timevis_date"] <- apply(X = df,
+                                MARGIN = 1,
+                                FUN = .timevis_date)
 
     content <- apply(df, 1, .makeContent)
-
-    print(df["timevis_date"])
-    print(df["Approved_finish_date"])
 
     data <- tibble(
       id      = 1:nrow(df),
@@ -333,48 +375,14 @@ shinyServer(function(input, output, session) {
       start   = df["timevis_date"][[1]],
       end     = rep(NA, nrow(df)),
       group = df["IP"],
-      className = df["className"])
+      className = df["className"]
+    )
 
+    data_groups <-
+      tibble(id = unique(df["IP"]), content = unique(df["IP"]))
 
-    observeEvent(
-      eventExpr = input$reset,
-      handlerExpr = {
-        updateDateRangeInput(
-          session,
-          "date",
-          start = Sys.Date()-10,
-          end = Sys.Date()-5
-        )
-      })
-
-
-    observeEvent(
-      eventExpr = input$reset,
-      handlerExpr = {
-        reset("main-page-date-slider")
-      })
-
-
-    observeEvent( input$go, {
-      # Empties the text input
-      orginal_start <- ""
-      original_end  <- ""
-
-      updateTextInput(
-        session,
-        "text",
-        value = "")
-    })
-
-
-    data %<>%
-      filter(start >= input$`main-page-date-slider`[1]) %>%
-      filter(start <= input$`main-page-date-slider`[2])
-
-    data_groups <- tibble(id = unique(df["IP"]), content = unique(df["IP"]))
-
-    options <- list(orientation='both')
-    timevis(data, groups=data_groups, options=options)
+    options <- list(orientation = "both")
+    timevis(data, groups = data_groups, options = options) %>% centerTime(today()) %>% fitWindow()
   })
 
 
@@ -416,6 +424,7 @@ shinyServer(function(input, output, session) {
       filter(!is.na(Approved_finish_date)) %>%
       filter(if (Schedule.Health.Standard == "completed") {
         Actual_date >= as.IDate(paste0(as.character(year(now(
+
         ))), "-01-01"))
       })
 
@@ -569,8 +578,7 @@ shinyServer(function(input, output, session) {
 
   })
 
- output$a_team_projects_health <- renderPlotly({
-
+  output$a_team_projects_health <- renderPlotly({
     status$IP2 <- paste0(status$IP)
 
     df <- status %>%
@@ -579,17 +587,17 @@ shinyServer(function(input, output, session) {
       filter(IP %in% ip_selected()$ips) %>%
       left_join(budget[, c("IP", "Approved Budget")])
 
-    df$status <- factor(df$status, levels = c("On-Track", "Caution", "Delayed"))
+    df$status <-
+      factor(df$status, levels = c("On-Track", "Caution", "Delayed"))
 
     status_plot(df, "IP Projects") %>%
-    ggplotly(tooltip = "text") %>%
+      ggplotly(tooltip = "text") %>%
       config(displayModeBar = F) %>%
       layout(xaxis = list(showgrid = F),
              yaxis = list(showgrid = F))
   })
 
   output$ip_projects_health <- renderPlotly({
-
     status$IP2 <- paste0(status$IP)
 
     df <- status %>%
@@ -598,17 +606,17 @@ shinyServer(function(input, output, session) {
       filter(IP %in% ip_selected()$ips) %>%
       left_join(budget[, c("IP", "Approved Budget")])
 
-    df$status <- factor(df$status, levels = c("On-Track", "Caution", "Delayed"))
+    df$status <-
+      factor(df$status, levels = c("On-Track", "Caution", "Delayed"))
 
     status_plot(df, "IP Projects") %>%
-    ggplotly(tooltip = "text") %>%
+      ggplotly(tooltip = "text") %>%
       config(displayModeBar = F) %>%
       layout(xaxis = list(showgrid = F),
              yaxis = list(showgrid = F))
   })
 
   output$innovation_projects_health <- renderPlotly({
-
     status$IP2 <- paste0(status$IP)
 
     df <- status %>%
@@ -630,38 +638,42 @@ shinyServer(function(input, output, session) {
   })
 
   output$project_portfolio_budget_individual <- renderUI({
+    box(
+      title = "Budget Breakdown",
+      status = "info",
+      solidHeader = T,
+      width = 4,
 
-        box(
-          title = "Budget Breakdown",
-          status = "info",
-          solidHeader = T,
-          width = 4,
+      br(),
 
-          br(),
+      valueBox(
+        width = 12,
+        subtitle = "Approved Budget",
+        value = amount_approved_budget_individual(),
+        color = "aqua"
+      ),
 
-          valueBox(width = 12,
-                   subtitle = "Approved Budget",
-                   value = amount_approved_budget_individual(),
-                   color = "aqua"),
+      valueBox(
+        width = 12,
+        subtitle = "Expenditures to Date",
+        value = amount_expenditure_to_date_individual(),
+        color = "aqua"
+      ),
 
-          valueBox(width = 12,
-                   subtitle = "Expenditures to Date",
-                   value = amount_expenditure_to_date_individual(),
-                   color = "aqua"),
+      valueBox(
+        width = 12,
+        subtitle = "Forecasted Total Expenditure",
+        value = amount_forecasted_total_expenditures_individual(),
+        color = "aqua"
+      ),
 
-          valueBox(
-            width = 12,
-            subtitle = "Forecasted Total Expenditure",
-            value = amount_forecasted_total_expenditures_individual(),
-            color = "aqua"),
+      #  valueBox(
+      #    width = 12,
+      #    subtitle = "Project Forecasted Expenditures",
+      #    value = amount_project_forecasted_expenditures_individual(),
+      #    color = "aqua")
 
-         #  valueBox(
-         #    width = 12,
-         #    subtitle = "Project Forecasted Expenditures",
-         #    value = amount_project_forecasted_expenditures_individual(),
-         #    color = "aqua")
-
-          )
+    )
   })
 
 
@@ -683,49 +695,45 @@ shinyServer(function(input, output, session) {
             dashboardBadge("Project Expenditure",            color = "purple"),
             dashboardBadge("Project Authority: Non Capital", color = "teal"),
             dashboardBadge("Project Authority: Capital",     color = "orange")
-          )),
+          )
+      ),
 
-        box(
-          title = "Budget Breakdown",
-          status = "info",
-          solidHeader = T,
-          width = 4,
+      box(
+        title = "Budget Breakdown",
+        status = "info",
+        solidHeader = T,
+        width = 4,
 
-          br(),
+        br(),
 
-          valueBox(width = 12,
-                   subtitle = "Approved Budget",
-                   value = amount_approved_budget(),
-                   color = "aqua"),
+        valueBox(
+          width = 12,
+          subtitle = "Approved Budget",
+          value = amount_approved_budget(),
+          color = "aqua"
+        ),
 
-          valueBox(width = 12,
-                   subtitle = "Expenditures to Date",
-                   value = amount_expenditure_to_date(),
-                   color = "aqua"),
+        valueBox(
+          width = 12,
+          subtitle = "Expenditures to Date",
+          value = amount_expenditure_to_date(),
+          color = "aqua"
+        ),
 
-          valueBox(
-            width = 12,
-            subtitle = "Forecasted Total Expenditures",
-            value = amount_forecasted_total_expenditures(),
-            color = "aqua"),
-
-          # valueBox(
-          #   width = 12,
-          #   subtitle = "Project Forecasted Expenditures",
-          #   value = amount_project_forecasted_expenditures(),
-          #   color = "aqua"),
-
+        valueBox(
+          width = 12,
+          subtitle = "Forecasted Total Expenditures",
+          value = amount_forecasted_total_expenditures(),
+          color = "aqua"
         )
       )
+    )
 
   })
 
 
   summary_status_and_count <- reactive({
     #' @todo: is this code necessary for anything?
-    #' all_proj$IP2<-paste0(all_proj$IP,':\n',substr(all_proj$`Internal or External`,1,1))
-    #'
-
 
     .status <- function(col) {
       col
