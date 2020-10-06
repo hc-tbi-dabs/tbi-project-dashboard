@@ -1,15 +1,26 @@
-# TBI-Project-Dashboard
+# Technology and Business Innovation Branch
+## Project Portfolio Management Dashboard
 
-TBI-Project-Dashboard displays information on schedule, milestones, budget, stage and project health for all IP and SF projects at Technology and Business Inovation branch (TBI). The dashboard was built using R Shiny.
+**Built with R Shiny.**
+
+<br>
+<br>
+<center>
+![Logo](./ppm-logo.png)
+</center>
+<br>
+<br>
+
+TBI Project Portfolio Management Dashboard (TBI PPMD) displays information on schedule, milestones, budget, stage and project health for all IP and SF projects at Technology and Business Innovation Branch (TBI). 
 
 The application consists of:
-- [ui.R](https://github.com/hc-tbi-dabs/TBI-Project-Dashboard/blob/master/ui.R) : defines user interface of the application
-- [server.R](https://github.com/hc-tbi-dabs/TBI-Project-Dashboard/blob/master/server.R) : defines server components of the application
-- [global.R](https://github.com/hc-tbi-dabs/TBI-Project-Dashboard/blob/master/global.R) : loads libraries and data needed for the application
-- [functions.R](https://github.com/hc-tbi-dabs/TBI-Project-Dashboard/blob/master/functions.R) : extra functions, dependencies needed
 
-Next steps:
-- collect data from PMs
-- host the application in the HPFB server
+- ui.R: User interface of the application.
 
-Author: HPFB
+- server.R: Server components of the application.
+
+- global.R: Libraries and data needed for the application.
+
+- functions.R: Extra functions.
+
+TBI PPMD
