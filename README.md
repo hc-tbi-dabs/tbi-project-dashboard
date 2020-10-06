@@ -5,9 +5,9 @@
 
 <br>
 <br>
-<center>
-![Logo](./ppm-logo.png)
-</center>
+<p align="center">
+  <img src="./ppm-logo.png">
+</p>
 <br>
 <br>
 
