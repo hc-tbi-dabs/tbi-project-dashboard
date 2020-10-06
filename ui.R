@@ -285,14 +285,24 @@ body <- dashboardBody(tabItems(
               X = stream_2,
               MARGIN = 1,
               FUN = function(x)
-                (colorfulDashboardBadge(x))
-            ))
+                (colorfulDashboardBadge(x))))
           )
-
-
-
         )
       ),
+
+
+      column(
+        width = 12,
+        box(
+          status = "info",
+          collapsible = T,
+          closable = F,
+          title = "Overall Budget",
+          width = 12,
+          uiOutput("project_portfolio_budget")
+        )
+      ),
+
       column(
         width = 12,
 
@@ -300,7 +310,7 @@ body <- dashboardBody(tabItems(
           width = 12,
           collapsible = T,
           closable = F,
-          title = "Budget Status",
+          title = "Budget Details",
           status = "success",
           box(
             width = 4,
@@ -311,6 +321,7 @@ body <- dashboardBody(tabItems(
             solidHeader = T,
             withSpinner(plotlyOutput("ip_projects_health"))
           ),
+
           box(
             width = 4,
             collapsible = F,
@@ -330,8 +341,6 @@ body <- dashboardBody(tabItems(
             status = "success",
             withSpinner(plotlyOutput("innovation_projects_health"))
           ),
-
-
           footer = tagList(
             dashboardLabel("On Track", status = "success"),
             dashboardLabel("Caution", status = "warning"),
@@ -340,17 +349,6 @@ body <- dashboardBody(tabItems(
         )
       ),
 
-      column(
-        width = 12,
-        box(
-          status = "info",
-          collapsible = T,
-          closable = F,
-          title = "Budget Details",
-          width = 12,
-          uiOutput("project_portfolio_budget")
-        )
-      ),
 
       column(
         width = 12,
@@ -361,10 +359,7 @@ body <- dashboardBody(tabItems(
           width = 12,
           title = "Fiscal Year Schedule",
           footer = tagList(
-            dashboardLabel(
-              "On track to be completed within 3 months of approved finish date.",
-              status = "success"
-            ),
+            dashboardLabel("On track to be completed within 3 months of approved finish date.", status = "success"),
             dashboardLabel("Delayed by 3 to 6 months.", status = "warning"),
             dashboardLabel("More than 6 months delayed.", status = "danger")
           ),
