@@ -3,6 +3,5 @@
 .RData
 .Ruserdata
 rsconnect/
-packrat/
 *~*
 packrat/lib*/
