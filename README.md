@@ -24,3 +24,15 @@ The application consists of:
 - functions.R: Extra functions.
 
 TBI PPMD
+
+## Updating data:
+
+There are some tricks to getting new data files to work.
+
+1. You must rename some of the columns so the column names do not contain any new line characters.
+
+2. In the Schedule tab you need to change some of the Schedule.Health.Standard entries to say one of either:
+  - 3
+  - 4.5
+  - 6
+  - completed

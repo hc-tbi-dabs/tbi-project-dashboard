@@ -156,9 +156,10 @@ shinyServer(function(input, output, session) {
 
 
   output$individual_project_description <- renderText({
-    status %>%
-      filter(IP == input$selectip) %>%
-      select(`Project Objectives`)[[1]]
+    df <- status %>%
+      filter(IP == input$selectip)
+
+    df$obj[[1]]
   })
 
 
