@@ -37,6 +37,13 @@
       "Repository": "CRAN",
       "Hash": "d1bc1c8e9c0ace57ec9ffea01021d45f"
     },
+    "Matrix": {
+      "Package": "Matrix",
+      "Version": "1.3-3",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "df57c82e79600601287edfdcef92c2d6"
+    },
     "R.methodsS3": {
       "Package": "R.methodsS3",
       "Version": "1.8.1",
@@ -513,13 +520,6 @@
       "Repository": "CRAN",
       "Hash": "58baa74e4603fcfb9a94401c58c8f9b1"
     },
-    "methods": {
-      "Package": "methods",
-      "Version": "3.6.2",
-      "Source": "Repository",
-      "Repository": null,
-      "Hash": "5680b062465d8e294625d8fe3614288d"
-    },
     "mgcv": {
       "Package": "mgcv",
       "Version": "1.8-33",
@@ -926,13 +926,6 @@
       "Repository": "CRAN",
       "Hash": "db6477efcfbffcd9b3758c3c2882cf58"
     },
-    "tools": {
-      "Package": "tools",
-      "Version": "3.6.2",
-      "Source": "Repository",
-      "Repository": null,
-      "Hash": "307ace7f966ce33187caa7fd4ffdcfa7"
-    },
     "usethis": {
       "Package": "usethis",
       "Version": "1.6.3",
@@ -946,13 +939,6 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "4a5081acfb7b81a572e4384a7aaf2af1"
-    },
-    "utils": {
-      "Package": "utils",
-      "Version": "3.6.2",
-      "Source": "Repository",
-      "Repository": null,
-      "Hash": "fd1716d41b57f6ad82a6065093c1d338"
     },
     "vctrs": {
       "Package": "vctrs",

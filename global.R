@@ -78,7 +78,7 @@ schedule    <- read_excel('dattbi-nov-18-2020.xlsx', 2)
 budget      <- read_excel('dattbi-nov-18-2020.xlsx', 3)
 budget_yr   <- read_excel('dattbi-nov-18-2020.xlsx', 4)
 status      <- read_excel('dattbi-nov-18-2020.xlsx', 5) #' all_proj in old
-#' all_proj    <- read_excel('dattbi-nov-18-2020.xlsx', 5)
+all_proj    <- read_excel('dattbi-nov-18-2020.xlsx', 5)
 proj_risk   <- read_excel('dattbi-nov-18-2020.xlsx', 6)
 proj_issue  <- read_excel('dattbi-nov-18-2020.xlsx', 7)
 capital     <- read_excel('dattbi-nov-18-2020.xlsx', 8)
